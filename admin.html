@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <script>
-    // 云端配置与密钥
+    // 云端配置与密钥（已补全字母 y）
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
     const { createClient } = supabase;
@@ -17,7 +17,6 @@
     const ADMIN_PIN = "8888";
     let allDishes = [];
 
-    // 验证登录密码
     function checkPin() {
       const pin = document.getElementById('pin-input').value.trim();
       if (pin === ADMIN_PIN) {
@@ -39,7 +38,6 @@
       window.location.reload();
     }
 
-    // 从 Supabase 拉取全部菜品
     async function fetchDishes() {
       const container = document.getElementById('dish-list');
       container.innerHTML = '<div class="text-center py-10 text-gray-400 text-xs">Cargando platos desde la nube...</div>';
@@ -53,7 +51,6 @@
       renderList(allDishes);
     }
 
-    // 渲染管理卡片
     function renderList(list) {
       const container = document.getElementById('dish-list');
       if (list.length === 0) {
@@ -136,7 +133,6 @@
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
 
-  <!-- 登录遮罩层 -->
   <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
       <div class="text-4xl mb-3">🔒</div>
@@ -148,7 +144,6 @@
     </div>
   </div>
 
-  <!-- 后台主界面 -->
   <div id="admin-panel" class="hidden max-w-2xl mx-auto pb-12">
     <header class="bg-white border-b sticky top-0 z-20 px-4 py-3 shadow-sm flex justify-between items-center">
       <div>
