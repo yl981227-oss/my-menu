@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Menú Online - Comida China</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* 隐藏横向滚动条但保持可滑动 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 pb-28">
 
-  <!-- 顶部店铺招牌 -->
+  <!-- 顶部招牌 -->
   <header class="bg-red-700 text-white p-4 shadow-md sticky top-0 z-20">
     <div class="flex justify-between items-center">
       <div>
@@ -55,7 +55,7 @@
 
   <!-- 菜单主要展示区 -->
   <main id="menu-container" class="px-3 space-y-6">
-    <!-- 各系列与菜品将由 JavaScript 自动渲染 -->
+    <div class="text-center py-16 text-gray-400 text-xs">Cargando menú actualizado...</div>
   </main>
 
   <!-- 底部购物车条 -->
@@ -69,7 +69,7 @@
     </button>
   </footer>
 
-  <!-- 1. 菜品规格定制弹窗 (Modal de Opciones) -->
+  <!-- 菜品定制弹窗 -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-start border-b pb-3 mb-3">
@@ -80,7 +80,7 @@
         <button onclick="closeOptionModal()" class="text-gray-400 text-2xl font-bold ml-2">&times;</button>
       </div>
 
-      <!-- 配菜选择（仅限 Colaciones） -->
+      <!-- 配餐选择（限便当） -->
       <div id="colacion-side-box" class="hidden mb-4">
         <label class="block text-xs font-bold text-gray-700 mb-1.5">Acompañamiento (配餐选择) *</label>
         <div class="space-y-1.5 text-xs">
@@ -99,7 +99,7 @@
         </div>
       </div>
 
-      <!-- 辣度选项 -->
+      <!-- 辣度 -->
       <div class="mb-4">
         <label class="block text-xs font-bold text-gray-700 mb-1.5">Nivel de Ají (辣度) *</label>
         <div class="grid grid-cols-3 gap-2 text-xs">
@@ -157,7 +157,7 @@
     </div>
   </div>
 
-  <!-- 2. 最终结账弹窗 (Modal de Checkout) -->
+  <!-- 结账弹窗 -->
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-3 border-b pb-2">
@@ -165,12 +165,8 @@
         <button onclick="closeCheckoutModal()" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
-      <!-- 购物车已选列表 -->
-      <div id="cart-items-preview" class="space-y-2 mb-4 max-h-40 overflow-y-auto divide-y text-xs">
-        <!-- 购物车内明细由 JS 生成 -->
-      </div>
+      <div id="cart-items-preview" class="space-y-2 mb-4 max-h-40 overflow-y-auto divide-y text-xs"></div>
 
-      <!-- 客户信息填写 -->
       <div class="space-y-2.5">
         <div>
           <label class="block text-[11px] font-bold text-gray-600 mb-1">Nombre completo *</label>
@@ -214,275 +210,103 @@
   </div>
 
   <script>
-    // 你的 WhatsApp 接单号码（智利区号 56 + 9位手机号）
     const MY_WHATSAPP_NUMBER = "56974142810";
+    const SUPABASE_URL = "https://ecjxlhhhwxsqtwbujxr.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zsz2aqNTmTWCq5iqtOjCbQ_AHTV5jku";
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 完整的菜单分类与菜品数据库（100% 录入菜单内容）
-    const menuData = [
-      {
-        id: "cat-menus",
-        title: "🍱 MENÚS COMBINADOS (家庭套餐)",
-        items: [
-          { id: 101, name: "Menú 1 persona A", price: 14500, desc: "1 wantán frito (10u), 1 chapsui de pollo, 1 arroz chaufán" },
-          { id: 102, name: "Menú 1 persona B", price: 15300, desc: "1 wantán frito (10u), 1 carne mongoliana, 1 arroz chaufán" },
-          { id: 103, name: "Menú 2 personas A", price: 25800, desc: "1 wantán frito, 1 diente dragón pollo, 1 chapsui carne, 2 arroz chaufán" },
-          { id: 104, name: "Menú 2 personas B", price: 26800, desc: "1 wantán frito, 1 carne mongoliana, 1 chapsui pollo, 2 arroz chaufán" },
-          { id: 105, name: "Menú 3 personas", price: 40900, desc: "1 wantán frito, 1 arrollado primavera, 1 diente dragón pollo, 1 carne mongoliana, 1 chapsui carne, 3 arroz chaufán" },
-          { id: 106, name: "Menú 4 personas", price: 52500, desc: "1 wantán frito, 1 arrollado primavera, 1 diente dragón pollo, 1 carne mongoliana, 1 arrollado marisco, 1 chapsui carne, 4 arroz chaufán" },
-          { id: 107, name: "Menú 5 personas", price: 58900, desc: "2 wantán frito, 1 arrollado primavera, 1 diente dragón pollo, 1 carne mongoliana, 1 arrollado marisco, 1 chapsui carne, 5 arroz chaufán" },
-          { id: 108, name: "Menú 6 personas", price: 74500, desc: "2 wantán frito, 1 arrollado primavera, 1 diente dragón pollo, 1 carne mongoliana, 1 arrollado marisco, 1 chapsui especial, 1 costillar cantonés, 6 arroz chaufán" },
-          { id: 109, name: "Menú 8 personas", price: 99800, desc: "2 wantán frito, 2 arrollado primavera, 1 diente dragón pollo, 1 carne mongoliana, 1 chapsui carne, 1 arrollado marisco, 1 chapsui pollo, 1 chapsui especial, 1 costillar cantonés, 8 arroz chaufán" },
-          { id: 110, name: "Menú 10 personas", price: 116900, desc: "3 wantán frito, 2 arrollado primavera, 2 diente dragón pollo, 1 carne mongoliana, 1 chapsui carne, 1 arrollado marisco, 1 pollo chitén, 1 chapsui especial, 1 costillar cantonés, 10 arroz chaufán" }
-        ]
-      },
-      {
-        id: "cat-colaciones",
-        title: "🍛 COLACIONES (便当快餐)",
-        items: [
-          { id: 201, name: "Colación Chapsui Verduras", price: 7000, desc: "Verduras surtidas al wok + Acompañamiento a elección", isColacion: true },
-          { id: 202, name: "Colación Chapsui Pollo ó Carne", price: 7000, desc: "Pollo o vacuno con verduras + Acompañamiento", isColacion: true },
-          { id: 203, name: "Colación Diente Dragón Carne ó Pollo", price: 7000, desc: "Brotes salteados con carne o pollo + Acompañamiento", isColacion: true },
-          { id: 204, name: "Colación Pollo Mongoliano", price: 7300, desc: "Pollo tierno con cebollín + Acompañamiento", isColacion: true },
-          { id: 205, name: "Colación Carne Mongoliana", price: 7500, desc: "Carne de vacuno con cebollín + Acompañamiento", isColacion: true },
-          { id: 206, name: "Colación Carne Pollo Mixto Mongoliano", price: 7500, desc: "Carne y pollo salteado con cebollín + Acompañamiento", isColacion: true },
-          { id: 207, name: "Colación Costillar Cantonés", price: 7500, desc: "Cerdo frito crocante con piña agridulce + Acompañamiento", isColacion: true },
-          { id: 208, name: "Colación Chapsui Especial", price: 8600, desc: "Pollo, carne, camarón y verduras + Acompañamiento", isColacion: true },
-          { id: 209, name: "Colación Chapsui Camarón", price: 9000, desc: "Camarones con verduras surtidas + Acompañamiento", isColacion: true },
-          { id: 210, name: "Colación Carne Sola", price: 8300, desc: "Porción de carne sola + Acompañamiento", isColacion: true },
-          { id: 211, name: "Colación Pollo Solo", price: 8000, desc: "Porción de pollo solo + Acompañamiento", isColacion: true }
-        ]
-      },
-      {
-        id: "cat-aperitivos",
-        title: "🥟 EL APERITIVO (点心小吃)",
-        items: [
-          { id: 301, name: "BAO (Pan Chino 1 Unidad)", price: 1500, desc: "Cerdo, Pollo, Verduras ó Poroto Dulce" },
-          { id: 302, name: "BAO Promoción (3 Unidades)", price: 3900, desc: "3 unidades de pan chino surtido o a elección" },
-          { id: 303, name: "WANTAN ESPECIAL (10 u.)", price: 7200, desc: "Masa rellena con queso crema y camarón" },
-          { id: 304, name: "WANTAN FRITO (10 u.)", price: 3600, desc: "Hoja de masa frita crujiente con salsa tamarindo" },
-          { id: 305, name: "HOJAS CAMARÓN (15 u.)", price: 3300, desc: "Masa crujiente con sabor a camarón" },
-          { id: 306, name: "ARROLLADO PRIMAVERA (5 u.)", price: 4200, desc: "Rollitos rellenos de carne y verduras" },
-          { id: 307, name: "ARROLLADO QUESO (5 u.)", price: 5200, desc: "Rollitos fritos rellenos de queso derretido" },
-          { id: 308, name: "ARROLLADO JAMÓN/QUESO (5 u.)", price: 5200, desc: "Rollitos rellenos de queso y jamón" },
-          { id: 309, name: "POLLO MANDARIN (5 u.)", price: 5900, desc: "Empanada rellena con pollo y cebollín" },
-          { id: 310, name: "AJÍ RELLENO (6 u.)", price: 7800, desc: "Ají relleno de pescado frito" },
-          { id: 311, name: "CAMARÓN QUESO (5 u.)", price: 6500, desc: "Empanada frita de camarón queso y cebollín" },
-          { id: 312, name: "COPA DE ORO (6 u.)", price: 7200, desc: "Masa frita rellena de pollo, verduras y camarón" },
-          { id: 313, name: "CAMARON MANDARÍN (5 u.)", price: 6500, desc: "Empanada de camarón y cebollín" },
-          { id: 314, name: "EMPANADAS DE QUESO (8 u.)", price: 3000, desc: "Empanaditas fritas de queso" },
-          { id: 315, name: "PAPAS FRITAS PORCIÓN", price: 5900, desc: "Papas fritas tradicionales crujientes" },
-          { id: 316, name: "PAPAS FRITAS MEDIA PORCIÓN", price: 3800, desc: "Media porción de papas fritas" }
-        ]
-      },
-      {
-        id: "cat-vacuno",
-        title: "🥩 VACUNO (牛肉系列)",
-        items: [
-          { id: 401, name: "CARNE MONGOLIANA", price: 9800, desc: "Carne salteada con cebollín y salsa de soya tradicional" },
-          { id: 402, name: "CARNE CHACHOI", price: 9800, desc: "Carne con nabo picante estilo cantonés" },
-          { id: 403, name: "CARNE CHUNG SAN", price: 10300, desc: "Carne con champiñón, algas chinas y cebollín" },
-          { id: 404, name: "CARNE CHURRY", price: 9800, desc: "Carne de vacuno salteada con salsa curry" },
-          { id: 405, name: "CARNE CHAMPIÑÓN", price: 10300, desc: "Carne, champiñón seleccionado y cebollín" },
-          { id: 406, name: "CARNE ALGAS", price: 10300, desc: "Carne con algas chinas y cebollín" },
-          { id: 407, name: "CARNE PIMENTÓN", price: 9800, desc: "Carne salteada con pimentón fresco" },
-          { id: 408, name: "CARNE AJO", price: 9800, desc: "Carne salteada con ajo aromático y cebollín" },
-          { id: 409, name: "CARNE MONTAÑA", price: 9800, desc: "Carne con pimentón, champiñón y algas" },
-          { id: 410, name: "CARNE CEBOLLA", price: 9800, desc: "Carne salteada con cebolla en pluma" },
-          { id: 411, name: "CARNE SOLA", price: 11800, desc: "Porción abundante de carne de vacuno sola" },
-          { id: 412, name: "CARNE CAMARÓN CHAMPIÑÓN", price: 11800, desc: "Carne, camarones, champiñón y cebollín" }
-        ]
-      },
-      {
-        id: "cat-pollo",
-        title: "🍗 POLLO (鸡肉系列)",
-        items: [
-          { id: 501, name: "POLLO MONGOLIANO", price: 9300, desc: "Trozos de pollo salteados con cebollín" },
-          { id: 502, name: "POLLO CHITÉN", price: 9300, desc: "Pollo con verduras y almendras tostadas" },
-          { id: 503, name: "POLLO PIMENTÓN", price: 9300, desc: "Pollo salteado con pimentón verde" },
-          { id: 504, name: "POLLO PEKIN", price: 9800, desc: "Pollo asado estilo Pekín con cebollín" },
-          { id: 505, name: "POLLO CHAMPIÑÓN", price: 9800, desc: "Pollo tierno con cebollín y champiñones" },
-          { id: 506, name: "POLLO TAUSÍ", price: 9300, desc: "Pollo salteado con porotos negros en conserva" },
-          { id: 507, name: "POLLO CHICHARRÓN", price: 10300, desc: "Pollo arrebozado frito crocante con cebollín" },
-          { id: 508, name: "POLLO CHINA", price: 9800, desc: "Pollo con cebollín, champiñón y algas" },
-          { id: 509, name: "POLLO PIÑA", price: 10300, desc: "Pollo arrebozado frito con piña y salsa tamarindo" },
-          { id: 510, name: "POLLO SAMSI", price: 10800, desc: "Combinación de pollo, cerdo, camarón y cebollín" },
-          { id: 511, name: "POLLO SOLO", price: 10800, desc: "Porción de pollo salteado solo" },
-          { id: 512, name: "POLLO CAMARÓN MONGOLIANO", price: 10800, desc: "Pollo, camarones y cebollín al wok" },
-          { id: 513, name: "POLLO CON CURRY", price: 9300, desc: "Pollo salteado con cebollín y curry" }
-        ]
-      },
-      {
-        id: "cat-cerdo",
-        title: "🐷 CERDO (猪肉系列)",
-        items: [
-          { id: 601, name: "CHANCHO TAUSÍ", price: 9300, desc: "Cerdo con porotos negros en conserva y cebollín" },
-          { id: 602, name: "CHANCHO MONGOLIANO", price: 9300, desc: "Cerdo en trozos con cebollín" },
-          { id: 603, name: "CHANCHO A LA CHINA", price: 9800, desc: "Cerdo, cebollín, champiñón y algas chinas" },
-          { id: 604, name: "CHANCHO CHASIU", price: 9800, desc: "Cerdo asado dulce tradicional con cebollín" },
-          { id: 605, name: "COSTILLAR CANTONÉS", price: 10500, desc: "Costillar arrebozado frito con piña y tamarindo" },
-          { id: 606, name: "KU LO YU", price: 10500, desc: "Cerdo arrebozado frito con ají y salsa tamarindo" }
-        ]
-      },
-      {
-        id: "cat-chaumin",
-        title: "🍜 CHAUMÍN (炒面系列 - Tallarines Chinos)",
-        items: [
-          { id: 701, name: "POLLO CHAUMÍN", price: 9300, desc: "Fideos salteados con trozos de pollo y verduras" },
-          { id: 702, name: "CARNE CHAUMÍN", price: 9700, desc: "Fideos salteados con carne de vacuno y verduras" },
-          { id: 703, name: "CERDO CHAUMÍN", price: 9300, desc: "Fideos salteados con cerdo y verduras" },
-          { id: 704, name: "CAMARÓN CHAUMÍN", price: 13000, desc: "Fideos salteados con camarones y verduras" },
-          { id: 705, name: "CHAUMÍN ESPECIAL", price: 12000, desc: "Fideos salteados con pollo, carne, camarón y verduras" },
-          { id: 706, name: "CHAUMÍN SOLO", price: 8500, desc: "Fideos salteados al wok solos con salsa" },
-          { id: 707, name: "CHAUMÍN DIENTE", price: 8800, desc: "Fideos con brotes de porotos diente de dragón y cebollín" },
-          { id: 708, name: "CHAUMÍN VERDURAS", price: 8800, desc: "Fideos salteados con verduras surtidas frescas" }
-        ]
-      },
-      {
-        id: "cat-arroz",
-        title: "🍚 ARROZ (炒饭系列)",
-        items: [
-          { id: 801, name: "ARROZ BLANCO", price: 2800, desc: "Porción de arroz blanco al vapor" },
-          { id: 802, name: "ARROZ CHAUFÁN", price: 3000, desc: "Arroz salteado con huevo, jamón, zanahoria y cebollín" },
-          { id: 803, name: "ARROZ CHAUFÁN ESPECIAL (Doble)", price: 7300, desc: "Doble porción con camarón, pollo y verduras" }
-        ]
-      },
-      {
-        id: "cat-sopas",
-        title: "🍲 SOPAS (汤羹系列)",
-        items: [
-          { id: 901, name: "SOPA MONTAÑA", price: 6000, desc: "Sopa nutritiva de carne de vacuno y verduras" },
-          { id: 902, name: "SOPA I FU MIN", price: 6000, desc: "Pollo, fideos especiales, camarones y verduras" },
-          { id: 903, name: "SOPA WANTAN", price: 6300, desc: "Sopa con wantán relleno de pollo y verduras" },
-          { id: 904, name: "SOPA WANTAN MIN", price: 6300, desc: "Sopa con wantán, pollo, verduras y fideos chinos" },
-          { id: 905, name: "SOPA HANCHOW", price: 6000, desc: "Pollo, hilo de huevo y fideos de arroz finos" },
-          { id: 906, name: "SOPA DE MARISCOS", price: 6600, desc: "Mariscos surtidos seleccionados y verduras" }
-        ]
-      },
-      {
-        id: "cat-chapsui",
-        title: "🥗 CHAPSUI (什锦杂碎系列)",
-        items: [
-          { id: 1001, name: "CHAPSUI DE VERDURAS", price: 8300, desc: "Verduras surtidas salteadas al wok crocantes" },
-          { id: 1002, name: "CHAPSUI DE POLLO", price: 8600, desc: "Pechuga de pollo con verduras surtidas" },
-          { id: 1003, name: "CHAPSUI DE CARNE", price: 8800, desc: "Carne de vacuno con verduras surtidas" },
-          { id: 1004, name: "CHAPSUI DE CERDO", price: 8600, desc: "Cerdo con verduras surtidas salteadas" },
-          { id: 1005, name: "CHAPSUI ESPECIAL", price: 11300, desc: "Pollo, carne, camarones con verduras y almendras" },
-          { id: 1006, name: "POCK PO CHOI", price: 11300, desc: "Pollo, camarones, verduras y fideos fansi" },
-          { id: 1007, name: "CHAPSUI DE CONGRIO", price: 11900, desc: "Trocitos de congrio fresco con verduras" },
-          { id: 1008, name: "CHAPSUI DE CALAMAR", price: 9900, desc: "Calamar salteado con verduras surtidas" },
-          { id: 1009, name: "CHAPSUI DE MARISCOS", price: 9900, desc: "Mariscos surtidos salteados con verduras" },
-          { id: 1010, name: "CHAPSUI DE CAMARÓN", price: 11900, desc: "Camarones seleccionados con verduras" }
-        ]
-      },
-      {
-        id: "cat-dragon",
-        title: "🌱 DIENTE DE DRAGÓN (豆芽系列)",
-        items: [
-          { id: 1101, name: "DIENTE DRAGÓN ESPECIAL", price: 11300, desc: "Brotes, cebollín, carne, pollo, camarón, champiñón y algas" },
-          { id: 1102, name: "DIENTE DRAGÓN CON POLLO", price: 8600, desc: "Brotes frescos salteados con cebollín y pollo" },
-          { id: 1103, name: "DIENTE DRAGÓN CON CARNE", price: 8800, desc: "Brotes salteados con cebollín y carne de vacuno" },
-          { id: 1104, name: "DIENTE DRAGÓN CON CERDO", price: 8600, desc: "Brotes salteados con cebollín y cerdo" },
-          { id: 1105, name: "DIENTE DRAGÓN CON CAMARÓN", price: 11900, desc: "Brotes salteados con cebollín y camarones" }
-        ]
-      },
-      {
-        id: "cat-mariscos",
-        title: "🍤 PESCADOS Y MARISCOS (海鲜鱼类)",
-        items: [
-          { id: 1201, name: "ARROLLADO DE MARISCO", price: 9500, desc: "Panqueque de huevo en pasta de pescado al vapor con soya" },
-          { id: 1202, name: "CALAMAR CEBOLLÍN", price: 10900, desc: "Calamar salteado con cebollín fresco" },
-          { id: 1203, name: "MARISCO A LA CHINA", price: 12500, desc: "Mariscos surtidos con champiñón, algas y cebollín" },
-          { id: 1204, name: "CONGRIO FUYÓN", price: 13900, desc: "Tortilla de huevo esponjosa con congrio" },
-          { id: 1205, name: "CONGRIO SHANGHAI", price: 13900, desc: "Congrio arrebozado frito con cebollín y verduras" },
-          { id: 1206, name: "CONGRIO YANGTZÉ", price: 13900, desc: "Congrio arrebozado frito y cebollín" },
-          { id: 1207, name: "CONGRIO CON AJO", price: 13900, desc: "Congrio salteado con cebollín y ajo" },
-          { id: 1208, name: "CAMARÓN CALAMAR MONGOLIANO", price: 13000, desc: "Camarón y calamar al wok con cebollín" },
-          { id: 1209, name: "CAMARÓN YANGTZÉ", price: 13900, desc: "Camarones arrebozados fritos crocantes" },
-          { id: 1210, name: "CAMARÓN FUYÓN", price: 13900, desc: "Tortilla de huevo esponjosa con camarones" },
-          { id: 1211, name: "CAMARÓN A LA CHINA", price: 13900, desc: "Camarón con cebollín, champiñón y algas" },
-          { id: 1212, name: "CAMARÓN MONGOLIANO", price: 13900, desc: "Camarones jugosos salteados con cebollín" }
-        ]
-      },
-      {
-        id: "cat-parrilladas",
-        title: "🥘 PARRILLADAS (铁板系列)",
-        items: [
-          { id: 1301, name: "PARRILLADA POLLO", price: 11500, desc: "Pollo, pimentón y cebolla en plancha caliente" },
-          { id: 1302, name: "PARRILLADA ESPECIAL", price: 11300, desc: "Carne, pollo, camarón y verduras surtidas" },
-          { id: 1303, name: "PARRILLADA CANTONESA", price: 12300, desc: "Carne, pollo, cerdo, camarón, champiñón y algas" },
-          { id: 1304, name: "PARRILLADA CARNE", price: 12300, desc: "Carne de vacuno con pimentón y cebolla" },
-          { id: 1305, name: "PARRILLADA MARISCO", price: 13500, desc: "Mariscos surtidos, pimentón, cebolla, champiñón y algas" },
-          { id: 1306, name: "PARRILLADA CHINA", price: 12800, desc: "Carne, pollo, cerdo, camarones, cebollín y algas" },
-          { id: 1307, name: "PARRILLADA CONGRIO", price: 16500, desc: "Congrio tierno, pimentón, cebolla y champiñón" },
-          { id: 1308, name: "PARRILLADA CAMARÓN", price: 16500, desc: "Camarones abundantes, pimentón, cebolla y champiñón" }
-        ]
-      }
+    const categoriesDef = [
+      { id: "cat-menus", title: "🍱 MENÚS COMBINADOS" },
+      { id: "cat-colaciones", title: "🍛 COLACIONES" },
+      { id: "cat-aperitivos", title: "🥟 EL APERITIVO" },
+      { id: "cat-vacuno", title: "🥩 VACUNO" },
+      { id: "cat-pollo", title: "🍗 POLLO" },
+      { id: "cat-cerdo", title: "🐷 CERDO" },
+      { id: "cat-chaumin", title: "🍜 CHAUMÍN" },
+      { id: "cat-arroz", title: "🍚 ARROZ" },
+      { id: "cat-sopas", title: "🍲 SOPAS" },
+      { id: "cat-chapsui", title: "🥗 CHAPSUI" },
+      { id: "cat-dragon", title: "🌱 DIENTE DE DRAGÓN" },
+      { id: "cat-mariscos", title: "🍤 PESCADOS Y MARISCOS" },
+      { id: "cat-parrilladas", title: "🥘 PARRILLADAS" }
     ];
 
-    let cart = []; // 存储结构: [ { dishId, name, unitPrice, qty, options: [] } ]
+    let allDishes = [];
+    let cart = [];
     let currentSelectedDish = null;
     let modalQty = 1;
     let orderType = 'pickup';
 
-    // 页面初始化渲染菜单
-    function renderMenu() {
+    // 页面初始化时从 Supabase 动态拉取最新数据
+    async function loadLiveMenu() {
       const container = document.getElementById('menu-container');
-      container.innerHTML = menuData.map(cat => `
-        <section id="${cat.id}">
-          <h2 class="text-sm font-black text-gray-800 bg-gray-200 py-1.5 px-3 rounded-lg mb-2.5 uppercase tracking-wide">
-            ${cat.title}
-          </h2>
-          <div class="space-y-2.5">
-            ${cat.items.map(dish => `
-              <div onclick="openOptionModal(${dish.id})" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center active:bg-gray-50 cursor-pointer">
-                <div class="flex-1 pr-3">
-                  <h3 class="font-bold text-xs text-gray-900">${dish.name}</h3>
-                  <p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2">${dish.desc}</p>                   <div class="text-xs font-black text-red-600 mt-1">$ ${dish.price.toLocaleString('es-CL')} CLP</div>
-                </div>
-                <button class="w-8 h-8 rounded-full bg-red-600 text-white font-black text-base flex items-center justify-center shadow-sm shrink-0">
-                  +
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </section>
-      `).join('');
+      const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
+
+      if (error) {
+        container.innerHTML = `<div class="text-center py-16 text-red-500 text-xs">Error de conexión: ${error.message}</div>`;
+        return;
+      }
+
+      allDishes = data;
+      renderLiveMenu();
     }
 
-    // 分类平滑跳转
+    function renderLiveMenu() {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = categoriesDef.map(cat => {
+        const items = allDishes.filter(d => d.category === cat.id);
+        if (items.length === 0) return '';
+
+        return `
+          <section id="${cat.id}">
+            <h2 class="text-sm font-black text-gray-800 bg-gray-200 py-1.5 px-3 rounded-lg mb-2.5 uppercase tracking-wide">
+              ${cat.title}
+            </h2>
+            <div class="space-y-2.5">
+              ${items.map(dish => {
+                const isSoldOut = !dish.is_available;
+                return `
+                  <div onclick="${isSoldOut ? '' : `openOptionModal(${dish.id})`}" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center ${isSoldOut ? 'opacity-60 cursor-not-allowed bg-gray-50' : 'active:bg-gray-50 cursor-pointer'}">
+                    <div class="flex-1 pr-3">
+                      <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-xs text-gray-900">${dish.name}</h3>${isSoldOut ? '<span class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-wide">AGOTADO</span>' : ''}
+                      </div>
+                      <p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2">${dish.description \vert{}\vert{} ''}</p>                       <div class="text-xs font-black text-red-600 mt-1">$ ${dish.price.toLocaleString('es-CL')} CLP</div>
+                    </div>
+                    <button class="w-8 h-8 rounded-full ${isSoldOut ? 'bg-gray-300 text-gray-500' : 'bg-red-600 text-white'} font-black text-base flex items-center justify-center shadow-sm shrink-0">
+                      ${isSoldOut ? '✕' : '+'}
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </section>
+        `;
+      }).join('');
+    }
+
     function scrollToCat(id) {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // 寻找菜品对象
-    function findDishById(id) {
-      for (const cat of menuData) {
-        const found = cat.items.find(i => i.id === id);
-        if (found) return found;
-      }
-      return null;
-    }
-
-    // 打开菜品定制弹窗
     function openOptionModal(dishId) {
-      currentSelectedDish = findDishById(dishId);
-      if (!currentSelectedDish) return;
+      currentSelectedDish = allDishes.find(i => i.id === dishId);
+      if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
       modalQty = 1;
       document.getElementById('opt-modal-qty').innerText = modalQty;
       document.getElementById('opt-dish-name').innerText = currentSelectedDish.name;
-      document.getElementById('opt-dish-desc').innerText = currentSelectedDish.desc;
+      document.getElementById('opt-dish-desc').innerText = currentSelectedDish.description || '';
 
-      // 控制便当配餐选项显示
       const sideBox = document.getElementById('colacion-side-box');
-      if (currentSelectedDish.isColacion) {
+      if (currentSelectedDish.is_colacion) {
         sideBox.classList.remove('hidden');
       } else {
         sideBox.classList.add('hidden');
       }
 
-      // 重置选项
       document.querySelector('input[name="opt-aji"][value="Sin ají"]').checked = true;
       document.getElementById('pref-sal').checked = false;
       document.getElementById('pref-sillao').checked = false;
@@ -501,15 +325,13 @@
       document.getElementById('opt-modal-qty').innerText = modalQty;
     }
 
-    // 确认定制并加入购物车
     function confirmAddToCart() {
       if (!currentSelectedDish) return;
 
       let extraPrice = 0;
       let optionsList = [];
 
-      // 1. 便当配菜
-      if (currentSelectedDish.isColacion) {
+      if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
           optionsList.push(selectedSide.value);
@@ -517,13 +339,9 @@
         }
       }
 
-      // 2. 辣度
       const ajiChoice = document.querySelector('input[name="opt-aji"]:checked').value;
-      if (ajiChoice !== 'Sin ají') {
-        optionsList.push(ajiChoice);
-      }
+      if (ajiChoice !== 'Sin ají') optionsList.push(ajiChoice);
 
-      // 3. 口味偏好
       if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
       if (document.getElementById('pref-sillao').checked) optionsList.push('Poco sillao');
       if (document.getElementById('pref-cebollin').checked) optionsList.push('Sin cebollín');
@@ -531,7 +349,6 @@
 
       const finalUnitPrice = currentSelectedDish.price + extraPrice;
 
-      // 加入购物车数组
       cart.push({
         dishId: currentSelectedDish.id,
         name: currentSelectedDish.name,
@@ -544,21 +361,17 @@
       updateCartUI();
     }
 
-    // 更新购物车底栏
     function updateCartUI() {
       let totalQty = 0;
       let totalPrice = 0;
-
       cart.forEach(item => {
         totalQty += item.qty;
         totalPrice += item.unitPrice * item.qty;
       });
-
       document.getElementById('cart-total-count').innerText = totalQty;
       document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
     }
 
-    // 履约方式选择
     function setOrderType(type) {
       orderType = type;
       const btnPick = document.getElementById('btn-pickup');
@@ -583,14 +396,11 @@
       else cashBox.classList.add('hidden');
     }
 
-    // 查看结算弹窗
     function openCheckoutModal() {
       if (cart.length === 0) {
-        alert("El carrito está vacío. Agrega productos al pedido.");
+        alert("El carrito está vacío.");
         return;
       }
-
-      // 渲染购物车明细
       const container = document.getElementById('cart-items-preview');
       container.innerHTML = cart.map((item, index) => `
         <div class="py-2 flex justify-between items-start">
@@ -602,7 +412,6 @@
           <button onclick="removeFromCart(${index})" class="text-red-500 text-xs px-2 py-1 font-bold">Quitar</button>
         </div>
       `).join('');
-
       document.getElementById('checkout-modal').classList.remove('hidden');
     }
 
@@ -617,7 +426,6 @@
       document.getElementById('checkout-modal').classList.add('hidden');
     }
 
-    // 获取智利格式日期时间
     function getChileDateTime() {
       const now = new Date();
       const dd = String(now.getDate()).padStart(2, '0');
@@ -628,7 +436,6 @@
       return { date: `${dd}/${mm}/${yyyy}`, time: `${hh}:${min}` };
     }
 
-    // 生成并发送 WhatsApp 消息
     function sendOrderToWhatsApp() {
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
@@ -649,16 +456,13 @@
       const orderCode = 'CL-' + Math.floor(1000000000 + Math.random() * 9000000000);
       const dt = getChileDateTime();
 
-      // 格式化菜品列表，附带具体定制选项
       let subtotal = 0;
       let productsList = [];
       cart.forEach(item => {
         const itemTotal = item.unitPrice * item.qty;
         subtotal += itemTotal;
         let line = `X${item.qty} ${item.name} $ ${itemTotal.toLocaleString('es-CL')}`;
-        if (item.options.length > 0) {
-          line += `\n   • ${item.options.join(', ')}`;
-        }
+        if (item.options.length > 0) line += `\n   • ${item.options.join(', ')}`;
         productsList.push(line);
       });
 
@@ -682,7 +486,6 @@
       const serviceType = orderType === 'pickup' ? 'Para llevar' : 'Delivery';
       const addressLine = orderType === 'delivery' ? `\nDirección: ${address}` : '';
 
-      // 100% 还原智利餐饮规范 WhatsApp 模板
       const message = `${orderCode}
 📅 ${dt.date} ⏰ ${dt.time}
 
@@ -709,8 +512,7 @@ ${notes ? notes : 'Sin comentarios'}`;
       window.location.href = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     }
 
-    // 运行初始渲染
-    renderMenu();
+    loadLiveMenu();
   </script>
 </body>
 </html>
