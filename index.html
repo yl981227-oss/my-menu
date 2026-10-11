@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="notranslate" translate="no">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
   <title>Menú Online - Comida China</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,7 +12,7 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 pb-28">
+<body class="bg-gray-100 text-gray-800 pb-28 notranslate" translate="no">
 
   <!-- 顶部招牌 -->
   <header class="bg-red-700 text-white p-4 shadow-md sticky top-0 z-20">
@@ -74,15 +75,15 @@
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-start border-b pb-3 mb-3">
         <div>
-          <h3 id="opt-dish-name" class="text-base font-black text-gray-900 leading-tight">菜品名称</h3>
-          <p id="opt-dish-desc" class="text-xs text-gray-500 mt-1">菜品简介</p>
+          <h3 id="opt-dish-name" class="text-base font-black text-gray-900 leading-tight">Plato</h3>
+          <p id="opt-dish-desc" class="text-xs text-gray-500 mt-1">Descripción</p>
         </div>
         <button onclick="closeOptionModal()" class="text-gray-400 text-2xl font-bold ml-2">&times;</button>
       </div>
 
       <!-- 配餐选择（限便当） -->
       <div id="colacion-side-box" class="hidden mb-4">
-        <label class="block text-xs font-bold text-gray-700 mb-1.5">Acompañamiento (配餐选择) *</label>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
           <label class="flex items-center gap-2 p-2 rounded-lg border cursor-pointer hover:bg-gray-50">
             <input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0">
@@ -101,38 +102,38 @@
 
       <!-- 辣度 -->
       <div class="mb-4">
-        <label class="block text-xs font-bold text-gray-700 mb-1.5">Nivel de Ají (辣度) *</label>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Nivel de Ají *</label>
         <div class="grid grid-cols-3 gap-2 text-xs">
           <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold">
             <input type="radio" name="opt-aji" value="Sin ají" checked class="hidden">
-            <span>Sin ají (不辣)</span>
+            <span>Sin ají</span>
           </label>
           <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold">
             <input type="radio" name="opt-aji" value="Con ají" class="hidden">
-            <span>Con ají (加辣)</span>
+            <span>Con ají</span>
           </label>
           <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold">
             <input type="radio" name="opt-aji" value="Ají aparte" class="hidden">
-            <span>Ají aparte (另包)</span>
+            <span>Ají aparte</span>
           </label>
         </div>
       </div>
 
-      <!-- 口味偏好定制 -->
+      <!-- 口味定制偏好 -->
       <div class="mb-4">
-        <label class="block text-xs font-bold text-gray-700 mb-1.5">Preferencias de cocina (口味要求)</label>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Preferencias de cocina</label>
         <div class="grid grid-cols-2 gap-2 text-xs">
           <label class="flex items-center gap-1.5 p-2 rounded-lg border">
             <input type="checkbox" id="pref-sal" value="Bajo en sal" class="rounded text-red-600">
-            <span>Bajo en sal (少盐)</span>
+            <span>Bajo en sal</span>
           </label>
           <label class="flex items-center gap-1.5 p-2 rounded-lg border">
             <input type="checkbox" id="pref-sillao" value="Poco sillao" class="rounded text-red-600">
-            <span>Poco sillao (少酱油)</span>
+            <span>Poco sillao</span>
           </label>
           <label class="flex items-center gap-1.5 p-2 rounded-lg border">
             <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="rounded text-red-600">
-            <span>Sin cebollín (免葱)</span>
+            <span>Sin cebollín</span>
           </label>
           <label class="flex items-center gap-1.5 p-2 rounded-lg border">
             <input type="checkbox" id="pref-diente" value="Sin diente de dragón" class="rounded text-red-600">
@@ -184,20 +185,20 @@
         <div>
           <label class="block text-[11px] font-bold text-gray-600 mb-1">Método de pago *</label>
           <select id="pay-method" onchange="toggleCashInput()" class="w-full border rounded-lg p-2 text-xs bg-white">
-            <option value="efectivo">Efectivo al recibir (现金)</option>
-            <option value="tarjeta">Tarjeta Débito / Crédito POS (现场刷卡)</option>
-            <option value="transferencia">Transferencia Bancaria (银行转账)</option>
+            <option value="efectivo">Efectivo al recibir</option>
+            <option value="tarjeta">Tarjeta Débito / Crédito POS</option>
+            <option value="transferencia">Transferencia Bancaria</option>
           </select>
         </div>
 
         <div id="cash-amount-box">
-          <label class="block text-[11px] font-bold text-gray-600 mb-1">¿Con cuánto efectivo pagarás? (找零计算)</label>
-          <input id="cust-cash" type="number" placeholder="Ej: 20000 (deja vacío si es justo)" class="w-full border rounded-lg p-2 text-xs">
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">¿Con cuánto efectivo pagarás? (Vuelto)</label>
+          <input id="cust-cash" type="number" placeholder="Ej: 20000" class="w-full border rounded-lg p-2 text-xs">
         </div>
 
         <div>
-          <label class="block text-[11px] font-bold text-gray-600 mb-1">Comentarios adicionales generales</label>
-          <input id="cust-notes" type="text" placeholder="Ej: Servilletas extras, llamar al llegar..." class="w-full border rounded-lg p-2 text-xs">
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Comentarios adicionales</label>
+          <input id="cust-notes" type="text" placeholder="Ej: Servilletas extras..." class="w-full border rounded-lg p-2 text-xs">
         </div>
       </div>
 
@@ -211,7 +212,6 @@
 
   <script>
     const MY_WHATSAPP_NUMBER = "56974142810";
-    // 正确的云端地址（包含字母 y）
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
     const { createClient } = supabase;
@@ -244,7 +244,7 @@
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
 
       if (error) {
-        container.innerHTML = `<div class="text-center py-16 text-red-500 text-xs">Error de conexión: ${error.message}</div>`;
+        container.innerHTML = '<div class="text-center py-16 text-red-500 text-xs">Error de conexión: ' + error.message + '</div>';
         return;
       }
 
@@ -252,38 +252,48 @@
       renderLiveMenu();
     }
 
+    // 重构的渲染函数：彻底杜绝嵌套模板字符串语法错误
     function renderLiveMenu() {
       const container = document.getElementById('menu-container');
-      container.innerHTML = categoriesDef.map(cat => {
-        const items = allDishes.filter(d => d.category === cat.id);
-        if (items.length === 0) return '';
+      let html = '';
 
-        return `
-          <section id="${cat.id}">
-            <h2 class="text-sm font-black text-gray-800 bg-gray-200 py-1.5 px-3 rounded-lg mb-2.5 uppercase tracking-wide">
-              ${cat.title}
-            </h2>
-            <div class="space-y-2.5">
-              ${items.map(dish => {
-                const isSoldOut = !dish.is_available;
-                return `
-                  <div onclick="${isSoldOut ? '' : `openOptionModal(${dish.id})`}" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center ${isSoldOut ? 'opacity-60 cursor-not-allowed bg-gray-50' : 'active:bg-gray-50 cursor-pointer'}">
-                    <div class="flex-1 pr-3">
-                      <div class="flex items-center gap-2">
-                        <h3 class="font-bold text-xs text-gray-900">${dish.name}</h3>${isSoldOut ? '<span class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-wide">AGOTADO</span>' : ''}
-                      </div>
-                      <p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2">${dish.description \vert{}\vert{} ''}</p>                       <div class="text-xs font-black text-red-600 mt-1">$ ${dish.price.toLocaleString('es-CL')} CLP</div>
-                    </div>
-                    <button class="w-8 h-8 rounded-full ${isSoldOut ? 'bg-gray-300 text-gray-500' : 'bg-red-600 text-white'} font-black text-base flex items-center justify-center shadow-sm shrink-0">
-                      ${isSoldOut ? '✕' : '+'}
-                    </button>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </section>
-        `;
-      }).join('');
+      categoriesDef.forEach(cat => {
+        const items = allDishes.filter(d => d.category === cat.id);
+        if (items.length === 0) return;
+
+        html += '<section id="' + cat.id + '">';
+        html += '<h2 class="text-sm font-black text-gray-800 bg-gray-200 py-1.5 px-3 rounded-lg mb-2.5 uppercase tracking-wide">' + cat.title + '</h2>';
+        html += '<div class="space-y-2.5">';
+
+        items.forEach(dish => {
+          const isSoldOut = !dish.is_available;
+          const clickAttr = isSoldOut ? '' : 'onclick="openOptionModal(' + dish.id + ')"';
+          const cardStyle = isSoldOut 
+            ? 'bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center opacity-60 cursor-not-allowed bg-gray-50' 
+            : 'bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center active:bg-gray-50 cursor-pointer';
+          const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-wide">AGOTADO</span>' : '';
+          const btnBg = isSoldOut ? 'bg-gray-300 text-gray-500' : 'bg-red-600 text-white';
+          const btnIcon = isSoldOut ? '✕' : '+';
+          const descText = dish.description ? dish.description : '';
+          const priceStr = Number(dish.price).toLocaleString('es-CL');
+
+          html += '<div ' + clickAttr + ' class="' + cardStyle + '">';
+          html += '  <div class="flex-1 pr-3">';
+          html += '    <div class="flex items-center gap-2">';
+          html += '      <h3 class="font-bold text-xs text-gray-900">' + dish.name + '</h3>';
+          html +=        badge;
+          html += '    </div>';
+          html += '    <p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2">' + descText + '</p>';
+          html += '    <div class="text-xs font-black text-red-600 mt-1">$ ' + priceStr + ' CLP</div>';
+          html += '  </div>';
+          html += '  <button class="w-8 h-8 rounded-full ' + btnBg + ' font-black text-base flex items-center justify-center shadow-sm shrink-0">' + btnIcon + '</button>';
+          html += '</div>';
+        });
+
+        html += '</div></section>';
+      });
+
+      container.innerHTML = html;
     }
 
     function scrollToCat(id) {
@@ -402,16 +412,20 @@
         return;
       }
       const container = document.getElementById('cart-items-preview');
-      container.innerHTML = cart.map((item, index) => `
-        <div class="py-2 flex justify-between items-start">
-          <div class="flex-1 pr-2">
-            <div class="font-bold text-gray-900">${item.qty}x ${item.name}</div>
-            ${item.options.length > 0 ? `<div class="text-[10px] text-gray-500">• ${item.options.join(', ')}</div>` : ''}
-            <div class="text-red-600 font-semibold mt-0.5">$ ${(item.unitPrice * item.qty).toLocaleString('es-CL')} CLP</div>
-          </div>
-          <button onclick="removeFromCart(${index})" class="text-red-500 text-xs px-2 py-1 font-bold">Quitar</button>
-        </div>
-      `).join('');
+      let previewHtml = '';
+      cart.forEach((item, index) => {
+        const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
+        const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-500">• ' + item.options.join(', ') + '</div>' : '';
+        previewHtml += '<div class="py-2 flex justify-between items-start">';
+        previewHtml += '  <div class="flex-1 pr-2">';
+        previewHtml += '    <div class="font-bold text-gray-900">' + item.qty + 'x ' + item.name + '</div>';
+        previewHtml +=      optText;
+        previewHtml += '    <div class="text-red-600 font-semibold mt-0.5">$ ' + itemTotal + ' CLP</div>';
+        previewHtml += '  </div>';
+        previewHtml += '  <button onclick="removeFromCart(' + index + ')" class="text-red-500 text-xs px-2 py-1 font-bold">Quitar</button>';
+        previewHtml += '</div>';
+      });
+      container.innerHTML = previewHtml;
       document.getElementById('checkout-modal').classList.remove('hidden');
     }
 
@@ -433,7 +447,7 @@
       const yyyy = now.getFullYear();
       const hh = String(now.getHours()).padStart(2, '0');
       const min = String(now.getMinutes()).padStart(2, '0');
-      return { date: `${dd}/${mm}/${yyyy}`, time: `${hh}:${min}` };
+      return { date: dd + '/' + mm + '/' + yyyy, time: hh + ':' + min };
     }
 
     function sendOrderToWhatsApp() {
@@ -461,8 +475,8 @@
       cart.forEach(item => {
         const itemTotal = item.unitPrice * item.qty;
         subtotal += itemTotal;
-        let line = `X${item.qty} ${item.name} $ ${itemTotal.toLocaleString('es-CL')}`;
-        if (item.options.length > 0) line += `\n   • ${item.options.join(', ')}`;
+        let line = 'X' + item.qty + ' ' + item.name + ' $ ' + itemTotal.toLocaleString('es-CL');
+        if (item.options.length > 0) line += '\n   • ' + item.options.join(', ');
         productsList.push(line);
       });
 
@@ -473,43 +487,37 @@
       if (method === 'efectivo') {
         if (cashGiven > total) {
           const vuelto = cashGiven - total;
-          payDetail = `Efectivo ${total.toLocaleString('es-CL')} (monto recibido ${cashGiven.toLocaleString('es-CL')}, vuelto ${vuelto.toLocaleString('es-CL')})`;
+          payDetail = 'Efectivo ' + total.toLocaleString('es-CL') + ' (monto recibido ' + cashGiven.toLocaleString('es-CL') + ', vuelto ' + vuelto.toLocaleString('es-CL') + ')';
         } else {
-          payDetail = `Efectivo exacto $ ${total.toLocaleString('es-CL')}`;
+          payDetail = 'Efectivo exacto $ ' + total.toLocaleString('es-CL');
         }
       } else if (method === 'tarjeta') {
-        payDetail = `Tarjeta Débito/Crédito al recibir (POS)`;
+        payDetail = 'Tarjeta Débito/Crédito al recibir (POS)';
       } else {
-        payDetail = `Transferencia Bancaria`;
+        payDetail = 'Transferencia Bancaria';
       }
 
       const serviceType = orderType === 'pickup' ? 'Para llevar' : 'Delivery';
-      const addressLine = orderType === 'delivery' ? `\nDirección: ${address}` : '';
+      const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
 
-      const message = `${orderCode}
-📅 ${dt.date} ⏰ ${dt.time}
+      const message = orderCode + '\n' +
+        '📅 ' + dt.date + ' ⏰ ' + dt.time + '\n\n' +
+        'Tipo de servicio: ' + serviceType + '\n\n' +
+        'Nombre: ' + name + '\n' +
+        'Teléfono: ' + phone + addressLine + '\n\n' +
+        '📝 Productos\n' +
+        productsList.join('\n') + '\n\n' +
+        'Subtotal: $ ' + subtotal.toLocaleString('es-CL') + '\n' +
+        'Entrega: $ ' + deliveryFee.toLocaleString('es-CL') + '\n' +
+        'Total: $ ' + total.toLocaleString('es-CL') + '\n\n' +
+        '💲 Pago\n' +
+        'Estado del pago: No pagado\n' +
+        'Total a pagar: $ ' + total.toLocaleString('es-CL') + '\n' +
+        payDetail + '\n\n' +
+        'Comentarios adicionales:\n' +
+        (notes ? notes : 'Sin comentarios');
 
-Tipo de servicio: ${serviceType}
-
-Nombre: ${name}
-Teléfono: ${phone}${addressLine}
-
-📝 Productos
-${productsList.join('\n')}
-
-Subtotal: $ ${subtotal.toLocaleString('es-CL')}
-Entrega: $ ${deliveryFee.toLocaleString('es-CL')}
-Total: $ ${total.toLocaleString('es-CL')}
-
-💲 Pago
-Estado del pago: No pagado
-Total a pagar: $ ${total.toLocaleString('es-CL')}
-${payDetail}
-
-Comentarios adicionales:
-${notes ? notes : 'Sin comentarios'}`;
-
-      window.location.href = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.location.href = 'https://wa.me/' + MY_WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
     }
 
     loadLiveMenu();
