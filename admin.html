@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="notranslate" translate="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
   <title>Panel de Control - Administración</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <script>
-    // 云端配置与密钥（已补全字母 y）
+    // 云端配置与密钥
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
     const { createClient } = supabase;
@@ -16,6 +17,31 @@
 
     const ADMIN_PIN = "8888";
     let allDishes = [];
+    let currentFilterType = 'all'; // all, china, sushi, bebidas, soldout
+
+    // 分类字典映射
+    const categoryNames = {
+      'cat-menus': '🍱 Menús',
+      'cat-colaciones': '🍛 Colaciones',
+      'cat-aperitivos': '🥟 Aperitivos',
+      'cat-vacuno': '🥩 Vacuno',
+      'cat-pollo': '🍗 Pollo',
+      'cat-cerdo': '🐷 Cerdo',
+      'cat-chaumin': '🍜 Chaumín',
+      'cat-arroz': '🍚 Arroz',
+      'cat-sopas': '🍲 Sopas',
+      'cat-chapsui': '🥗 Chapsui',
+      'cat-dragon': '🌱 Diente Dragón',
+      'cat-mariscos': '🍤 Mariscos',
+      'cat-parrilladas': '🥘 Parrilladas',
+      'cat-sushi-promos': '🍱 Promos Sushi',
+      'cat-sushi-hot': '🔥 Hot Rolls',
+      'cat-sushi-california': '🥑 California',
+      'cat-sushi-envueltos': '🍣 Envueltos',
+      'cat-sushi-handrolls': '🌯 Hand Rolls',
+      'cat-sushi-gohan': '🍚 Gohan',
+      'cat-bebidas': '🥤 Bebidas'
+    };
 
     function checkPin() {
       const pin = document.getElementById('pin-input').value.trim();
@@ -38,82 +64,161 @@
       window.location.reload();
     }
 
+    // 从 Supabase 拉取全部菜品
     async function fetchDishes() {
       const container = document.getElementById('dish-list');
-      container.innerHTML = '<div class="text-center py-10 text-gray-400 text-xs">Cargando platos desde la nube...</div>';
+      container.innerHTML = '<div class="text-center py-16 text-gray-400 text-xs">Cargando platos desde la nube...</div>';
 
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
       if (error) {
-        container.innerHTML = `<div class="text-center py-10 text-red-500 text-xs">Error: ${error.message}</div>`;
+        container.innerHTML = '<div class="text-center py-16 text-red-500 text-xs">Error de conexión: ' + error.message + '</div>';
         return;
       }
-      allDishes = data;
-      renderList(allDishes);
+      allDishes = data || [];
+      updateDashboardCounts();
+      applyFilters();
     }
 
-    function renderList(list) {
-      const container = document.getElementById('dish-list');
-      if (list.length === 0) {
-        container.innerHTML = '<div class="text-center py-10 text-gray-400 text-xs">No se encontraron platos.</div>';
-        return;
+    // 统计面板数量
+    function updateDashboardCounts() {
+      const total = allDishes.length;
+      const available = allDishes.filter(d => d.is_available).length;
+      const soldOut = total - available;
+
+      document.getElementById('count-total').innerText = total;
+      document.getElementById('count-available').innerText = available;
+      document.getElementById('count-soldout').innerText = soldOut;
+    }
+
+    // 设置类型过滤器
+    function setFilter(type) {
+      currentFilterType = type;
+      
+      const tabIds = ['tab-all', 'tab-china', 'tab-sushi', 'tab-bebidas', 'tab-soldout'];
+      tabIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0";
+        }
+      });
+
+      const activeBtn = document.getElementById('tab-' + type);
+      if (activeBtn) {
+        if (type === 'soldout') {
+          activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-red-600 text-white shadow-sm shrink-0";
+        } else {
+          activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-gray-900 text-white shadow-sm shrink-0";
+        }
       }
 
-      container.innerHTML = list.map(item => `
-        <div class="bg-white p-3.5 rounded-xl border ${item.is_available ? 'border-gray-200' : 'border-red-300 bg-red-50/40'} shadow-sm flex flex-col gap-2.5">
-          <div class="flex justify-between items-start">
-            <div class="flex-1 pr-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">${item.category.replace('cat-', '')} #${item.id}</span>
-              <h3 class="text-xs font-black text-gray-900 leading-snug">${item.name}</h3>
-            </div>
-            <button onclick="toggleAvailability(${item.id}, ${item.is_available})" class="px-3 py-1.5 rounded-lg text-xs font-black shrink-0 transition ${item.is_available ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-600 text-white shadow-sm'}">
-              ${item.is_available ? '✅ Disponible' : '⛔ AGOTADO'}
-            </button>
-          </div>
-
-          <div class="flex items-center gap-2 border-t pt-2 mt-0.5">
-            <span class="text-xs font-bold text-gray-500">$</span>
-            <input id="price-${item.id}" type="number" value="${item.price}" class="w-28 border rounded-lg px-2.5 py-1 text-xs font-bold text-gray-800 bg-gray-50 outline-none focus:border-red-600">
-            <span class="text-[11px] text-gray-400">CLP</span>
-            <button onclick="updatePrice(${item.id})" class="ml-auto bg-gray-900 hover:bg-black text-white text-xs font-bold px-3 py-1 rounded-lg">
-              Guardar precio
-            </button>
-          </div>
-        </div>
-      `).join('');
+      applyFilters();
     }
 
-    function filterDishes() {
+    // 执行过滤并渲染
+    function applyFilters() {
       const q = document.getElementById('search-input').value.toLowerCase().trim();
-      const filtered = allDishes.filter(d => d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q));
+      
+      let filtered = allDishes.filter(item => {
+        // 1. 文本搜索
+        const matchText = item.name.toLowerCase().includes(q) || 
+                          String(item.id).includes(q) ||
+                          item.category.toLowerCase().includes(q);
+        if (!matchText) return false;
+
+        // 2. 标签分类筛选
+        if (currentFilterType === 'all') return true;
+        if (currentFilterType === 'soldout') return !item.is_available;
+        if (currentFilterType === 'bebidas') return item.category === 'cat-bebidas';
+        if (currentFilterType === 'sushi') return item.category.startsWith('cat-sushi-');
+        if (currentFilterType === 'china') return !item.category.startsWith('cat-sushi-') && item.category !== 'cat-bebidas';
+
+        return true;
+      });
+
       renderList(filtered);
     }
 
-    async function updatePrice(id) {
-      const newPrice = parseInt(document.getElementById(`price-${id}`).value);
-      if (isNaN(newPrice) || newPrice <= 0) {
-        alert("Precio inválido");
+    // 渲染卡片列表
+    function renderList(list) {
+      const container = document.getElementById('dish-list');
+      if (list.length === 0) {
+        container.innerHTML = '<div class="text-center py-16 text-gray-400 text-xs">No se encontraron platos que coincidan con el filtro.</div>';
         return;
       }
+
+      let html = '';
+      list.forEach(item => {
+        const catBadge = categoryNames[item.category] || item.category;
+        const cardBg = item.is_available ? 'bg-white border-gray-200' : 'bg-red-50/50 border-red-300';
+        const statusBtnClass = item.is_available 
+          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-300' 
+          : 'bg-red-600 text-white shadow-md font-black animate-pulse';
+        const statusBtnText = item.is_available ? '✅ En Venta' : '⛔ AGOTADO';
+
+        html += '<div class="' + cardBg + ' p-3 rounded-xl border shadow-sm flex flex-col gap-2 transition">';
+        html += '  <div class="flex justify-between items-start gap-2">';
+        html += '    <div class="flex-1">';
+        html += '      <div class="flex items-center gap-1.5">';
+        html += '        <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-bold">' + catBadge + '</span>';
+        html += '        <span class="text-[10px] text-gray-400 font-mono">#' + item.id + '</span>';
+        html += '      </div>';
+        html += '      <h3 class="text-xs font-black text-gray-900 mt-1 leading-snug">' + item.name + '</h3>';
+        if (item.description) {
+          html += '    <p class="text-[10px] text-gray-400 line-clamp-1 mt-0.5">' + item.description + '</p>';
+        }
+        html += '    </div>';
+        html += '    <button onclick="toggleAvailability(' + item.id + ', ' + item.is_available + ')" class="px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition ' + statusBtnClass + '">';
+        html +=        statusBtnText;
+        html += '    </button>';
+        html += '  </div>';
+
+        // 改价模块
+        html += '  <div class="flex items-center gap-2 border-t pt-2 mt-0.5">';
+        html += '    <span class="text-xs font-black text-gray-500">$</span>';
+        html += '    <input id="price-' + item.id + '" type="number" value="' + item.price + '" class="w-24 border rounded-lg px-2.5 py-1 text-xs font-black text-gray-800 bg-gray-50 outline-none focus:border-red-600">';
+        html += '    <span class="text-[10px] text-gray-400 font-bold">CLP</span>';
+        html += '    <button onclick="updatePrice(' + item.id + ')" class="ml-auto bg-gray-900 hover:bg-black active:scale-95 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm transition">';
+        html += '      Guardar precio';
+        html += '    </button>';
+        html += '  </div>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    // 价格更新
+    async function updatePrice(id) {
+      const inputEl = document.getElementById('price-' + id);
+      const newPrice = parseInt(inputEl.value);
+      if (isNaN(newPrice) || newPrice <= 0) {
+        alert("Por favor ingresa un precio válido mayor a 0");
+        return;
+      }
+
       const { error } = await db.from('dishes').update({ price: newPrice }).eq('id', id);
       if (error) {
         alert("Error al actualizar precio: " + error.message);
       } else {
-        showToast("¡Precio actualizado!");
+        showToast("¡Precio de #" + id + " actualizado a $" + newPrice.toLocaleString('es-CL') + " CLP!");
         const item = allDishes.find(d => d.id === id);
         if (item) item.price = newPrice;
       }
     }
 
+    // 上下架（售罄）状态切换
     async function toggleAvailability(id, currentStatus) {
       const newStatus = !currentStatus;
       const { error } = await db.from('dishes').update({ is_available: newStatus }).eq('id', id);
       if (error) {
         alert("Error al cambiar estado: " + error.message);
       } else {
-        showToast(newStatus ? "Plato marcado como DISPONIBLE" : "Plato marcado como AGOTADO");
         const item = allDishes.find(d => d.id === id);
         if (item) item.is_available = newStatus;
-        renderList(allDishes);
+
+        showToast(newStatus ? "Plato marcado como EN VENTA" : "Plato marcado como AGOTADO");
+        updateDashboardCounts();
+        applyFilters();
       }
     }
 
@@ -131,38 +236,89 @@
     });
   </script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen">
+<body class="bg-gray-100 text-gray-800 min-h-screen notranslate" translate="no">
 
+  <!-- 1. 登录验证遮罩层 -->
   <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
       <div class="text-4xl mb-3">🔒</div>
-      <h2 class="text-lg font-bold mb-1">Panel de Control</h2>
+      <h2 class="text-base font-black text-gray-900 mb-1">Panel de Control</h2>
       <p class="text-xs text-gray-500 mb-4">Ingresa la clave de administración</p>
       <input id="pin-input" onkeydown="if(event.key==='Enter') checkPin()" type="password" maxlength="6" placeholder="Clave PIN" class="w-full text-center text-2xl tracking-widest border rounded-xl p-3 mb-4 focus:ring-2 focus:ring-red-600 outline-none">
-      <button onclick="checkPin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow">Ingresar</button>
-      <p id="pin-error" class="text-xs text-red-500 mt-2 hidden">Clave incorrecta</p>
+      <button onclick="checkPin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow text-sm">Ingresar</button>
+      <p id="pin-error" class="text-xs text-red-500 mt-2 hidden font-bold">Clave incorrecta</p>
     </div>
   </div>
 
+  <!-- 2. 后台主管理面板 -->
   <div id="admin-panel" class="hidden max-w-2xl mx-auto pb-12">
+    <!-- 顶部状态栏 -->
     <header class="bg-white border-b sticky top-0 z-20 px-4 py-3 shadow-sm flex justify-between items-center">
       <div>
-        <h1 class="text-base font-black text-gray-900">Control de Menú</h1>
-        <p class="text-[11px] text-gray-400">Modifica precios y disponibilidad en tiempo real</p>
+        <h1 class="text-base font-black text-gray-900 flex items-center gap-1.5">
+          <span>⚙️</span> Control de Menú
+        </h1>
+        <p class="text-[10px] text-gray-400">Modifica precios y agota platos en tiempo real</p>
       </div>
-      <button onclick="logout()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg font-semibold">Salir</button>
+      <div class="flex items-center gap-2">
+        <button onclick="fetchDishes()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1">
+          <span>🔄</span> Refrescar
+        </button>
+        <button onclick="logout()" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1.5 rounded-lg font-bold">
+          Salir
+        </button>
+      </div>
     </header>
 
-    <div class="p-4 space-y-3">
-      <div class="flex gap-2">
-        <input id="search-input" oninput="filterDishes()" type="text" placeholder="Buscar plato..." class="flex-1 border rounded-xl px-3 py-2 text-sm bg-white shadow-sm outline-none focus:border-red-600">
-        <button onclick="fetchDishes()" class="bg-gray-800 text-white px-3 py-2 rounded-xl text-xs font-bold shrink-0">Actualizar</button>
+    <!-- 顶部数据看板块 -->
+    <div class="p-3 bg-white border-b grid grid-cols-3 gap-2 text-center text-xs">
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-100">
+        <div class="text-[10px] text-gray-400 font-bold">TOTAL PLATOS</div>
+        <div id="count-total" class="text-base font-black text-gray-800">0</div>
       </div>
-      <div id="status-toast" class="hidden text-center text-xs py-2 px-3 rounded-xl bg-green-100 text-green-700 font-bold shadow-sm"></div>
+      <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+        <div class="text-[10px] text-emerald-600 font-bold">EN VENTA</div>
+        <div id="count-available" class="text-base font-black text-emerald-700">0</div>
+      </div>
+      <div class="bg-red-50 p-2 rounded-xl border border-red-100">
+        <div class="text-[10px] text-red-600 font-bold">AGOTADOS</div>
+        <div id="count-soldout" class="text-base font-black text-red-600">0</div>
+      </div>
     </div>
 
-    <main id="dish-list" class="px-4 space-y-3">
-      <div class="text-center py-10 text-gray-400 text-xs">Cargando platos desde la nube...</div>
+    <!-- 搜索与多维度分类切换栏 -->
+    <div class="p-3 space-y-2.5 sticky top-[57px] bg-white border-b z-10 shadow-sm">
+      <!-- 搜索输入框 -->
+      <div class="flex gap-2">
+        <input id="search-input" oninput="applyFilters()" type="text" placeholder="Buscar por nombre, código o categoría..." class="flex-1 border rounded-xl px-3 py-2 text-xs bg-gray-50 outline-none focus:border-red-600 focus:bg-white">
+      </div>
+
+      <!-- 分类快捷标签栏 (横向滚动) -->
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+        <button id="tab-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-gray-900 text-white shadow-sm shrink-0">
+          📋 Todos
+        </button>
+        <button id="tab-china" onclick="setFilter('china')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
+          🥢 Comida China
+        </button>
+        <button id="tab-sushi" onclick="setFilter('sushi')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
+          🍣 Sushi
+        </button>
+        <button id="tab-bebidas" onclick="setFilter('bebidas')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
+          🥤 Bebidas
+        </button>
+        <button id="tab-soldout" onclick="setFilter('soldout')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
+          ⛔ Solo Agotados
+        </button>
+      </div>
+
+      <!-- 状态保存浮动提示 -->
+      <div id="status-toast" class="hidden text-center text-xs py-2 px-3 rounded-xl bg-green-100 text-green-700 font-bold shadow-sm transition"></div>
+    </div>
+
+    <!-- 菜品卡片列表区域 -->
+    <main id="dish-list" class="p-3 space-y-2.5">
+      <div class="text-center py-16 text-gray-400 text-xs">Cargando platos desde la nube...</div>
     </main>
   </div>
 
