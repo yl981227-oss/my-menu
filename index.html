@@ -7,103 +7,169 @@
   <title>Menú Online - Comida China & Sushi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
+<body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
 
-  <!-- 1. 顶部招牌 -->
-  <header class="bg-red-700 text-white px-3 py-2.5 shadow shrink-0 z-20 flex justify-between items-center">
-    <div>
-      <h1 class="text-base font-black tracking-wide flex items-center gap-1.5">
-        <span>🥢</span> RESTAURANT & SUSHI
-      </h1>
-      <p class="text-[10px] text-red-200 leading-tight">Pedidos por WhatsApp • Sin comisiones</p>
+  <!-- 1. 顶部质感门面招牌 -->
+  <header class="bg-gradient-to-r from-red-800 via-rose-700 to-red-700 text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20">
+    <div class="flex justify-between items-center mb-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl shadow-inner">
+          🥢
+        </div>
+        <div>
+          <h1 class="text-base font-black tracking-tight leading-none text-white drop-shadow-sm">
+            RESTAURANT & SUSHI
+          </h1>
+          <p class="text-[11px] text-red-100 font-medium mt-1 flex items-center gap-1.5 opacity-90">
+            <span>Sabores Auténticos</span>
+            <span class="w-1 h-1 rounded-full bg-red-300"></span>
+            <span>WhatsApp Directo</span>
+          </p>
+        </div>
+      </div>
+      <!-- 营业状态指示灯 -->
+      <div class="flex items-center gap-1.5 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 px-2.5 py-1 rounded-full shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-[11px] font-black text-emerald-100 tracking-wide">Abierto</span>
+      </div>
     </div>
-    <span class="bg-red-800 text-[10px] px-2 py-0.5 rounded-full text-red-100 font-semibold border border-red-500">Abierto</span>
+
+    <!-- 信任特征胶囊标签 -->
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/90">
+      <span class="bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1">
+        ⭐ 4.9 (180+ reseñas)
+      </span>
+      <span class="bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1">
+        ⏱️ 20-30 min
+      </span>
+      <span class="bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1">
+        🛵 Envío $1.800 CLP
+      </span>
+    </div>
+
+    <!-- 实时菜品搜索框 -->
+    <div class="mt-2.5 relative">
+      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Arroz, Mongoliana, Roll...)" class="w-full bg-black/25 placeholder-red-200/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
+      <span class="absolute left-2.5 top-2.5 text-xs text-red-200">🔍</span>
+    </div>
   </header>
 
-  <!-- 2. 菜单大类切换器 (Comida China vs Sushi) -->
-  <nav class="bg-white px-3 py-2 border-b shrink-0 z-20 flex gap-2 shadow-sm">
-    <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-1.5 rounded-xl text-xs font-black border-2 border-red-600 bg-red-50 text-red-700 flex items-center justify-center gap-1 shadow-sm transition">
-      <span>🥢</span> Comida China
-    </button>
-    <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-1.5 rounded-xl text-xs font-bold border border-gray-200 bg-gray-50 text-gray-600 flex items-center justify-center gap-1 transition">
-      <span>🍣</span> Sushi
-    </button>
+  <!-- 2. iOS 风格主分类切换卡槽 -->
+  <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
+    <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
+      <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black bg-white text-red-700 shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
+        <span class="text-sm">🥢</span> Comida China
+      </button>
+      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200">
+        <span class="text-sm">🍣</span> Sushi
+      </button>
+    </div>
   </nav>
 
-  <!-- 3. 主界面布局：左侧竖向分类栏 + 右侧菜品列表 -->
+  <!-- 3. 双栏黄金布局：左侧品类直达 + 右侧菜品卡片瀑布 -->
   <div class="flex flex-1 overflow-hidden">
-    <!-- 左侧竖向分类导航栏 -->
-    <aside id="sidebar-categories" class="w-24 bg-gray-50 border-r border-gray-200 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1">
-      <!-- 由 JS 动态渲染 -->
+    
+    <!-- 左侧竖向导航栏 -->
+    <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
+      <!-- 由 JS 渲染 -->
     </aside>
 
-    <!-- 右侧菜品列表滚动展示区 -->
-    <main id="menu-container" class="flex-1 overflow-y-auto p-2 pb-28 space-y-5">
-      <div class="text-center py-20 text-gray-400 text-xs">Cargando menú actualizado...</div>
+    <!-- 右侧菜品卡片展示区 -->
+    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
+      <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
-  <!-- 4. 底部常驻购物车条 -->
-  <footer class="fixed bottom-0 left-0 right-0 bg-white border-t p-2.5 flex items-center justify-between shadow-2xl z-30">
-    <div>
-      <div class="text-[10px] text-gray-400">Total pedido:</div>
-      <div class="text-base font-black text-red-600">$ <span id="cart-total-price">0</span> CLP</div>
-    </div>
-    <button onclick="openCheckoutModal()" class="bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-2 px-4 rounded-xl shadow-md text-xs flex items-center gap-1.5">
-      <span>Ver pedido</span>
-      <span class="bg-white text-red-600 rounded-full w-5 h-5 flex items-center justify-center text-[11px] font-black" id="cart-total-count">0</span>
-    </button>
-  </footer>
-
-  <!-- 5. 菜品定制弹窗 (中餐 / 寿司 / 饮品 智能切换) -->
-  <div id="option-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 shadow-2xl max-h-[85vh] overflow-y-auto">
-      <div class="flex justify-between items-start border-b pb-2.5 mb-3">
-        <div>
-          <h3 id="opt-dish-name" class="text-sm font-black text-gray-900 leading-tight">Plato</h3>
-          <p id="opt-dish-desc" class="text-[11px] text-gray-500 mt-0.5">Descripción</p>
+  <!-- 4. 国际范悬浮胶囊购物车 (Floating Dock Bar) -->
+  <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
+    <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
+      <div class="flex items-center gap-3 pl-1">
+        <div class="relative">
+          <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-lg shadow-md">
+            🛒
+          </div>
+          <span id="cart-total-count" class="absolute -top-1.5 -right-1.5 bg-amber-400 text-gray-950 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md">0</span>
         </div>
-        <button onclick="closeOptionModal()" class="text-gray-400 text-2xl font-bold ml-2 leading-none">&times;</button>
+        <div>
+          <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Subtotal</div>
+          <div class="text-base font-black tracking-tight text-white leading-tight">
+            $ <span id="cart-total-price">0</span> <span class="text-[10px] font-normal text-gray-400">CLP</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="openCheckoutModal()" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold py-2.5 px-5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition">
+        <span>Ver pedido</span>
+        <span>→</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- 5. 现代化底部抽屉弹窗：菜品定制 (Option Modal) -->
+  <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+      
+      <!-- 拖拽感把手 -->
+      <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
+
+      <div class="flex justify-between items-start border-b pb-3 mb-3.5">
+        <div>
+          <h3 id="opt-dish-name" class="text-base font-black text-gray-900 leading-snug">Plato</h3>
+          <p id="opt-dish-desc" class="text-xs text-gray-500 mt-0.5 leading-relaxed">Descripción</p>
+        </div>
+        <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- A. 便当配餐选择 (仅中餐便当有效) -->
-      <div id="colacion-side-box" class="hidden mb-3">
-        <label class="block text-[11px] font-bold text-gray-700 mb-1">Acompañamiento *</label>
+      <!-- 便当配餐加价选项 -->
+      <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+        <label class="block text-xs font-black text-gray-800 mb-2">🍱 Elige tu acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
-          <label class="flex items-center gap-2 p-2 rounded-lg border cursor-pointer hover:bg-gray-50">
-            <input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0">
-            <span>Con Arroz Chaufán / Blanco (+$0)</span>
+          <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-red-400">
+            <div class="flex items-center gap-2">
+              <input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0" class="text-red-600 focus:ring-0">
+              <span class="font-bold">Arroz Chaufán / Blanco</span>
+            </div>
+            <span class="text-[11px] font-black text-gray-400">+$0</span>
           </label>
-          <label class="flex items-center gap-2 p-2 rounded-lg border cursor-pointer hover:bg-gray-50">
-            <input type="radio" name="side-choice" value="Con Papas Fritas" data-addprice="500">
-            <span>Con Papas Fritas (+ $500)</span>
+          <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-red-400">
+            <div class="flex items-center gap-2">
+              <input type="radio" name="side-choice" value="Con Papas Fritas" data-addprice="500" class="text-red-600 focus:ring-0">
+              <span class="font-bold">Papas Fritas crujientes</span>
+            </div>
+            <span class="text-[11px] font-black text-red-600">+ $500</span>
           </label>
-          <label class="flex items-center gap-2 p-2 rounded-lg border cursor-pointer hover:bg-gray-50">
-            <input type="radio" name="side-choice" value="Con Fideo Chaumín" data-addprice="800">
-            <span>Con Fideo Chaumín (+ $800)</span>
+          <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-red-400">
+            <div class="flex items-center gap-2">
+              <input type="radio" name="side-choice" value="Con Fideo Chaumín" data-addprice="800" class="text-red-600 focus:ring-0">
+              <span class="font-bold">Fideo Chaumín</span>
+            </div>
+            <span class="text-[11px] font-black text-red-600">+ $800</span>
           </label>
         </div>
       </div>
 
-      <!-- B. 中餐专属定制选项 (辣度与少盐免葱) -->
-      <div id="box-china-options" class="space-y-3">
+      <!-- 中餐专属定制 -->
+      <div id="box-china-options" class="space-y-4">
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Nivel de Ají *</label>
-          <div class="grid grid-cols-3 gap-1.5 text-xs">
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+          <label class="block text-xs font-black text-gray-800 mb-2">🌶️ Nivel de Ají *</label>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-aji" value="Sin ají" checked class="hidden">
               <span>Sin ají</span>
             </label>
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-aji" value="Con ají" class="hidden">
-              <span>Con ají</span>
+              <span>Con ají 🔥</span>
             </label>
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-aji" value="Ají aparte" class="hidden">
               <span>Ají aparte</span>
             </label>
@@ -111,60 +177,60 @@
         </div>
 
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Preferencias de cocina</label>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="rounded text-red-600">
-              <span>Bajo en sal</span>
+          <label class="block text-xs font-black text-gray-800 mb-2">🧂 Preferencias de cocina</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Bajo en sal</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="rounded text-red-600">
-              <span>Poco sillao</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Poco sillao</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="rounded text-red-600">
-              <span>Sin cebollín</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="pref-diente" value="Sin diente" class="rounded text-red-600">
-              <span>Sin diente</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="pref-diente" value="Sin diente" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Sin diente dragón</span>
             </label>
           </div>
         </div>
       </div>
 
-      <!-- C. 寿司专属定制选项 (酱料、木筷、免芝士等) -->
-      <div id="box-sushi-options" class="space-y-3 hidden">
+      <!-- 寿司专属定制 -->
+      <div id="box-sushi-options" class="space-y-4 hidden">
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Salsas para sushi (选择酱料)</label>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] bg-gray-50">
-              <input type="checkbox" id="sushi-soya" value="Salsa Soya" checked class="rounded text-red-600">
-              <span>Salsa Soya (酱油)</span>
+          <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
+              <input type="checkbox" id="sushi-soya" value="Salsa Soya" checked class="w-4 h-4 rounded text-red-600">
+              <span class="font-bold">Soya (酱油)</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] bg-gray-50">
-              <input type="checkbox" id="sushi-teriyaki" value="Salsa Teriyaki" checked class="rounded text-red-600">
-              <span>Salsa Teriyaki (甜酱)</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
+              <input type="checkbox" id="sushi-teriyaki" value="Salsa Teriyaki" checked class="w-4 h-4 rounded text-red-600">
+              <span class="font-bold">Teriyaki (甜酱)</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="rounded text-red-600">
-              <span>Wasabi (芥末)</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Wasabi (芥末)</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="rounded text-red-600">
-              <span>Jengibre (红姜)</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Jengibre (红姜)</span>
             </label>
           </div>
         </div>
 
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Palitos chinos (木筷) *</label>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+          <label class="block text-xs font-black text-gray-800 mb-2">🥢 ¿Deseas Palitos de madera?</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center justify-center py-2.5 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
-              <span>🥢 Con palitos</span>
+              <span>🥢 Sí, con palitos</span>
             </label>
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+            <label class="flex items-center justify-center py-2.5 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
               <span>🌱 Sin palitos</span>
             </label>
@@ -172,38 +238,38 @@
         </div>
 
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Detalles de preparación</label>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="rounded text-red-600">
-              <span>Sin queso crema</span>
+          <label class="block text-xs font-black text-gray-800 mb-2">🥑 Detalles del Roll</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Sin queso crema</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="rounded text-red-600">
-              <span>Sin cebollín</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="rounded text-red-600">
-              <span>Sin sésamo</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Sin sésamo</span>
             </label>
-            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-              <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="rounded text-red-600">
-              <span>Bien dorado (炸脆)</span>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
+              <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="w-4 h-4 rounded text-red-600">
+              <span class="font-semibold text-gray-700">Bien dorado 🔥</span>
             </label>
           </div>
         </div>
       </div>
 
-      <!-- D. 饮料专属选项 (冰镇 / 常温) -->
-      <div id="box-drink-options" class="space-y-3 hidden">
+      <!-- 饮料专属定制 -->
+      <div id="box-drink-options" class="space-y-4 hidden">
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Temperatura deseada *</label>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+          <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura de la bebida *</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center justify-center py-3 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Fría / Helada" checked class="hidden">
-              <span>❄️ Fría / Helada</span>
+              <span>❄️ Bien Fría / Helada</span>
             </label>
-            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+            <label class="flex items-center justify-center py-3 rounded-xl border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50/80 has-[:checked]:text-red-700 font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Al tiempo" class="hidden">
               <span>🌤️ Al tiempo</span>
             </label>
@@ -211,91 +277,101 @@
         </div>
       </div>
 
-      <!-- 数量调整 -->
-      <div class="flex items-center justify-between border-t pt-2.5 mt-3 mb-3">
-        <span class="text-xs font-bold text-gray-700">Cantidad:</span>
-        <div class="flex items-center gap-3">
-          <button onclick="changeModalQty(-1)" class="w-7 h-7 rounded-full bg-gray-200 text-gray-800 font-black flex items-center justify-center">-</button>
-          <span id="opt-modal-qty" class="font-bold text-sm">1</span>
-          <button onclick="changeModalQty(1)" class="w-7 h-7 rounded-full bg-red-600 text-white font-black flex items-center justify-center">+</button>
+      <!-- 数量步进器 -->
+      <div class="flex items-center justify-between border-t border-gray-150 pt-3.5 mt-4 mb-4">
+        <span class="text-xs font-black text-gray-700">Cantidad:</span>
+        <div class="flex items-center gap-3 bg-gray-100 p-1 rounded-2xl border border-gray-200">
+          <button onclick="changeModalQty(-1)" class="w-8 h-8 rounded-xl bg-white text-gray-800 font-black shadow-sm flex items-center justify-center text-sm active:scale-90 transition">-</button>
+          <span id="opt-modal-qty" class="font-black text-sm px-2">1</span>
+          <button onclick="changeModalQty(1)" class="w-8 h-8 rounded-xl bg-red-600 text-white font-black shadow-md flex items-center justify-center text-sm active:scale-90 transition">+</button>
         </div>
       </div>
 
-      <button onclick="confirmAddToCart()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl shadow text-xs">
-        Agregar al pedido
+      <button onclick="confirmAddToCart()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-black py-3.5 rounded-2xl shadow-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+        <span>Agregar al pedido</span>
       </button>
     </div>
   </div>
 
-  <!-- 6. 结账结算弹窗 (配送费已变更为 1.800 CLP) -->
-  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-2.5 border-b pb-2">
-        <h3 class="text-sm font-bold text-gray-900">Resumen del Pedido</h3>
-        <button onclick="closeCheckoutModal()" class="text-gray-400 text-2xl font-bold leading-none">&times;</button>
+  <!-- 6. 结账结算弹窗 (Checkout Modal) -->
+  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      
+      <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
+
+      <div class="flex justify-between items-center mb-3 border-b pb-2.5">
+        <div>
+          <h3 class="text-base font-black text-gray-900">Resumen de tu Pedido</h3>
+          <p class="text-[11px] text-gray-400">Verifica los datos antes de enviar a WhatsApp</p>
+        </div>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- 购物车已选商品预览 -->
-      <div id="cart-items-preview" class="space-y-2 mb-3 max-h-36 overflow-y-auto divide-y text-xs"></div>
+      <!-- 购物车列表明细 -->
+      <div id="cart-items-preview" class="space-y-2 mb-3.5 max-h-40 overflow-y-auto divide-y divide-gray-100 text-xs pr-1"></div>
 
-      <!-- 取餐方式：在此处选择 Para llevar 或 Delivery (+$1.800 CLP) -->
-      <div class="mb-3">
-        <label class="block text-[11px] font-bold text-gray-700 mb-1">Tipo de entrega *</label>
+      <!-- 履约方式选择：自提 vs 外送 -->
+      <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
+        <label class="block text-xs font-black text-gray-800 mb-2">🛵 Método de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-          <button type="button" id="btn-pickup" onclick="setOrderType('pickup')" class="py-2 rounded-lg border-2 border-red-600 bg-red-50 text-red-600 text-center">
-            🛍️ Para llevar<br><span class="text-[10px] font-normal text-gray-500">(Retiro en local)</span>
+          <button type="button" id="btn-pickup" onclick="setOrderType('pickup')" class="p-2.5 rounded-xl border-2 border-red-600 bg-white text-red-700 shadow-sm text-center transition">
+            🛍️ Para llevar<br><span class="text-[10px] font-normal text-gray-500">Retiro en local</span>
           </button>
-          <button type="button" id="btn-delivery" onclick="setOrderType('delivery')" class="py-2 rounded-lg border border-gray-300 text-gray-600 text-center">
-            🛵 Delivery<br><span class="text-[10px] font-normal text-gray-500">(Envío +$1.800 CLP)</span>
+          <button type="button" id="btn-delivery" onclick="setOrderType('delivery')" class="p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 text-center transition">
+            🛵 Delivery<br><span class="text-[10px] font-semibold text-rose-600">+$1.800 CLP</span>
           </button>
         </div>
       </div>
 
-      <!-- 顾客信息填写区 -->
-      <div class="space-y-2 text-xs">
+      <!-- 顾客表单信息填写 -->
+      <div class="space-y-2.5 text-xs">
         <div>
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Nombre completo *</label>
-          <input id="cust-name" type="text" placeholder="Ej: Lina" class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre Completo *</label>
+          <input id="cust-name" type="text" placeholder="Ej: Marcela González" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 focus:bg-white transition">
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Teléfono WhatsApp *</label>
-          <input id="cust-phone" type="tel" placeholder="Ej: 56974142834" class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Teléfono WhatsApp *</label>
+          <input id="cust-phone" type="tel" placeholder="Ej: 56912345678" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 focus:bg-white transition">
         </div>
         
-        <!-- 配送地址（仅当选择 Delivery 时展开） -->
+        <!-- 外送地址框 -->
         <div id="address-box" class="hidden">
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Dirección de entrega *</label>
-          <input id="cust-address" type="text" placeholder="Calle, número, departamento / Comuna" class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Dirección de entrega (Calle, Número, Depto) *</label>
+          <input id="cust-address" type="text" placeholder="Ej: Av. Recoleta 1234, Depto 402" class="w-full border border-red-200 bg-red-50/30 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 focus:bg-white transition">
         </div>
 
         <div>
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Método de pago *</label>
-          <select id="pay-method" onchange="toggleCashInput()" class="w-full border rounded-lg p-2 text-xs bg-white outline-none focus:border-red-600">
-            <option value="efectivo">Efectivo al recibir (现金)</option>
-            <option value="tarjeta">Tarjeta Débito / Crédito POS (现场刷卡)</option>
-            <option value="transferencia">Transferencia Bancaria (银行转账)</option>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de pago *</label>
+          <select id="pay-method" onchange="toggleCashInput()" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 font-semibold text-gray-700">
+            <option value="efectivo">💵 Efectivo al recibir</option>
+            <option value="tarjeta">💳 Tarjeta Débito / Crédito POS (现场刷卡)</option>
+            <option value="transferencia">🏦 Transferencia Bancaria (转账)</option>
           </select>
         </div>
 
         <div id="cash-amount-box">
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">¿Con cuánto efectivo pagarás? (找零)</label>
-          <input id="cust-cash" type="number" placeholder="Ej: 20000" class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">¿Con cuánto efectivo pagarás? (para el vuelto)</label>
+          <input id="cust-cash" type="number" placeholder="Ej: 20000 (deja vacío si es justo)" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 transition">
         </div>
 
         <div>
-          <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Comentarios adicionales</label>
-          <input id="cust-notes" type="text" placeholder="Ej: Servilletas extras, llamar al llegar..." class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Comentarios / Instrucciones especiales</label>
+          <input id="cust-notes" type="text" placeholder="Ej: Timbre no funciona, llamar al llegar..." class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-red-600 transition">
         </div>
       </div>
 
-      <!-- 结账汇总金额与跳转发送按钮 -->
-      <div class="mt-3.5 border-t pt-2.5">
-        <div class="flex justify-between text-xs font-bold text-gray-700 mb-2">
-          <span>Total a pagar:</span>
-          <span class="text-red-600 text-sm font-black">$ <span id="modal-checkout-total">0</span> CLP</span>
+      <!-- 最终总计与一键 WhatsApp 唤起按钮 -->
+      <div class="mt-4 border-t border-gray-150 pt-3">
+        <div class="flex justify-between items-baseline mb-3">
+          <span class="text-xs font-bold text-gray-600">Total a pagar:</span>
+          <div class="text-right">
+            <span class="text-lg font-black text-rose-700 tracking-tight">$ <span id="modal-checkout-total">0</span></span>
+            <span class="text-xs font-bold text-gray-400">CLP</span>
+          </div>
         </div>
-        <button onclick="sendOrderToWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-1.5 shadow text-xs">
-          <span>Enviar pedido a WhatsApp</span>
+        <button onclick="sendOrderToWhatsApp()" class="w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-black py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-green-500/20 text-xs active:scale-95 transition">
+          <span class="text-base">📲</span>
+          <span>Enviar Pedido a WhatsApp</span>
         </button>
       </div>
     </div>
@@ -308,7 +384,7 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 中餐分类体系（包含饮品）
+    // 中餐品类体系
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
@@ -326,7 +402,7 @@
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
-    // 寿司分类体系（包含饮品）
+    // 寿司品类体系
     const categoriesSushi = [
       { id: "cat-sushi-promos", title: "🍱 PROMOS SUSHI", icon: "🍱", short: "Promos" },
       { id: "cat-sushi-hot", title: "🔥 HOT ROLLS (Fritos)", icon: "🔥", short: "Hot Rolls" },
@@ -350,11 +426,11 @@
       const btnSushi = document.getElementById('btn-tab-sushi');
 
       if (mode === 'china') {
-        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-black border-2 border-red-600 bg-red-50 text-red-700 flex items-center justify-center gap-1 shadow-sm transition";
-        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-bold border border-gray-200 bg-gray-50 text-gray-600 flex items-center justify-center gap-1 transition";
+        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white text-red-700 shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       } else {
-        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-black border-2 border-red-600 bg-red-50 text-red-700 flex items-center justify-center gap-1 shadow-sm transition";
-        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-bold border border-gray-200 bg-gray-50 text-gray-600 flex items-center justify-center gap-1 transition";
+        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white text-red-700 shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       }
       renderCurrentMenu();
     }
@@ -383,10 +459,10 @@
       let html = '';
       cats.forEach((cat, idx) => {
         const isFirst = idx === 0;
-        const activeClass = isFirst ? 'bg-white text-red-600 font-black border-l-4 border-red-600 shadow-sm' : 'text-gray-500 font-semibold hover:bg-gray-100';
-        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-2.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-100 ' + activeClass + '">';
-        html += '  <span class="text-base leading-none">' + cat.icon + '</span>';
-        html += '  <span class="leading-tight break-words">' + cat.short + '</span>';
+        const activeClass = isFirst ? 'bg-white text-rose-700 font-black border-l-4 border-rose-600 shadow-sm' : 'text-gray-500 font-semibold hover:bg-gray-200/60';
+        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 ' + activeClass + '">';
+        html += '  <span class="text-lg leading-none">' + cat.icon + '</span>';
+        html += '  <span class="leading-tight break-words text-[10px]">' + cat.short + '</span>';
         html += '</button>';
       });
       sidebar.innerHTML = html;
@@ -400,34 +476,42 @@
         const items = allDishes.filter(d => d.category === cat.id);
         if (items.length === 0) return;
 
-        html += '<section id="' + cat.id + '" class="scroll-mt-2">';
-        html += '<h2 class="text-xs font-black text-gray-700 bg-gray-200/80 py-1.5 px-2.5 rounded-lg mb-2 uppercase tracking-wide flex items-center gap-1">' + cat.icon + ' ' + cat.title + '</h2>';
+        html += '<section id="' + cat.id + '" class="scroll-mt-3">';
+        html += '<div class="flex items-center gap-2 mb-2 px-1">';
+        html += '  <span class="text-sm">' + cat.icon + '</span>';
+        html += '  <h2 class="text-xs font-black text-gray-800 uppercase tracking-wider">' + cat.title + '</h2>';
+        html += '  <span class="text-[10px] font-bold text-gray-400 ml-auto bg-gray-200/60 px-2 py-0.5 rounded-full">' + items.length + '</span>';
+        html += '</div>';
         html += '<div class="space-y-2">';
 
         items.forEach(dish => {
           const isSoldOut = !dish.is_available;
           const clickAttr = isSoldOut ? '' : 'onclick="openOptionModal(' + dish.id + ')"';
           const cardStyle = isSoldOut 
-            ? 'bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center opacity-50 bg-gray-50 cursor-not-allowed' 
-            : 'bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center active:scale-[0.99] transition cursor-pointer shadow-sm';
-          const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[8px] px-1 py-0.2 rounded font-black">AGOTADO</span>' : '';
-          const btnBg = isSoldOut ? 'bg-gray-300 text-gray-500' : 'bg-red-600 text-white';
+            ? 'bg-white/60 p-3 rounded-2xl border border-gray-200/50 flex justify-between items-center opacity-60 cursor-not-allowed' 
+            : 'bg-white p-3 rounded-2xl border border-gray-150 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md flex justify-between items-center active:scale-[0.99] transition cursor-pointer';
+          const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded-md font-black tracking-wider">AGOTADO</span>' : '';
+          const btnBg = isSoldOut ? 'bg-gray-200 text-gray-400' : 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-rose-200 active:scale-90';
           const btnIcon = isSoldOut ? '✕' : '+';
           const descText = dish.description || '';
           const priceStr = Number(dish.price).toLocaleString('es-CL');
 
-          html += '<div ' + clickAttr + ' class="' + cardStyle + '">';
-          html += '  <div class="flex-1 pr-2">';
+          html += '<div ' + clickAttr + ' class="' + cardStyle + ' dish-card" data-dishname="' + dish.name.toLowerCase() + '" data-dishdesc="' + descText.toLowerCase() + '">';
+          html += '  <div class="flex-1 pr-3">';
           html += '    <div class="flex items-center gap-1.5">';
-          html += '      <h3 class="font-bold text-xs text-gray-900 leading-snug">' + dish.name + '</h3>';
+          html += '      <h3 class="font-extrabold text-xs text-gray-900 leading-snug">' + dish.name + '</h3>';
           html +=        badge;
           html += '    </div>';
           if (descText) {
             html += '    <p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
           }
-          html += '    <div class="text-xs font-black text-red-600 mt-1">$ ' + priceStr + ' CLP</div>';
+          html += '    <div class="mt-1.5 flex items-baseline gap-1">';
+          html += '      <span class="text-[10px] font-bold text-rose-600">$</span>';
+          html += '      <span class="text-sm font-black text-rose-700 tracking-tight">' + priceStr + '</span>';
+          html += '      <span class="text-[9px] font-semibold text-gray-400">CLP</span>';
+          html += '    </div>';
           html += '  </div>';
-          html += '  <button class="w-7 h-7 rounded-full ' + btnBg + ' font-black text-sm flex items-center justify-center shrink-0 shadow-sm">' + btnIcon + '</button>';
+          html += '  <button class="w-8 h-8 rounded-full ' + btnBg + ' font-black text-base flex items-center justify-center shrink-0 transition">' + btnIcon + '</button>';
           html += '</div>';
         });
 
@@ -435,10 +519,25 @@
       });
 
       if (!html) {
-        html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles en esta sección por el momento.</div>';
+        html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
       }
 
       container.innerHTML = html;
+    }
+
+    // 快捷搜索过滤
+    function filterMenuItems() {
+      const q = document.getElementById('quick-search').value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.dish-card');
+      cards.forEach(card => {
+        const name = card.getAttribute('data-dishname') || '';
+        const desc = card.getAttribute('data-dishdesc') || '';
+        if (name.includes(q) || desc.includes(q)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     }
 
     function scrollToSection(catId) {
@@ -446,16 +545,15 @@
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.querySelectorAll('#sidebar-categories button').forEach(btn => {
-          btn.className = "w-full text-left px-2.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-100 text-gray-500 font-semibold hover:bg-gray-100";
+          btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
         });
         const activeBtn = document.getElementById('side-btn-' + catId);
         if (activeBtn) {
-          activeBtn.className = "w-full text-left px-2.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-100 bg-white text-red-600 font-black border-l-4 border-red-600 shadow-sm";
+          activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white text-rose-700 font-black border-l-4 border-rose-600 shadow-sm";
         }
       }
     }
 
-    // 打开定制弹窗（核心分支：区分中餐、寿司、饮料）
     function openOptionModal(dishId) {
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
@@ -469,13 +567,11 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
-      // 控制不同分类的界面展示
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
       document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink);
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
-      // 重置各个模块的默认值
       if (isSushi) {
         document.getElementById('sushi-soya').checked = true;
         document.getElementById('sushi-teriyaki').checked = true;
@@ -514,7 +610,6 @@
       let extraPrice = 0;
       let optionsList = [];
 
-      // 1. 便当加价选项
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -526,7 +621,6 @@
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
 
-      // 2. 根据类型收录专属选项
       if (isSushi) {
         let salsas = [];
         if (document.getElementById('sushi-soya').checked) salsas.push('Soya');
@@ -580,7 +674,6 @@
       document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
     }
 
-    // 履约方式切换（配送费严格设定为 1800 CLP）
     function setOrderType(type) {
       orderType = type;
       const btnPick = document.getElementById('btn-pickup');
@@ -588,12 +681,12 @@
       const addrBox = document.getElementById('address-box');
 
       if (type === 'pickup') {
-        btnPick.className = "py-2 rounded-lg border-2 border-red-600 bg-red-50 text-red-600 text-center";
-        btnDel.className = "py-2 rounded-lg border border-gray-300 text-gray-600 text-center";
+        btnPick.className = "p-2.5 rounded-xl border-2 border-red-600 bg-white text-red-700 shadow-sm text-center transition";
+        btnDel.className = "p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 text-center transition";
         addrBox.classList.add('hidden');
       } else {
-        btnDel.className = "py-2 rounded-lg border-2 border-red-600 bg-red-50 text-red-600 text-center";
-        btnPick.className = "py-2 rounded-lg border border-gray-300 text-gray-600 text-center";
+        btnDel.className = "p-2.5 rounded-xl border-2 border-red-600 bg-white text-red-700 shadow-sm text-center transition";
+        btnPick.className = "p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 text-center transition";
         addrBox.classList.remove('hidden');
       }
       refreshCheckoutTotal();
@@ -606,7 +699,6 @@
       else cashBox.classList.add('hidden');
     }
 
-    // 总结算金额（含配送费 1800 CLP）
     function refreshCheckoutTotal() {
       let subtotal = 0;
       cart.forEach(item => {
@@ -627,13 +719,13 @@
       cart.forEach((item, index) => {
         const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
         const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-400 leading-tight mt-0.5">• ' + item.options.join(', ') + '</div>' : '';
-        previewHtml += '<div class="py-1.5 flex justify-between items-start">';
+        previewHtml += '<div class="py-2 flex justify-between items-start">';
         previewHtml += '  <div class="flex-1 pr-2">';
-        previewHtml += '    <div class="font-bold text-gray-800 text-xs">' + item.qty + 'x ' + item.name + '</div>';
+        previewHtml += '    <div class="font-extrabold text-gray-900 text-xs">' + item.qty + 'x ' + item.name + '</div>';
         previewHtml +=      optText;
-        previewHtml += '    <div class="text-red-600 font-bold mt-0.5 text-xs">$ ' + itemTotal + ' CLP</div>';
+        previewHtml += '    <div class="text-rose-700 font-black mt-0.5 text-xs">$ ' + itemTotal + ' CLP</div>';
         previewHtml += '  </div>';
-        previewHtml += '  <button onclick="removeFromCart(' + index + ')" class="text-red-500 text-[11px] px-1.5 py-0.5 font-bold">Quitar</button>';
+        previewHtml += '  <button onclick="removeFromCart(' + index + ')" class="text-red-500 hover:text-red-700 text-[11px] px-2 py-1 font-bold rounded-lg bg-red-50">Quitar</button>';
         previewHtml += '</div>';
       });
       container.innerHTML = previewHtml;
@@ -662,7 +754,6 @@
       return { date: dd + '/' + mm + '/' + yyyy, time: hh + ':' + min };
     }
 
-    // 生成发往 WhatsApp 的订单长文本
     function sendOrderToWhatsApp() {
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
@@ -693,7 +784,6 @@
         productsList.push(line);
       });
 
-      // 配送费设为 1800 CLP
       const deliveryFee = (orderType === 'delivery') ? 1800 : 0;
       const total = subtotal + deliveryFee;
 
