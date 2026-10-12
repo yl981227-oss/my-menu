@@ -37,10 +37,9 @@
 
   <!-- 3. 主界面布局：左侧竖向分类栏 + 右侧菜品列表 -->
   <div class="flex flex-1 overflow-hidden">
-    
     <!-- 左侧竖向分类导航栏 -->
     <aside id="sidebar-categories" class="w-24 bg-gray-50 border-r border-gray-200 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1">
-      <!-- 分类项由 JS 动态生成 -->
+      <!-- 由 JS 动态渲染 -->
     </aside>
 
     <!-- 右侧菜品列表滚动展示区 -->
@@ -61,7 +60,7 @@
     </button>
   </footer>
 
-  <!-- 5. 菜品定制弹窗 (便当配餐/辣度/口味) -->
+  <!-- 5. 菜品定制弹窗 (中餐 / 寿司 / 饮品 智能切换) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-start border-b pb-2.5 mb-3">
@@ -72,7 +71,7 @@
         <button onclick="closeOptionModal()" class="text-gray-400 text-2xl font-bold ml-2 leading-none">&times;</button>
       </div>
 
-      <!-- 配餐选择（便当专用） -->
+      <!-- A. 便当配餐选择 (仅中餐便当有效) -->
       <div id="colacion-side-box" class="hidden mb-3">
         <label class="block text-[11px] font-bold text-gray-700 mb-1">Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -91,50 +90,129 @@
         </div>
       </div>
 
-      <!-- 辣度 -->
-      <div id="box-aji" class="mb-3">
-        <label class="block text-[11px] font-bold text-gray-700 mb-1">Nivel de Ají *</label>
-        <div class="grid grid-cols-3 gap-1.5 text-xs">
-          <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
-            <input type="radio" name="opt-aji" value="Sin ají" checked class="hidden">
-            <span>Sin ají</span>
-          </label>
-          <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
-            <input type="radio" name="opt-aji" value="Con ají" class="hidden">
-            <span>Con ají</span>
-          </label>
-          <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
-            <input type="radio" name="opt-aji" value="Ají aparte" class="hidden">
-            <span>Ají aparte</span>
-          </label>
+      <!-- B. 中餐专属定制选项 (辣度与少盐免葱) -->
+      <div id="box-china-options" class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Nivel de Ají *</label>
+          <div class="grid grid-cols-3 gap-1.5 text-xs">
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-aji" value="Sin ají" checked class="hidden">
+              <span>Sin ají</span>
+            </label>
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-aji" value="Con ají" class="hidden">
+              <span>Con ají</span>
+            </label>
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-aji" value="Ají aparte" class="hidden">
+              <span>Ají aparte</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Preferencias de cocina</label>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="rounded text-red-600">
+              <span>Bajo en sal</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="rounded text-red-600">
+              <span>Poco sillao</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="rounded text-red-600">
+              <span>Sin cebollín</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="pref-diente" value="Sin diente" class="rounded text-red-600">
+              <span>Sin diente</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <!-- 口味定制偏好 -->
-      <div id="box-pref" class="mb-3">
-        <label class="block text-[11px] font-bold text-gray-700 mb-1">Preferencias de cocina</label>
-        <div class="grid grid-cols-2 gap-1.5 text-xs">
-          <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-            <input type="checkbox" id="pref-sal" value="Bajo en sal" class="rounded text-red-600">
-            <span>Bajo en sal</span>
-          </label>
-          <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-            <input type="checkbox" id="pref-sillao" value="Poco sillao" class="rounded text-red-600">
-            <span>Poco sillao</span>
-          </label>
-          <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-            <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="rounded text-red-600">
-            <span>Sin cebollín</span>
-          </label>
-          <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
-            <input type="checkbox" id="pref-diente" value="Sin diente" class="rounded text-red-600">
-            <span>Sin diente</span>
-          </label>
+      <!-- C. 寿司专属定制选项 (酱料、木筷、免芝士等) -->
+      <div id="box-sushi-options" class="space-y-3 hidden">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Salsas para sushi (选择酱料)</label>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] bg-gray-50">
+              <input type="checkbox" id="sushi-soya" value="Salsa Soya" checked class="rounded text-red-600">
+              <span>Salsa Soya (酱油)</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] bg-gray-50">
+              <input type="checkbox" id="sushi-teriyaki" value="Salsa Teriyaki" checked class="rounded text-red-600">
+              <span>Salsa Teriyaki (甜酱)</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="rounded text-red-600">
+              <span>Wasabi (芥末)</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="rounded text-red-600">
+              <span>Jengibre (红姜)</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Palitos chinos (木筷) *</label>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
+              <span>🥢 Con palitos</span>
+            </label>
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
+              <span>🌱 Sin palitos</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Detalles de preparación</label>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="rounded text-red-600">
+              <span>Sin queso crema</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="rounded text-red-600">
+              <span>Sin cebollín</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="rounded text-red-600">
+              <span>Sin sésamo</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px]">
+              <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="rounded text-red-600">
+              <span>Bien dorado (炸脆)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- D. 饮料专属选项 (冰镇 / 常温) -->
+      <div id="box-drink-options" class="space-y-3 hidden">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Temperatura deseada *</label>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-drink-temp" value="Fría / Helada" checked class="hidden">
+              <span>❄️ Fría / Helada</span>
+            </label>
+            <label class="flex items-center justify-center p-2 rounded-lg border text-center cursor-pointer has-[:checked]:border-red-600 has-[:checked]:bg-red-50 has-[:checked]:text-red-600 font-semibold text-[11px]">
+              <input type="radio" name="opt-drink-temp" value="Al tiempo" class="hidden">
+              <span>🌤️ Al tiempo</span>
+            </label>
+          </div>
         </div>
       </div>
 
       <!-- 数量调整 -->
-      <div class="flex items-center justify-between border-t pt-2.5 mb-3">
+      <div class="flex items-center justify-between border-t pt-2.5 mt-3 mb-3">
         <span class="text-xs font-bold text-gray-700">Cantidad:</span>
         <div class="flex items-center gap-3">
           <button onclick="changeModalQty(-1)" class="w-7 h-7 rounded-full bg-gray-200 text-gray-800 font-black flex items-center justify-center">-</button>
@@ -149,7 +227,7 @@
     </div>
   </div>
 
-  <!-- 6. 结账结算弹窗 (包含后移的取餐方式选择) -->
+  <!-- 6. 结账结算弹窗 (配送费已变更为 1.800 CLP) -->
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-2.5 border-b pb-2">
@@ -160,7 +238,7 @@
       <!-- 购物车已选商品预览 -->
       <div id="cart-items-preview" class="space-y-2 mb-3 max-h-36 overflow-y-auto divide-y text-xs"></div>
 
-      <!-- 取餐方式：在此处选择 Para llevar 或 Delivery -->
+      <!-- 取餐方式：在此处选择 Para llevar 或 Delivery (+$1.800 CLP) -->
       <div class="mb-3">
         <label class="block text-[11px] font-bold text-gray-700 mb-1">Tipo de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -168,7 +246,7 @@
             🛍️ Para llevar<br><span class="text-[10px] font-normal text-gray-500">(Retiro en local)</span>
           </button>
           <button type="button" id="btn-delivery" onclick="setOrderType('delivery')" class="py-2 rounded-lg border border-gray-300 text-gray-600 text-center">
-            🛵 Delivery<br><span class="text-[10px] font-normal text-gray-500">(Envío +$2.000 CLP)</span>
+            🛵 Delivery<br><span class="text-[10px] font-normal text-gray-500">(Envío +$1.800 CLP)</span>
           </button>
         </div>
       </div>
@@ -206,7 +284,7 @@
 
         <div>
           <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Comentarios adicionales</label>
-          <input id="cust-notes" type="text" placeholder="Ej: Sin cubiertos, llamar al llegar..." class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
+          <input id="cust-notes" type="text" placeholder="Ej: Servilletas extras, llamar al llegar..." class="w-full border rounded-lg p-2 text-xs outline-none focus:border-red-600">
         </div>
       </div>
 
@@ -253,20 +331,19 @@
       { id: "cat-sushi-promos", title: "🍱 PROMOS SUSHI", icon: "🍱", short: "Promos" },
       { id: "cat-sushi-hot", title: "🔥 HOT ROLLS (Fritos)", icon: "🔥", short: "Hot Rolls" },
       { id: "cat-sushi-california", title: "🥑 CALIFORNIA ROLLS", icon: "🥑", short: "California" },
-      { id: "cat-sushi-envueltos", title: "🍣 ENVUELTOS (Palta/Salmón)", icon: "🍣", short: "Envueltos" },
+      { id: "cat-sushi-envueltos", title: "🍣 ENVUELTOS", icon: "🍣", short: "Envueltos" },
       { id: "cat-sushi-handrolls", title: "🌯 HAND ROLLS", icon: "🌯", short: "Hand Rolls" },
       { id: "cat-sushi-gohan", title: "🍚 GOHAN BOWLS", icon: "🍚", short: "Gohan" },
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
-    let currentMenuMode = 'china'; // 'china' 或 'sushi'
+    let currentMenuMode = 'china';
     let allDishes = [];
     let cart = [];
     let currentSelectedDish = null;
     let modalQty = 1;
-    let orderType = 'pickup'; // 默认自提
+    let orderType = 'pickup';
 
-    // 切换主菜单模式 (Comida China vs Sushi)
     function switchMainMenu(mode) {
       currentMenuMode = mode;
       const btnChina = document.getElementById('btn-tab-china');
@@ -282,7 +359,6 @@
       renderCurrentMenu();
     }
 
-    // 初始化获取云端数据
     async function loadLiveMenu() {
       const container = document.getElementById('menu-container');
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
@@ -296,14 +372,12 @@
       renderCurrentMenu();
     }
 
-    // 渲染左侧分类与右侧菜品
     function renderCurrentMenu() {
       const activeCats = currentMenuMode === 'china' ? categoriesChina : categoriesSushi;
       renderSidebar(activeCats);
       renderDishesList(activeCats);
     }
 
-    // 渲染左侧分类导航
     function renderSidebar(cats) {
       const sidebar = document.getElementById('sidebar-categories');
       let html = '';
@@ -318,7 +392,6 @@
       sidebar.innerHTML = html;
     }
 
-    // 渲染右侧菜品列表
     function renderDishesList(cats) {
       const container = document.getElementById('menu-container');
       let html = '';
@@ -368,12 +441,10 @@
       container.innerHTML = html;
     }
 
-    // 左侧分类平滑滚动
     function scrollToSection(catId) {
       const el = document.getElementById(catId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // 高亮选中项
         document.querySelectorAll('#sidebar-categories button').forEach(btn => {
           btn.className = "w-full text-left px-2.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-100 text-gray-500 font-semibold hover:bg-gray-100";
         });
@@ -384,7 +455,7 @@
       }
     }
 
-    // 打开菜品定制弹窗
+    // 打开定制弹窗（核心分支：区分中餐、寿司、饮料）
     function openOptionModal(dishId) {
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
@@ -394,31 +465,36 @@
       document.getElementById('opt-dish-name').innerText = currentSelectedDish.name;
       document.getElementById('opt-dish-desc').innerText = currentSelectedDish.description || '';
 
-      const sideBox = document.getElementById('colacion-side-box');
-      const boxAji = document.getElementById('box-aji');
-      const boxPref = document.getElementById('box-pref');
+      const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
+      const isDrink = currentSelectedDish.category === 'cat-bebidas';
+      const isColacion = currentSelectedDish.is_colacion;
 
-      // 仅便当显示配餐选项
-      if (currentSelectedDish.is_colacion) {
-        sideBox.classList.remove('hidden');
+      // 控制不同分类的界面展示
+      document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
+      document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink);
+      document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
+      document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
+
+      // 重置各个模块的默认值
+      if (isSushi) {
+        document.getElementById('sushi-soya').checked = true;
+        document.getElementById('sushi-teriyaki').checked = true;
+        document.getElementById('sushi-wasabi').checked = false;
+        document.getElementById('sushi-jengibre').checked = false;
+        document.querySelector('input[name="opt-palitos"][value="Con palitos"]').checked = true;
+        document.getElementById('sushi-no-queso').checked = false;
+        document.getElementById('sushi-no-cebollin').checked = false;
+        document.getElementById('sushi-no-sesamo').checked = false;
+        document.getElementById('sushi-bien-dorado').checked = false;
+      } else if (isDrink) {
+        document.querySelector('input[name="opt-drink-temp"][value="Fría / Helada"]').checked = true;
       } else {
-        sideBox.classList.add('hidden');
+        document.querySelector('input[name="opt-aji"][value="Sin ají"]').checked = true;
+        document.getElementById('pref-sal').checked = false;
+        document.getElementById('pref-sillao').checked = false;
+        document.getElementById('pref-cebollin').checked = false;
+        document.getElementById('pref-diente').checked = false;
       }
-
-      // 如果是饮品或寿司，隐藏不适用的少盐/少酱油等中餐定制选项
-      if (currentSelectedDish.category === 'cat-bebidas') {
-        boxAji.classList.add('hidden');
-        boxPref.classList.add('hidden');
-      } else {
-        boxAji.classList.remove('hidden');
-        boxPref.classList.remove('hidden');
-      }
-
-      document.querySelector('input[name="opt-aji"][value="Sin ají"]').checked = true;
-      document.getElementById('pref-sal').checked = false;
-      document.getElementById('pref-sillao').checked = false;
-      document.getElementById('pref-cebollin').checked = false;
-      document.getElementById('pref-diente').checked = false;
 
       document.getElementById('option-modal').classList.remove('hidden');
     }
@@ -438,6 +514,7 @@
       let extraPrice = 0;
       let optionsList = [];
 
+      // 1. 便当加价选项
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -446,7 +523,29 @@
         }
       }
 
-      if (currentSelectedDish.category !== 'cat-bebidas') {
+      const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
+      const isDrink = currentSelectedDish.category === 'cat-bebidas';
+
+      // 2. 根据类型收录专属选项
+      if (isSushi) {
+        let salsas = [];
+        if (document.getElementById('sushi-soya').checked) salsas.push('Soya');
+        if (document.getElementById('sushi-teriyaki').checked) salsas.push('Teriyaki');
+        if (document.getElementById('sushi-wasabi').checked) salsas.push('Wasabi');
+        if (document.getElementById('sushi-jengibre').checked) salsas.push('Jengibre');
+        if (salsas.length > 0) optionsList.push('Salsas: ' + salsas.join(', '));
+
+        const palitosChoice = document.querySelector('input[name="opt-palitos"]:checked').value;
+        optionsList.push(palitosChoice);
+
+        if (document.getElementById('sushi-no-queso').checked) optionsList.push('Sin queso crema');
+        if (document.getElementById('sushi-no-cebollin').checked) optionsList.push('Sin cebollín');
+        if (document.getElementById('sushi-no-sesamo').checked) optionsList.push('Sin sésamo');
+        if (document.getElementById('sushi-bien-dorado').checked) optionsList.push('Bien dorado');
+      } else if (isDrink) {
+        const tempChoice = document.querySelector('input[name="opt-drink-temp"]:checked').value;
+        optionsList.push(tempChoice);
+      } else {
         const ajiChoice = document.querySelector('input[name="opt-aji"]:checked').value;
         if (ajiChoice !== 'Sin ají') optionsList.push(ajiChoice);
 
@@ -481,7 +580,7 @@
       document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
     }
 
-    // 履约方式切换（在结算弹窗中进行）
+    // 履约方式切换（配送费严格设定为 1800 CLP）
     function setOrderType(type) {
       orderType = type;
       const btnPick = document.getElementById('btn-pickup');
@@ -507,13 +606,13 @@
       else cashBox.classList.add('hidden');
     }
 
-    // 重新计算结账弹窗总金额（含运费）
+    // 总结算金额（含配送费 1800 CLP）
     function refreshCheckoutTotal() {
       let subtotal = 0;
       cart.forEach(item => {
         subtotal += item.unitPrice * item.qty;
       });
-      const deliveryFee = (orderType === 'delivery') ? 2000 : 0;
+      const deliveryFee = (orderType === 'delivery') ? 1800 : 0;
       const grandTotal = subtotal + deliveryFee;
       document.getElementById('modal-checkout-total').innerText = grandTotal.toLocaleString('es-CL');
     }
@@ -563,7 +662,7 @@
       return { date: dd + '/' + mm + '/' + yyyy, time: hh + ':' + min };
     }
 
-    // 生成 WhatsApp 订单格式
+    // 生成发往 WhatsApp 的订单长文本
     function sendOrderToWhatsApp() {
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
@@ -594,7 +693,8 @@
         productsList.push(line);
       });
 
-      const deliveryFee = (orderType === 'delivery') ? 2000 : 0;
+      // 配送费设为 1800 CLP
+      const deliveryFee = (orderType === 'delivery') ? 1800 : 0;
       const total = subtotal + deliveryFee;
 
       let payDetail = "";
