@@ -121,7 +121,7 @@
     </div>
 
     <div class="mt-2 relative">
-      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Wantán, Mongoliana, Roll...)" class="w-full bg-black/25 placeholder-white/60 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
+      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Arroz, Wantán, Carne...)" class="w-full bg-black/25 placeholder-white/60 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
       <span class="absolute left-2.5 top-2.5 text-xs text-white/70">🔍</span>
     </div>
   </header>
@@ -138,10 +138,10 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏布局 -->
+  <!-- 3. 双栏黄金布局：左侧竖向分类导航 + 右侧菜品瀑布 -->
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
-      <!-- JS 动态渲染 -->
+      <!-- 由 JS 渲染 -->
     </aside>
 
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
@@ -149,7 +149,7 @@
     </main>
   </div>
 
-  <!-- 4. 底部常驻悬浮购物车 (Floating Dock Bar) -->
+  <!-- 4. 底部悬浮购物车 (Floating Dock Bar) -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -173,7 +173,7 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 (Option Modal) -->
+  <!-- 5. 菜品定制弹窗 (Option Modal - Aperitivos, Sopas, Arroz 排除此弹窗) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -439,11 +439,15 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // 免弹窗直接加购的白名单分类：Aperitivos、Sopas、Arroz
+    const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
+
+    // 中餐品类字典（已将 Vacuno 改为 Carne）
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
       { id: "cat-aperitivos", title: "🥟 APERITIVOS", icon: "🥟", short: "Aperitivos" },
-      { id: "cat-vacuno", title: "🥩 VACUNO", icon: "🥩", short: "Vacuno" },
+      { id: "cat-vacuno", title: "🥩 CARNE", icon: "🥩", short: "Carne" }, // 改为 CARNE
       { id: "cat-pollo", title: "🍗 POLLO", icon: "🍗", short: "Pollo" },
       { id: "cat-cerdo", title: "🐷 CERDO", icon: "🐷", short: "Cerdo" },
       { id: "cat-chaumin", title: "🍜 CHAUMÍN", icon: "🍜", short: "Chaumín" },
@@ -472,6 +476,7 @@
     let currentSelectedDish = null;
     let modalQty = 1;
     let orderType = 'pickup';
+    let isUserClickingCategory = false; // 用于抑制点击滚动引发的重复高亮循环
 
     let currentActiveAjiRadio = null;
 
@@ -539,6 +544,7 @@
 
       allDishes = data || [];
       renderCurrentMenu();
+      setupScrollSpy(); // 挂载左右滚动联动监听
     }
 
     function renderCurrentMenu() {
@@ -575,10 +581,9 @@
       }
 
       const qty = getDishCartQty(dishId);
-      const isAperitivo = dish.category === 'cat-aperitivos';
-      const addCall = isAperitivo ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
+      const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category);
+      const addCall = isDirectAdd ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
 
-      // 如果未加购（数量为 0），显示单个圆圈加号
       if (qty === 0) {
         return `
           <button onclick="${addCall}" class="w-8 h-8 rounded-full theme-bg-primary text-white font-black text-base flex items-center justify-center shrink-0 shadow-md active:scale-90 transition">
@@ -587,7 +592,6 @@
         `;
       }
 
-      // 只要数量 >= 1，自动伸展为 [- 数量 +] 联动计数胶囊
       return `
         <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
           <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
@@ -609,7 +613,7 @@
         const items = allDishes.filter(d => d.category === cat.id);
         if (items.length === 0) return;
 
-        html += '<section id="' + cat.id + '" class="scroll-mt-3">';
+        html += '<section id="' + cat.id + '" class="scroll-mt-3 dish-section" data-cat-id="' + cat.id + '">';
         html += '<div class="flex items-center gap-2 mb-2 px-1">';
         html += '  <span class="text-sm">' + cat.icon + '</span>';
         html += '  <h2 class="text-xs font-black text-gray-800 uppercase tracking-wider">' + cat.title + '</h2>';
@@ -619,8 +623,8 @@
 
         items.forEach(dish => {
           const isSoldOut = !dish.is_available;
-          const isAperitivo = dish.category === 'cat-aperitivos';
-          const cardClickAction = isAperitivo 
+          const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category);
+          const cardClickAction = isDirectAdd 
             ? 'handleDirectAdd(' + dish.id + ', event)' 
             : 'openOptionModal(' + dish.id + ', event)';
 
@@ -648,7 +652,7 @@
           html += '    </div>';
           html += '  </div>';
 
-          // 右侧专属加减按钮挂载区
+          // 右侧加减按钮挂载区
           html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">';
           html +=      renderDishActionBtn(dish.id);
           html += '  </div>';
@@ -666,7 +670,7 @@
       container.innerHTML = html;
     }
 
-    // 快捷直接加购（免弹窗）
+    // 快捷直接加购（Aperitivos / Sopas / Arroz 均走此函数）
     function handleDirectAdd(dishId, event) {
       if (event) event.stopPropagation();
       const dish = allDishes.find(i => i.id === dishId);
@@ -687,7 +691,7 @@
       updateCartUI();
     }
 
-    // 快捷直接减购（免进结算页直接减掉或归零）
+    // 快捷直接减购
     function handleDishMinus(dishId, event) {
       if (event) event.stopPropagation();
       for (let i = cart.length - 1; i >= 0; i--) {
@@ -703,7 +707,6 @@
       updateCartUI();
     }
 
-    // 更新购物车及全屏各菜品计数按钮状态
     function updateCartUI() {
       let totalQty = 0;
       let totalPrice = 0;
@@ -714,7 +717,6 @@
       document.getElementById('cart-total-count').innerText = totalQty;
       document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
 
-      // 动态同步更新屏幕上所有的加减按钮显示
       document.querySelectorAll('[data-dish-action-id]').forEach(el => {
         const id = parseInt(el.getAttribute('data-dish-action-id'));
         el.innerHTML = renderDishActionBtn(id);
@@ -735,17 +737,63 @@
       });
     }
 
+    // ==========================================
+    // 🧭 左右双向联动滚动监听系统 (ScrollSpy)
+    // ==========================================
+    function setupScrollSpy() {
+      const menuContainer = document.getElementById('menu-container');
+      if (!menuContainer) return;
+
+      menuContainer.addEventListener('scroll', () => {
+        if (isUserClickingCategory) return;
+
+        const sections = menuContainer.querySelectorAll('.dish-section');
+        let currentCatId = '';
+        const containerTop = menuContainer.getBoundingClientRect().top;
+
+        sections.forEach(sec => {
+          const rect = sec.getBoundingClientRect();
+          // 如果分类标题距离容器顶部在合理范围内，判定为当前活跃分类
+          if (rect.top - containerTop <= 90) {
+            currentCatId = sec.getAttribute('data-cat-id');
+          }
+        });
+
+        if (currentCatId) {
+          highlightSidebarCategory(currentCatId, false);
+        }
+      });
+    }
+
+    function highlightSidebarCategory(catId, shouldScrollSidebar = true) {
+      const sidebar = document.getElementById('sidebar-categories');
+      if (!sidebar) return;
+
+      sidebar.querySelectorAll('button').forEach(btn => {
+        btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
+      });
+
+      const activeBtn = document.getElementById('side-btn-' + catId);
+      if (activeBtn) {
+        activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
+        // 让左侧高亮项自动跟随滚动到可见视野中
+        if (shouldScrollSidebar) {
+          activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+
     function scrollToSection(catId) {
       const el = document.getElementById(catId);
       if (el) {
+        isUserClickingCategory = true;
+        highlightSidebarCategory(catId, true);
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.querySelectorAll('#sidebar-categories button').forEach(btn => {
-          btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
-        });
-        const activeBtn = document.getElementById('side-btn-' + catId);
-        if (activeBtn) {
-          activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
-        }
+
+        // 滚动动画结束后恢复右滑监听
+        setTimeout(() => {
+          isUserClickingCategory = false;
+        }, 500);
       }
     }
 
@@ -754,7 +802,8 @@
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
-      if (currentSelectedDish.category === 'cat-aperitivos') {
+      // 双重保护：如果属于免弹窗分类，直接加购
+      if (DIRECT_ADD_CATEGORIES.includes(currentSelectedDish.category)) {
         handleDirectAdd(dishId, event);
         return;
       }
