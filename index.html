@@ -28,7 +28,6 @@
     .theme-border-primary { border-color: var(--color-primary); }
     .theme-bg-light { background-color: var(--color-primary-light); }
 
-    /* 顶部门头招牌默认兜底样式 */
     #store-header {
       background-size: cover;
       background-position: center;
@@ -39,7 +38,7 @@
 <body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
 
   <!-- ======================================================== -->
-  <!-- 🎨 店铺个性化配置中心 -->
+  <!-- 🎨 Configuración General del Local -->
   <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
@@ -48,16 +47,11 @@
       logoIcon: "🐉",
       whatsapp: "56974142810",
       orderCodePrefix: "DRAGON",
-
-      // 视觉主题预设: 'red'(中国红) | 'black_gold'(黑金) | 'orange'(活力橙) | 'emerald'(和风绿)
       theme: "red",
-
       ratingText: "⭐ 4.9 (210+ reseñas)",
       prepTimeText: "⏱️ 20-30 min",
       deliveryFee: 1800,
       promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!",
-
-      // 迎宾弹窗配置
       welcomeModal: {
         show: true,
         title: "¡Bienvenidos a DRAGÓN DE ORO!",
@@ -98,16 +92,13 @@
     };
   </script>
 
-  <!-- 🌟 0. 进店居中迎宾弹窗 -->
+  <!-- 🌟 Modal de Bienvenida -->
   <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
     <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all">
-      
-      <!-- 右上角小 × 关闭按钮 -->
       <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">
         &times;
       </button>
 
-      <!-- 弹窗封面大图 -->
       <div class="relative h-44 w-full overflow-hidden bg-gray-900">
         <img id="welcome-img" src="" alt="Bienvenidos" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -119,7 +110,6 @@
         </div>
       </div>
 
-      <!-- 弹窗文字 -->
       <div class="p-5 text-center">
         <h2 id="welcome-title" class="text-base font-black text-gray-900 leading-snug mb-1.5">
           ¡Bienvenidos a DRAGÓN DE ORO!
@@ -140,7 +130,7 @@
     </div>
   </div>
 
-  <!-- 1. 顶部招牌大门头（同一张大图注入于此） -->
+  <!-- 1. Encabezado / Banner Superior -->
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
@@ -162,13 +152,11 @@
       </div>
     </div>
 
-    <!-- 优惠信息栏 -->
     <div id="store-promo-bar" class="mb-2 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
       <span class="shrink-0">📢</span>
       <span id="store-promo-text" class="truncate leading-tight"></span>
     </div>
 
-    <!-- 标签 -->
     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/95">
       <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         ⭐ 4.9 (210+ reseñas)
@@ -181,14 +169,13 @@
       </span>
     </div>
 
-    <!-- 搜索输入框 -->
     <div class="mt-2 relative">
       <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
       <span class="absolute left-2.5 top-2.5 text-xs text-white/80">🔍</span>
     </div>
   </header>
 
-  <!-- 2. 主分类切换卡槽 -->
+  <!-- 2. Barra de Categoría Principal -->
   <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
     <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
       <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
@@ -200,18 +187,15 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏黄金布局 -->
+  <!-- 3. Navegación y Lista de Platos -->
   <div class="flex flex-1 overflow-hidden">
-    <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
-      <!-- 由 JS 渲染 -->
-    </aside>
-
+    <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
       <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
-  <!-- 4. 底部悬浮购物车 -->
+  <!-- 4. Barra Flotante del Carrito -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -235,7 +219,7 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 -->
+  <!-- 5. Modal de Opciones / Personalización -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -248,21 +232,47 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-   <!-- A. 套餐专属换菜备注栏 (Menús 专属) -->
-      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/80 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
-        <div class="flex justify-between items-center mb-1">
+      <!-- A. Sistema de Cambio de Plato con Recálculo de Precio para MENÚS -->
+      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
+        <div class="flex justify-between items-center mb-1.5">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
-            <span>🔄</span> Cambios de plato (换菜要求)
+            <span>🔄</span> Cambio de plato con recálculo automático
           </label>
-          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-full">Opcional</span>
+          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
-        <p class="text-[10px] text-amber-800/80 mb-2 leading-tight">
-          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado primavera por wantán frito, etc.).
+        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">
+          Selecciona qué plato retiras del menú y por cuál lo reemplazas. El sistema sumará o restará la diferencia exacta de precio.
         </p>
-        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado marisco por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
+
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato quitas del menú?</label>
+            <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition">
+              <option value="">-- Sin cambios (Menú estándar) --</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál plato lo reemplazas?</label>
+            <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition">
+              <option value="">-- Selecciona el plato nuevo deseado --</option>
+            </select>
+          </div>
+
+          <!-- Indicador visual de la diferencia de precio -->
+          <div id="swap-diff-badge" class="hidden bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
+            <span class="font-bold text-gray-700">Diferencia calculada:</span>
+            <span id="swap-diff-amount" class="font-black text-rose-600">+$0 CLP</span>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-amber-900/80 mb-1">Nota adicional sobre el cambio (opcional):</label>
+            <input id="menu-swap-note" type="text" placeholder="Ej: Sin cebollín en el plato nuevo..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition placeholder-gray-400">
+          </div>
+        </div>
       </div>
 
-      <!-- B. 便当配餐加价选项 -->
+      <!-- B. Acompañamiento para Colaciones -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -290,7 +300,7 @@
         </div>
       </div>
 
-      <!-- C. 中餐专属定制 (双按钮对称布局) -->
+      <!-- C. Opciones Comida China (Ají) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -332,7 +342,7 @@
         </div>
       </div>
 
-      <!-- D. 寿司专属定制 -->
+      <!-- D. Opciones Sushi -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
@@ -393,7 +403,7 @@
         </div>
       </div>
 
-      <!-- E. 饮料专属定制 -->
+      <!-- E. Bebidas -->
       <div id="box-drink-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
@@ -410,7 +420,7 @@
         </div>
       </div>
 
-      <!-- 数量步进器 -->
+      <!-- Contador de cantidad -->
       <div class="flex items-center justify-between border-t border-gray-150 pt-3.5 mt-4 mb-4">
         <span class="text-xs font-black text-gray-700">Cantidad:</span>
         <div class="flex items-center gap-3 bg-gray-100 p-1 rounded-2xl border border-gray-200">
@@ -426,7 +436,7 @@
     </div>
   </div>
 
-  <!-- 6. 结账结算弹窗 -->
+  <!-- 6. Modal de Finalización / Checkout -->
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -441,7 +451,6 @@
 
       <div id="cart-items-preview" class="space-y-2 mb-3.5 max-h-40 overflow-y-auto divide-y divide-gray-100 text-xs pr-1"></div>
 
-      <!-- 履约方式选择 -->
       <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🛵 Método de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -548,8 +557,9 @@
     let orderType = 'pickup';
     let isUserClickingCategory = false;
     let currentActiveAjiRadio = null;
+    let currentMenuSwapDifference = 0;
 
-    // 🌟 智能背景图嗅探加载引擎（自动适配 bg.jpg.jpg 或 bg.jpg）
+    // Detección automática del nombre de imagen
     let activeFoodBannerUrl = "bg.jpg.jpg";
 
     function autoDetectAndSetBanner() {
@@ -560,11 +570,9 @@
         testImg.src = candidates[index];
         testImg.onload = function() {
           activeFoodBannerUrl = candidates[index];
-          // 1. 同时给弹窗图片赋值
           const welcomeImg = document.getElementById('welcome-img');
           if (welcomeImg) welcomeImg.src = activeFoodBannerUrl;
 
-          // 2. 同时给主页顶部门头注入同一张背景大图
           const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
           const header = document.getElementById('store-header');
           if (header) {
@@ -901,6 +909,71 @@
       }
     }
 
+    // 🌟 Poblar opciones de cambio de platos para Menús
+    function populateMenuSwapSelectors() {
+      const selectFrom = document.getElementById('swap-dish-from');
+      const selectTo = document.getElementById('swap-dish-to');
+
+      // Obtener platos individuales (excluyendo categorías de combos/menús)
+      const individualDishes = allDishes.filter(d => d.category !== 'cat-menus' && d.category !== 'cat-sushi-promos');
+
+      let optionsHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
+      individualDishes.forEach(d => {
+        optionsHtml += `<option value="${d.id}" data-price="${d.price}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+      });
+
+      selectFrom.innerHTML = optionsHtml;
+      selectTo.innerHTML = '<option value="">-- Selecciona el plato nuevo deseado --</option>' + optionsHtml.replace('-- Sin cambio (Menú estándar) --', '-- Cancelar selección --');
+
+      selectFrom.value = "";
+      selectTo.value = "";
+      currentMenuSwapDifference = 0;
+      document.getElementById('swap-diff-badge').classList.add('hidden');
+      document.getElementById('menu-swap-note').value = "";
+    }
+
+    // 🌟 Recálculo matemático de diferencia de precio
+    function calculateMenuSwapDifference() {
+      const fromSelect = document.getElementById('swap-dish-from');
+      const toSelect = document.getElementById('swap-dish-to');
+      const badge = document.getElementById('swap-diff-badge');
+      const amountEl = document.getElementById('swap-diff-amount');
+
+      const fromId = fromSelect.value;
+      const toId = toSelect.value;
+
+      if (!fromId || !toId) {
+        currentMenuSwapDifference = 0;
+        badge.classList.add('hidden');
+        return;
+      }
+
+      const dishFrom = allDishes.find(d => d.id == fromId);
+      const dishTo = allDishes.find(d => d.id == toId);
+
+      if (!dishFrom || !dishTo) {
+        currentMenuSwapDifference = 0;
+        badge.classList.add('hidden');
+        return;
+      }
+
+      // Diferencia = Precio del nuevo plato - Precio del plato original
+      const diff = dishTo.price - dishFrom.price;
+      currentMenuSwapDifference = diff;
+
+      badge.classList.remove('hidden');
+      if (diff > 0) {
+        amountEl.className = "font-black text-rose-600";
+        amountEl.innerText = `+ $${Number(diff).toLocaleString('es-CL')} CLP`;
+      } else if (diff < 0) {
+        amountEl.className = "font-black text-emerald-600";
+        amountEl.innerText = `- $${Number(Math.abs(diff)).toLocaleString('es-CL')} CLP`;
+      } else {
+        amountEl.className = "font-black text-gray-600";
+        amountEl.innerText = `$0 CLP (Mismo valor)`;
+      }
+    }
+
     function openOptionModal(dishId, event) {
       if (event) event.stopPropagation();
       currentSelectedDish = allDishes.find(i => i.id === dishId);
@@ -923,7 +996,10 @@
 
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isMenu);
-      document.getElementById('menu-swap-input').value = '';
+
+      if (isMenu) {
+        populateMenuSwapSelectors();
+      }
 
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
       document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink);
@@ -970,13 +1046,32 @@
       let extraPrice = 0;
       let optionsList = [];
 
+      // 🌟 Aplicar cálculo de cambio de plato en Menús
       if (currentSelectedDish.category === 'cat-menus') {
-        const swapText = document.getElementById('menu-swap-input').value.trim();
-        if (swapText) {
-          optionsList.push('Cambio: ' + swapText);
+        const fromId = document.getElementById('swap-dish-from').value;
+        const toId = document.getElementById('swap-dish-to').value;
+        const swapNote = document.getElementById('menu-swap-note').value.trim();
+
+        if (fromId && toId) {
+          const dishFrom = allDishes.find(d => d.id == fromId);
+          const dishTo = allDishes.find(d => d.id == toId);
+
+          if (dishFrom && dishTo) {
+            extraPrice += currentMenuSwapDifference;
+            const diffSign = currentMenuSwapDifference > 0 
+              ? `+$${Number(currentMenuSwapDifference).toLocaleString('es-CL')}` 
+              : (currentMenuSwapDifference < 0 ? `-$${Number(Math.abs(currentMenuSwapDifference)).toLocaleString('es-CL')}` : `$0`);
+
+            optionsList.push(`Cambio: ${dishFrom.name} ➔ ${dishTo.name} (${diffSign})`);
+          }
+        }
+
+        if (swapNote) {
+          optionsList.push(`Nota: ${swapNote}`);
         }
       }
 
+      // Colaciones
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -1018,7 +1113,7 @@
         if (document.getElementById('pref-diente').checked) optionsList.push('Sin diente');
       }
 
-      const finalUnitPrice = currentSelectedDish.price + extraPrice;
+      const finalUnitPrice = Math.max(0, currentSelectedDish.price + extraPrice);
 
       cart.push({
         dishId: currentSelectedDish.id,
@@ -1076,7 +1171,7 @@
       let previewHtml = '';
       cart.forEach((item, index) => {
         const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
-        const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-400 leading-tight mt-0.5">• ' + item.options.join(', ') + '</div>' : '';
+        const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-400 leading-tight mt-0.5">• ' + item.options.join('<br>• ') + '</div>' : '';
         previewHtml += '<div class="py-2 flex justify-between items-start">';
         previewHtml += '  <div class="flex-1 pr-2">';
         previewHtml += '    <div class="font-extrabold text-gray-900 text-xs">' + item.qty + 'x ' + item.name + '</div>';
@@ -1138,7 +1233,7 @@
         const itemTotal = item.unitPrice * item.qty;
         subtotal += itemTotal;
         let line = 'X' + item.qty + ' ' + item.name + ' $ ' + itemTotal.toLocaleString('es-CL');
-        if (item.options.length > 0) line += '\n   • ' + item.options.join(', ');
+        if (item.options.length > 0) line += '\n   • ' + item.options.join('\n   • ');
         productsList.push(line);
       });
 
@@ -1182,9 +1277,8 @@
       window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
 
-    // 初始化运行
     applyStoreConfig();
-    autoDetectAndSetBanner(); // 自动匹配并同时注入弹窗与门头大图
+    autoDetectAndSetBanner();
     initWelcomeModal();
     loadLiveMenu();
   </script>
