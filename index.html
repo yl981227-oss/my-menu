@@ -34,17 +34,15 @@
   <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
-      // 1. 基础品牌信息
       storeName: "DRAGÓN DE ORO",
       slogan: "Comida China Tradicional & Sushi",
       logoIcon: "🐉",
       whatsapp: "56974142810",
       orderCodePrefix: "DRAGON",
 
-      // 2. 视觉主题预设: 'red'(中国红) | 'black_gold'(黑金) | 'orange'(活力橙) | 'emerald'(和风绿)
+      // 视觉主题预设: 'red'(中国红) | 'black_gold'(黑金) | 'orange'(活力橙) | 'emerald'(和风绿)
       theme: "red",
 
-      // 3. 门店运营参数
       ratingText: "⭐ 4.9 (210+ reseñas)",
       prepTimeText: "⏱️ 20-30 min",
       deliveryFee: 1800,
@@ -105,13 +103,11 @@
       </div>
     </div>
 
-    <!-- 顶部特惠横幅 -->
     <div id="store-promo-bar" class="mb-2 bg-black/25 backdrop-blur-sm border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
       <span class="shrink-0">📢</span>
       <span id="store-promo-text" class="truncate leading-tight"></span>
     </div>
 
-    <!-- 信任特征胶囊标签 -->
     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/90">
       <span id="badge-rating" class="bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1 whitespace-nowrap">
         ⭐ 4.9 (210+ reseñas)
@@ -124,7 +120,6 @@
       </span>
     </div>
 
-    <!-- 实时菜品搜索框 -->
     <div class="mt-2 relative">
       <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Wantán, Mongoliana, Roll...)" class="w-full bg-black/25 placeholder-white/60 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
       <span class="absolute left-2.5 top-2.5 text-xs text-white/70">🔍</span>
@@ -145,18 +140,16 @@
 
   <!-- 3. 双栏布局 -->
   <div class="flex flex-1 overflow-hidden">
-    <!-- 左侧竖向导航栏 -->
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
-      <!-- JS 渲染 -->
+      <!-- JS 动态渲染 -->
     </aside>
 
-    <!-- 右侧菜品卡片展示区 -->
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
       <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
-  <!-- 4. 悬浮胶囊购物车 (Floating Dock Bar) -->
+  <!-- 4. 底部常驻悬浮购物车 (Floating Dock Bar) -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -180,7 +173,7 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 (Option Modal - 前菜已排除此弹窗) -->
+  <!-- 5. 菜品定制弹窗 (Option Modal) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -221,7 +214,7 @@
         </div>
       </div>
 
-      <!-- 中餐专属定制 (辣度非必填，默认全不选中) -->
+      <!-- 中餐专属定制 (辣度非必填，默认全不亮) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -568,7 +561,46 @@
       sidebar.innerHTML = html;
     }
 
-    // 重点改造：前菜（cat-aperitivos）直接加购，跳过弹窗
+    // 计算某个菜品在购物车里的总数量
+    function getDishCartQty(dishId) {
+      return cart.filter(item => item.dishId === dishId).reduce((sum, item) => sum + item.qty, 0);
+    }
+
+    // 核心渲染：加减计数器按钮胶囊
+    function renderDishActionBtn(dishId) {
+      const dish = allDishes.find(d => d.id === dishId);
+      if (!dish) return '';
+      if (!dish.is_available) {
+        return '<button class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 font-black text-base flex items-center justify-center shrink-0">✕</button>';
+      }
+
+      const qty = getDishCartQty(dishId);
+      const isAperitivo = dish.category === 'cat-aperitivos';
+      const addCall = isAperitivo ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
+
+      // 如果未加购（数量为 0），显示单个圆圈加号
+      if (qty === 0) {
+        return `
+          <button onclick="${addCall}" class="w-8 h-8 rounded-full theme-bg-primary text-white font-black text-base flex items-center justify-center shrink-0 shadow-md active:scale-90 transition">
+            +
+          </button>
+        `;
+      }
+
+      // 只要数量 >= 1，自动伸展为 [- 数量 +] 联动计数胶囊
+      return `
+        <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
+          <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
+            -
+          </button>
+          <span class="text-xs font-black text-gray-900 px-1 min-w-[16px] text-center">${qty}</span>
+          <button onclick="${addCall}" class="w-7 h-7 rounded-full theme-bg-primary text-white font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
+            +
+          </button>
+        </div>
+      `;
+    }
+
     function renderDishesList(cats) {
       const container = document.getElementById('menu-container');
       let html = '';
@@ -588,19 +620,15 @@
         items.forEach(dish => {
           const isSoldOut = !dish.is_available;
           const isAperitivo = dish.category === 'cat-aperitivos';
+          const cardClickAction = isAperitivo 
+            ? 'handleDirectAdd(' + dish.id + ', event)' 
+            : 'openOptionModal(' + dish.id + ', event)';
 
-          // 如果是前菜，直接调用 directAddToCart，否则打开定制弹窗 openOptionModal
-          const clickAction = isAperitivo 
-            ? 'directAddToCart(' + dish.id + ')' 
-            : 'openOptionModal(' + dish.id + ')';
-
-          const clickAttr = isSoldOut ? '' : 'onclick="' + clickAction + '"';
+          const clickAttr = isSoldOut ? '' : 'onclick="' + cardClickAction + '"';
           const cardStyle = isSoldOut 
             ? 'bg-white/60 p-3 rounded-2xl border border-gray-200/50 flex justify-between items-center opacity-60 cursor-not-allowed' 
             : 'bg-white p-3 rounded-2xl border border-gray-150 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md flex justify-between items-center active:scale-[0.99] transition cursor-pointer';
           const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded-md font-black tracking-wider">AGOTADO</span>' : '';
-          const btnBg = isSoldOut ? 'bg-gray-200 text-gray-400' : 'theme-bg-primary text-white shadow-md active:scale-90';
-          const btnIcon = isSoldOut ? '✕' : '+';
           const descText = dish.description || '';
           const priceStr = Number(dish.price).toLocaleString('es-CL');
 
@@ -619,7 +647,12 @@
           html += '      <span class="text-[9px] font-semibold text-gray-400">CLP</span>';
           html += '    </div>';
           html += '  </div>';
-          html += '  <button class="w-8 h-8 rounded-full ' + btnBg + ' font-black text-base flex items-center justify-center shrink-0 transition">' + btnIcon + '</button>';
+
+          // 右侧专属加减按钮挂载区
+          html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">';
+          html +=      renderDishActionBtn(dish.id);
+          html += '  </div>';
+
           html += '</div>';
         });
 
@@ -633,12 +666,12 @@
       container.innerHTML = html;
     }
 
-    // 前菜专用：免弹窗直接快速加购函数
-    function directAddToCart(dishId) {
+    // 快捷直接加购（免弹窗）
+    function handleDirectAdd(dishId, event) {
+      if (event) event.stopPropagation();
       const dish = allDishes.find(i => i.id === dishId);
       if (!dish || !dish.is_available) return;
 
-      // 检查购物车中是否已经有同款且无定制要求的该菜品
       const existing = cart.find(item => item.dishId === dish.id && item.options.length === 0);
       if (existing) {
         existing.qty += 1;
@@ -651,8 +684,41 @@
           options: []
         });
       }
-
       updateCartUI();
+    }
+
+    // 快捷直接减购（免进结算页直接减掉或归零）
+    function handleDishMinus(dishId, event) {
+      if (event) event.stopPropagation();
+      for (let i = cart.length - 1; i >= 0; i--) {
+        if (cart[i].dishId === dishId) {
+          if (cart[i].qty > 1) {
+            cart[i].qty -= 1;
+          } else {
+            cart.splice(i, 1);
+          }
+          break;
+        }
+      }
+      updateCartUI();
+    }
+
+    // 更新购物车及全屏各菜品计数按钮状态
+    function updateCartUI() {
+      let totalQty = 0;
+      let totalPrice = 0;
+      cart.forEach(item => {
+        totalQty += item.qty;
+        totalPrice += item.unitPrice * item.qty;
+      });
+      document.getElementById('cart-total-count').innerText = totalQty;
+      document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
+
+      // 动态同步更新屏幕上所有的加减按钮显示
+      document.querySelectorAll('[data-dish-action-id]').forEach(el => {
+        const id = parseInt(el.getAttribute('data-dish-action-id'));
+        el.innerHTML = renderDishActionBtn(id);
+      });
     }
 
     function filterMenuItems() {
@@ -683,13 +749,13 @@
       }
     }
 
-    function openOptionModal(dishId) {
+    function openOptionModal(dishId, event) {
+      if (event) event.stopPropagation();
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
-      // 双重保护：如果是前菜直接走快速加购
       if (currentSelectedDish.category === 'cat-aperitivos') {
-        directAddToCart(dishId);
+        handleDirectAdd(dishId, event);
         return;
       }
 
@@ -800,17 +866,6 @@
 
       closeOptionModal();
       updateCartUI();
-    }
-
-    function updateCartUI() {
-      let totalQty = 0;
-      let totalPrice = 0;
-      cart.forEach(item => {
-        totalQty += item.qty;
-        totalPrice += item.unitPrice * item.qty;
-      });
-      document.getElementById('cart-total-count').innerText = totalQty;
-      document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
     }
 
     function setOrderType(type) {
