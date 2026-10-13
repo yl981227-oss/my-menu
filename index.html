@@ -38,7 +38,7 @@
 <body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
 
   <!-- ======================================================== -->
-  <!-- 🎨 Configuración General del Local -->
+  <!-- 🎨 店铺个性化配置中心 -->
   <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
@@ -92,7 +92,7 @@
     };
   </script>
 
-  <!-- 🌟 Modal de Bienvenida -->
+  <!-- 🌟 0. 进店居中迎宾弹窗 -->
   <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
     <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all">
       <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">
@@ -130,7 +130,7 @@
     </div>
   </div>
 
-  <!-- 1. Encabezado / Banner Superior -->
+  <!-- 1. 顶部招牌大门头 -->
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
@@ -175,7 +175,7 @@
     </div>
   </header>
 
-  <!-- 2. Barra de Categoría Principal -->
+  <!-- 2. 主分类切换卡槽 -->
   <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
     <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
       <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
@@ -187,7 +187,7 @@
     </div>
   </nav>
 
-  <!-- 3. Navegación y Lista de Platos -->
+  <!-- 3. 双栏黄金布局 -->
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
@@ -195,7 +195,7 @@
     </main>
   </div>
 
-  <!-- 4. Barra Flotante del Carrito -->
+  <!-- 4. 底部悬浮购物车 -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -219,7 +219,7 @@
     </footer>
   </div>
 
-  <!-- 5. Modal de Opciones / Personalización -->
+  <!-- 5. 菜品定制弹窗 -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -232,7 +232,7 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- A. Sistema de Cambio de Plato con Recálculo de Precio para MENÚS -->
+      <!-- A. 专属换菜改价（智能锁定：仅允许换套餐内有的菜，新菜仅限中餐） -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1.5">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
@@ -241,27 +241,27 @@
           <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
         <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">
-          Selecciona qué plato retiras del menú y por cuál lo reemplazas. El sistema sumará o restará la diferencia exacta de precio.
+          Selecciona qué plato retiras de este menú y por cuál lo reemplazas. El sistema calculará la diferencia exacta de precio.
         </p>
 
         <div class="space-y-2.5 text-xs">
           <div>
-            <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato quitas del menú?</label>
-            <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition">
-              <option value="">-- Sin cambios (Menú estándar) --</option>
+            <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato quitas de este menú?</label>
+            <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 transition font-semibold">
+              <option value="">-- Sin cambio (Menú estándar) --</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál plato lo reemplazas?</label>
-            <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition">
+            <label class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál plato de comida china lo reemplazas?</label>
+            <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 transition font-semibold">
               <option value="">-- Selecciona el plato nuevo deseado --</option>
             </select>
           </div>
 
-          <!-- Indicador visual de la diferencia de precio -->
+          <!-- 差价指示器 -->
           <div id="swap-diff-badge" class="hidden bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
-            <span class="font-bold text-gray-700">Diferencia calculada:</span>
+            <span class="font-bold text-gray-700">Diferencia de precio:</span>
             <span id="swap-diff-amount" class="font-black text-rose-600">+$0 CLP</span>
           </div>
 
@@ -272,7 +272,7 @@
         </div>
       </div>
 
-      <!-- B. Acompañamiento para Colaciones -->
+      <!-- B. 便当配餐加价选项 -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -300,7 +300,7 @@
         </div>
       </div>
 
-      <!-- C. Opciones Comida China (Ají) -->
+      <!-- C. 中餐专属定制 (双按钮对称布局) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -342,7 +342,7 @@
         </div>
       </div>
 
-      <!-- D. Opciones Sushi -->
+      <!-- D. 寿司专属定制 -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
@@ -403,7 +403,7 @@
         </div>
       </div>
 
-      <!-- E. Bebidas -->
+      <!-- E. 饮料专属定制 -->
       <div id="box-drink-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
@@ -420,7 +420,7 @@
         </div>
       </div>
 
-      <!-- Contador de cantidad -->
+      <!-- 数量步进器 -->
       <div class="flex items-center justify-between border-t border-gray-150 pt-3.5 mt-4 mb-4">
         <span class="text-xs font-black text-gray-700">Cantidad:</span>
         <div class="flex items-center gap-3 bg-gray-100 p-1 rounded-2xl border border-gray-200">
@@ -436,7 +436,7 @@
     </div>
   </div>
 
-  <!-- 6. Modal de Finalización / Checkout -->
+  <!-- 6. 结账结算弹窗 -->
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -451,6 +451,7 @@
 
       <div id="cart-items-preview" class="space-y-2 mb-3.5 max-h-40 overflow-y-auto divide-y divide-gray-100 text-xs pr-1"></div>
 
+      <!-- 履约方式选择 -->
       <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🛵 Método de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -559,7 +560,7 @@
     let currentActiveAjiRadio = null;
     let currentMenuSwapDifference = 0;
 
-    // Detección automática del nombre de imagen
+    // 智能双重探测图片名
     let activeFoodBannerUrl = "bg.jpg.jpg";
 
     function autoDetectAndSetBanner() {
@@ -909,21 +910,106 @@
       }
     }
 
-    // 🌟 Poblar opciones de cambio de platos para Menús
-    function populateMenuSwapSelectors() {
+    // 🌟 核心算法：智能匹配套餐内包含的菜品 + 严格限定只换中餐单品
+    function populateMenuSwapSelectors(currentDish) {
       const selectFrom = document.getElementById('swap-dish-from');
       const selectTo = document.getElementById('swap-dish-to');
 
-      // Obtener platos individuales (excluyendo categorías de combos/menús)
-      const individualDishes = allDishes.filter(d => d.category !== 'cat-menus' && d.category !== 'cat-sushi-promos');
+      // 1. 严格筛选出“纯正中餐单品炒菜与点心”（彻底排除套餐、排除便当、排除寿司、排除饮料）
+      const validChineseCatIds = [
+        'cat-aperitivos', 'cat-vacuno', 'cat-pollo', 'cat-cerdo',
+        'cat-chaumin', 'cat-arroz', 'cat-sopas', 'cat-chapsui',
+        'cat-dragon', 'cat-mariscos', 'cat-parrilladas'
+      ];
 
-      let optionsHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
-      individualDishes.forEach(d => {
-        optionsHtml += `<option value="${d.id}" data-price="${d.price}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+      const singleChineseDishes = allDishes.filter(d => 
+        validChineseCatIds.includes(d.category) && 
+        !d.is_colacion && 
+        d.is_available
+      );
+
+      // 2. 填充【1. ¿Qué plato quitas de este menú?】—— 仅解析展示此套餐内含有的菜品
+      let fromHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
+      const desc = currentDish.description || '';
+      const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
+
+      const normalizeStr = str => (str || '').toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const matchedItems = [];
+
+      rawParts.forEach(raw => {
+        // 清理数量前缀，例如 "1 ", "2 ", "3 ", "(10u)"
+        const clean = raw.replace(/^\d+[\s\.\-xX]*(unidades|u|uds)?\s*/i, '').replace(/\([^)]*\)/g, '').trim();
+        const normClean = normalizeStr(clean);
+        if (!normClean) return;
+
+        // 在中餐菜品库中智能匹配该菜品及其价格
+        let matched = singleChineseDishes.find(d => normalizeStr(d.name) === normClean);
+        if (!matched) {
+          matched = singleChineseDishes.find(d => normalizeStr(d.name).includes(normClean) || normClean.includes(normalizeStr(d.name)));
+        }
+        if (!matched) {
+          const cleanTokens = normClean.split(" ").filter(t => t.length > 2);
+          let bestOverlap = 0;
+          singleChineseDishes.forEach(d => {
+            const dTokens = normalizeStr(d.name).split(" ").filter(t => t.length > 2);
+            const overlap = cleanTokens.filter(t => dTokens.includes(t)).length;
+            if (overlap > bestOverlap && overlap >= 2) {
+              bestOverlap = overlap;
+              matched = d;
+            }
+          });
+        }
+
+        if (matched) {
+          if (!matchedItems.some(item => item.id === matched.id)) {
+            matchedItems.push({
+              id: matched.id,
+              name: matched.name,
+              price: matched.price,
+              displayName: clean.charAt(0).toUpperCase() + clean.slice(1)
+            });
+          }
+        } else {
+          matchedItems.push({
+            id: 'custom_' + normClean,
+            name: clean,
+            price: 0,
+            displayName: clean.charAt(0).toUpperCase() + clean.slice(1)
+          });
+        }
       });
 
-      selectFrom.innerHTML = optionsHtml;
-      selectTo.innerHTML = '<option value="">-- Selecciona el plato nuevo deseado --</option>' + optionsHtml.replace('-- Sin cambio (Menú estándar) --', '-- Cancelar selección --');
+      if (matchedItems.length > 0) {
+        matchedItems.forEach(item => {
+          const priceText = item.price > 0 ? ` ($${Number(item.price).toLocaleString('es-CL')})` : '';
+          fromHtml += `<option value="${item.id}" data-price="${item.price}" data-name="${item.name}">${item.displayName}${priceText}</option>`;
+        });
+      } else {
+        singleChineseDishes.forEach(d => {
+          fromHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+        });
+      }
+      selectFrom.innerHTML = fromHtml;
+
+      // 3. 填充【2. ¿Por cuál plato de comida china lo reemplazas?】—— 仅限中餐单品，按类别整齐分组
+      let toHtml = '<option value="">-- Selecciona el plato nuevo deseado --</option>';
+
+      categoriesChina.filter(c => validChineseCatIds.includes(c.id)).forEach(cat => {
+        const catDishes = singleChineseDishes.filter(d => d.category === cat.id);
+        if (catDishes.length > 0) {
+          toHtml += `<optgroup label="${cat.title}">`;
+          catDishes.forEach(d => {
+            toHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+          });
+          toHtml += `</optgroup>`;
+        }
+      });
+      selectTo.innerHTML = toHtml;
 
       selectFrom.value = "";
       selectTo.value = "";
@@ -932,33 +1018,26 @@
       document.getElementById('menu-swap-note').value = "";
     }
 
-    // 🌟 Recálculo matemático de diferencia de precio
+    // 实时计算价格差
     function calculateMenuSwapDifference() {
       const fromSelect = document.getElementById('swap-dish-from');
       const toSelect = document.getElementById('swap-dish-to');
       const badge = document.getElementById('swap-diff-badge');
       const amountEl = document.getElementById('swap-diff-amount');
 
-      const fromId = fromSelect.value;
-      const toId = toSelect.value;
+      const fromOption = fromSelect.selectedOptions[0];
+      const toOption = toSelect.selectedOptions[0];
 
-      if (!fromId || !toId) {
+      if (!fromSelect.value || !toSelect.value || !fromOption || !toOption) {
         currentMenuSwapDifference = 0;
         badge.classList.add('hidden');
         return;
       }
 
-      const dishFrom = allDishes.find(d => d.id == fromId);
-      const dishTo = allDishes.find(d => d.id == toId);
+      const priceFrom = parseFloat(fromOption.getAttribute('data-price')) || 0;
+      const priceTo = parseFloat(toOption.getAttribute('data-price')) || 0;
 
-      if (!dishFrom || !dishTo) {
-        currentMenuSwapDifference = 0;
-        badge.classList.add('hidden');
-        return;
-      }
-
-      // Diferencia = Precio del nuevo plato - Precio del plato original
-      const diff = dishTo.price - dishFrom.price;
+      const diff = priceTo - priceFrom;
       currentMenuSwapDifference = diff;
 
       badge.classList.remove('hidden');
@@ -998,7 +1077,7 @@
       boxMenuNotes.classList.toggle('hidden', !isMenu);
 
       if (isMenu) {
-        populateMenuSwapSelectors();
+        populateMenuSwapSelectors(currentSelectedDish);
       }
 
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
@@ -1046,24 +1125,24 @@
       let extraPrice = 0;
       let optionsList = [];
 
-      // 🌟 Aplicar cálculo de cambio de plato en Menús
+      // 套餐换菜计价记录
       if (currentSelectedDish.category === 'cat-menus') {
-        const fromId = document.getElementById('swap-dish-from').value;
-        const toId = document.getElementById('swap-dish-to').value;
+        const fromSelect = document.getElementById('swap-dish-from');
+        const toSelect = document.getElementById('swap-dish-to');
         const swapNote = document.getElementById('menu-swap-note').value.trim();
 
-        if (fromId && toId) {
-          const dishFrom = allDishes.find(d => d.id == fromId);
-          const dishTo = allDishes.find(d => d.id == toId);
+        if (fromSelect.value && toSelect.value) {
+          const fromOption = fromSelect.selectedOptions[0];
+          const toOption = toSelect.selectedOptions[0];
+          const fromName = fromOption.getAttribute('data-name') || fromOption.innerText.split(' ($')[0];
+          const toName = toOption.getAttribute('data-name') || toOption.innerText.split(' ($')[0];
 
-          if (dishFrom && dishTo) {
-            extraPrice += currentMenuSwapDifference;
-            const diffSign = currentMenuSwapDifference > 0 
-              ? `+$${Number(currentMenuSwapDifference).toLocaleString('es-CL')}` 
-              : (currentMenuSwapDifference < 0 ? `-$${Number(Math.abs(currentMenuSwapDifference)).toLocaleString('es-CL')}` : `$0`);
+          extraPrice += currentMenuSwapDifference;
+          const diffSign = currentMenuSwapDifference > 0 
+            ? `+$${Number(currentMenuSwapDifference).toLocaleString('es-CL')}` 
+            : (currentMenuSwapDifference < 0 ? `-$${Number(Math.abs(currentMenuSwapDifference)).toLocaleString('es-CL')}` : `$0`);
 
-            optionsList.push(`Cambio: ${dishFrom.name} ➔ ${dishTo.name} (${diffSign})`);
-          }
+          optionsList.push(`Cambio: ${fromName} ➔ ${toName} (${diffSign})`);
         }
 
         if (swapNote) {
@@ -1071,7 +1150,7 @@
         }
       }
 
-      // Colaciones
+      // 便当
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
