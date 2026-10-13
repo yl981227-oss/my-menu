@@ -28,9 +28,8 @@
     .theme-border-primary { border-color: var(--color-primary); }
     .theme-bg-light { background-color: var(--color-primary-light); }
 
-    /* 顶部门头招牌专属背景 */
+    /* 顶部门头招牌默认兜底样式 */
     #store-header {
-      background-image: linear-gradient(to bottom, rgba(153, 27, 27, 0.82), rgba(17, 24, 39, 0.88)), url('bg.jpg.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -58,13 +57,12 @@
       deliveryFee: 1800,
       promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!",
 
-      // 🌟 迎宾进店弹窗配置
+      // 迎宾弹窗配置
       welcomeModal: {
-        show: true,                                       // 是否开启进店欢迎弹窗 (true 开启 / false 关闭)
-        image: "bg.jpg.jpg",                              // 弹窗顶部封面图片
-        title: "¡Bienvenidos a DRAGÓN DE ORO!",          // 欢迎标题
-        subtitle: "Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.", // 欢迎语
-        btnText: "Ver Menú y Pedir 🥢"                    // 确认按钮文本
+        show: true,
+        title: "¡Bienvenidos a DRAGÓN DE ORO!",
+        subtitle: "Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.",
+        btnText: "Ver Menú y Pedir 🥢"
       }
     };
 
@@ -100,18 +98,18 @@
     };
   </script>
 
-  <!-- 🌟 0. 扫码进店居中迎宾弹窗 (Pop-up de Bienvenida) -->
+  <!-- 🌟 0. 进店居中迎宾弹窗 -->
   <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
-    <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all animate-[scaleIn_0.25s_ease-out]">
+    <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all">
       
       <!-- 右上角小 × 关闭按钮 -->
-      <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-10 transition backdrop-blur-sm shadow-md" title="Cerrar">
+      <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">
         &times;
       </button>
 
-      <!-- 弹窗封面图片 -->
+      <!-- 弹窗封面大图 -->
       <div class="relative h-44 w-full overflow-hidden bg-gray-900">
-        <img id="welcome-img" src="bg.jpg.jpg" alt="Bienvenidos" class="w-full h-full object-cover">
+        <img id="welcome-img" src="" alt="Bienvenidos" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
         <div class="absolute bottom-2.5 left-3.5 flex items-center gap-2">
           <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-lg shadow-sm">
@@ -121,7 +119,7 @@
         </div>
       </div>
 
-      <!-- 弹窗文字内容 -->
+      <!-- 弹窗文字 -->
       <div class="p-5 text-center">
         <h2 id="welcome-title" class="text-base font-black text-gray-900 leading-snug mb-1.5">
           ¡Bienvenidos a DRAGÓN DE ORO!
@@ -130,13 +128,11 @@
           Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.
         </p>
         
-        <!-- 满赠/福利小标签 -->
         <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 mb-4 text-[11px] font-bold text-amber-800 flex items-center justify-center gap-1.5">
           <span>🎁</span>
           <span>¡Por compras sobre $20.000 te regalamos Wantán frito!</span>
         </div>
 
-        <!-- 确认进入按钮（同样带关闭功能） -->
         <button id="btn-welcome-close" onclick="closeWelcomeModal()" class="w-full text-white font-black py-3 rounded-2xl shadow-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
           <span id="welcome-btn-text">Ver Menú y Pedir 🥢</span>
         </button>
@@ -144,7 +140,7 @@
     </div>
   </div>
 
-  <!-- 1. 顶部招牌大门头 -->
+  <!-- 1. 顶部招牌大门头（同一张大图注入于此） -->
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
@@ -192,7 +188,7 @@
     </div>
   </header>
 
-  <!-- 2. 主分类切换卡槽 (Comida China vs Sushi) -->
+  <!-- 2. 主分类切换卡槽 -->
   <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
     <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
       <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
@@ -215,7 +211,7 @@
     </main>
   </div>
 
-  <!-- 4. 底部悬浮购物车 (Floating Dock Bar) -->
+  <!-- 4. 底部悬浮购物车 -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -239,7 +235,7 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 (Option Modal) -->
+  <!-- 5. 菜品定制弹窗 -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -252,7 +248,7 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- A. 套餐专属换菜备注栏 (Menús 专属) -->
+      <!-- A. 套餐专属换菜备注栏 -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/80 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
@@ -266,7 +262,7 @@
         <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado primavera por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
       </div>
 
-      <!-- B. 便当配餐加价选项 (Colaciones 专属) -->
+      <!-- B. 便当配餐加价选项 -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -294,7 +290,7 @@
         </div>
       </div>
 
-      <!-- C. 中餐专属定制 (双按钮对称布局，选填) -->
+      <!-- C. 中餐专属定制 (双按钮对称布局) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -515,10 +511,8 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 免弹窗直接加购的白名单分类
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
-    // 中餐品类字典
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
@@ -553,13 +547,39 @@
     let modalQty = 1;
     let orderType = 'pickup';
     let isUserClickingCategory = false;
-
     let currentActiveAjiRadio = null;
 
-    // 🌟 控制迎宾弹窗显示与关闭
+    // 🌟 智能背景图嗅探加载引擎（自动适配 bg.jpg.jpg 或 bg.jpg）
+    let activeFoodBannerUrl = "bg.jpg.jpg";
+
+    function autoDetectAndSetBanner() {
+      const candidates = ["bg.jpg.jpg", "bg.jpg", "./bg.jpg.jpg", "./bg.jpg"];
+      function tryCandidate(index) {
+        if (index >= candidates.length) return;
+        const testImg = new Image();
+        testImg.src = candidates[index];
+        testImg.onload = function() {
+          activeFoodBannerUrl = candidates[index];
+          // 1. 同时给弹窗图片赋值
+          const welcomeImg = document.getElementById('welcome-img');
+          if (welcomeImg) welcomeImg.src = activeFoodBannerUrl;
+
+          // 2. 同时给主页顶部门头注入同一张背景大图
+          const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
+          const header = document.getElementById('store-header');
+          if (header) {
+            header.style.backgroundImage = t.headerOverlay + ", url('" + activeFoodBannerUrl + "')";
+          }
+        };
+        testImg.onerror = function() {
+          tryCandidate(index + 1);
+        };
+      }
+      tryCandidate(0);
+    }
+
     function initWelcomeModal() {
       if (STORE_CONFIG.welcomeModal && STORE_CONFIG.welcomeModal.show) {
-        document.getElementById('welcome-img').src = STORE_CONFIG.welcomeModal.image || 'bg.jpg.jpg';
         document.getElementById('welcome-title').innerText = STORE_CONFIG.welcomeModal.title;
         document.getElementById('welcome-subtitle').innerText = STORE_CONFIG.welcomeModal.subtitle;
         document.getElementById('welcome-btn-text').innerText = STORE_CONFIG.welcomeModal.btnText;
@@ -596,9 +616,6 @@
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
-      
-      // 更新门头背景遮罩渐变
-      document.getElementById('store-header').style.backgroundImage = t.headerOverlay + ", url('bg.jpg.jpg')";
 
       if (STORE_CONFIG.promoBanner) {
         document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
@@ -1165,9 +1182,11 @@
       window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
 
+    // 初始化运行
     applyStoreConfig();
+    autoDetectAndSetBanner(); // 自动匹配并同时注入弹窗与门头大图
+    initWelcomeModal();
     loadLiveMenu();
-    initWelcomeModal(); // 初始化运行迎宾弹窗
   </script>
 </body>
 </html>
