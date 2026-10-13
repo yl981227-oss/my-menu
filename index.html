@@ -195,9 +195,9 @@
           <span class="text-[10px] text-amber-700 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
         <p class="text-[10px] text-amber-800/80 mb-2 leading-tight">
-          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado por wantán, chapsui carne por chaumín carne, etc.).
+          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado por carne, chapsui por chaumín, etc.).
         </p>
-        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado marisco por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
+        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado primavera por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
       </div>
 
       <!-- B. 便当配餐加价选项 (Colaciones 专属) -->
@@ -228,18 +228,14 @@
         </div>
       </div>
 
-      <!-- C. 中餐专属定制 (辣度非必填，默认全不亮) -->
+      <!-- C. 中餐专属定制 (仅保留 Con ají 和 Ají aparte，双按钮对称布局) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🌶️ Nivel de Ají</label>
             <span class="text-[10px] text-gray-400 font-semibold">(Opcional)</span>
           </div>
-          <div class="grid grid-cols-3 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Sin ají" class="hidden" onclick="handleAjiToggle(this)">
-              <span>Sin ají</span>
-            </label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
             <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-aji" value="Con ají" class="hidden" onclick="handleAjiToggle(this)">
               <span>Con ají 🔥</span>
@@ -305,7 +301,7 @@
               <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
               <span>🥢 Sí, con palitos</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
               <span>🌱 Sin palitos</span>
             </label>
@@ -453,10 +449,8 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 免弹窗直接加购的白名单分类：Aperitivos、Sopas、Arroz
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
-    // 中餐品类字典（Vacuno 统一改为 Carne）
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
@@ -800,7 +794,6 @@
       }
     }
 
-    // 打开定制弹窗 (重点：为套餐展现换菜备注输入框)
     function openOptionModal(dishId, event) {
       if (event) event.stopPropagation();
       currentSelectedDish = allDishes.find(i => i.id === dishId);
@@ -821,7 +814,6 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
-      // 套餐换菜备注框控制
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isMenu);
       document.getElementById('menu-swap-input').value = '';
@@ -831,6 +823,7 @@
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
+      // 清除辣度单选状态，默认不选中
       document.querySelectorAll('input[name="opt-aji"]').forEach(r => r.checked = false);
       currentActiveAjiRadio = null;
 
@@ -871,7 +864,6 @@
       let extraPrice = 0;
       let optionsList = [];
 
-      // 1. 如果是套餐，提取换菜备注并前置
       if (currentSelectedDish.category === 'cat-menus') {
         const swapText = document.getElementById('menu-swap-input').value.trim();
         if (swapText) {
@@ -879,7 +871,6 @@
         }
       }
 
-      // 2. 如果是便当，提取配餐选项
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -910,6 +901,7 @@
         const tempChoice = document.querySelector('input[name="opt-drink-temp"]:checked').value;
         optionsList.push(tempChoice);
       } else {
+        // 仅当用户主动选中 Con ají 或 Ají aparte 时收录
         const ajiRadio = document.querySelector('input[name="opt-aji"]:checked');
         if (ajiRadio) {
           optionsList.push(ajiRadio.value);
