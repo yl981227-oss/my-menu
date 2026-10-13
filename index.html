@@ -13,12 +13,6 @@
   <style>
     body { 
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      /* 注入你的专属背景大图 */
-      background-image: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('bg.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -34,28 +28,16 @@
     .theme-border-primary { border-color: var(--color-primary); }
     .theme-bg-light { background-color: var(--color-primary-light); }
 
-    /* 高级毛玻璃通透质感 */
-    .glass-card {
-      background-color: rgba(255, 255, 255, 0.88) !important;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.6) !important;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    }
-    .glass-aside {
-      background-color: rgba(241, 245, 249, 0.65) !important;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-right: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    .glass-nav {
-      background-color: rgba(255, 255, 255, 0.75) !important;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+    /* 顶部门头招牌专属背景大图（图二位置） */
+    #store-header {
+      background-image: linear-gradient(to bottom, rgba(153, 27, 27, 0.82), rgba(17, 24, 39, 0.88)), url('bg.jpg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
   </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
+<body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
 
   <!-- ======================================================== -->
   <!-- 🎨 店铺个性化配置中心 -->
@@ -82,45 +64,45 @@
         primary: "#DC2626",
         primaryDark: "#991B1B",
         primaryLight: "#FEF2F2",
-        headerGradient: "from-red-900/90 via-rose-800/90 to-red-700/90",
+        headerOverlay: "linear-gradient(to bottom, rgba(153, 27, 27, 0.82), rgba(17, 24, 39, 0.88))",
         btnGradient: "from-red-600 to-rose-600"
       },
       black_gold: {
         primary: "#D97706",
         primaryDark: "#18181B",
         primaryLight: "#FFFBEB",
-        headerGradient: "from-zinc-950/90 via-zinc-900/90 to-stone-900/90",
+        headerOverlay: "linear-gradient(to bottom, rgba(24, 24, 27, 0.85), rgba(0, 0, 0, 0.92))",
         btnGradient: "from-amber-500 to-amber-600"
       },
       orange: {
         primary: "#EA580C",
         primaryDark: "#9A3412",
         primaryLight: "#FFF7ED",
-        headerGradient: "from-orange-800/90 via-orange-600/90 to-amber-600/90",
+        headerOverlay: "linear-gradient(to bottom, rgba(194, 65, 12, 0.85), rgba(24, 24, 27, 0.88))",
         btnGradient: "from-orange-600 to-amber-500"
       },
       emerald: {
         primary: "#059669",
         primaryDark: "#064E3B",
         primaryLight: "#ECFDF5",
-        headerGradient: "from-emerald-950/90 via-teal-900/90 to-emerald-800/90",
+        headerOverlay: "linear-gradient(to bottom, rgba(6, 78, 59, 0.85), rgba(15, 23, 42, 0.9))",
         btnGradient: "from-emerald-600 to-teal-600"
       }
     };
   </script>
 
-  <!-- 1. 顶部招牌 -->
-  <header id="store-header" class="bg-gradient-to-r text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 backdrop-blur-md transition-all">
+  <!-- 1. 顶部招牌大门头（背景图已注入在此） -->
+  <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
         <div id="store-logo" class="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl shadow-inner shrink-0">
           🐉
         </div>
         <div>
-          <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow-sm">
+          <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow">
             DRAGÓN DE ORO
           </h1>
-          <p id="store-slogan" class="text-[11px] text-white/90 font-medium mt-1 leading-tight line-clamp-1">
+          <p id="store-slogan" class="text-[11px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">
             Comida China Tradicional & Sushi
           </p>
         </div>
@@ -131,55 +113,58 @@
       </div>
     </div>
 
+    <!-- 优惠信息栏 -->
     <div id="store-promo-bar" class="mb-2 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
       <span class="shrink-0">📢</span>
       <span id="store-promo-text" class="truncate leading-tight"></span>
     </div>
 
+    <!-- 标签 -->
     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/95">
-      <span id="badge-rating" class="bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         ⭐ 4.9 (210+ reseñas)
       </span>
-      <span id="badge-preptime" class="bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         ⏱️ 20-30 min
       </span>
-      <span id="badge-delivery" class="bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         🛵 Envío $1.800 CLP
       </span>
     </div>
 
+    <!-- 搜索输入框 -->
     <div class="mt-2 relative">
-      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/50 focus:border-white/50 transition backdrop-blur-sm">
+      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
       <span class="absolute left-2.5 top-2.5 text-xs text-white/80">🔍</span>
     </div>
   </header>
 
   <!-- 2. 主分类切换卡槽 (Comida China vs Sushi) -->
-  <nav class="glass-nav px-3 py-2 border-b border-white/20 shrink-0 z-20 shadow-sm">
-    <div class="bg-black/10 p-1 rounded-2xl flex gap-1 border border-white/30 backdrop-blur-md">
+  <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
+    <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
       <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
         <span class="text-sm">🥢</span> Comida China
       </button>
-      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-gray-900 flex items-center justify-center gap-1.5 transition-all duration-200">
+      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200">
         <span class="text-sm">🍣</span> Sushi
       </button>
     </div>
   </nav>
 
-  <!-- 3. 双栏黄金布局：左侧半透明分类栏 + 右侧菜品瀑布 -->
+  <!-- 3. 双栏黄金布局：左侧清爽分类栏 + 右侧清爽菜品瀑布 -->
   <div class="flex flex-1 overflow-hidden">
-    <aside id="sidebar-categories" class="w-24 glass-aside overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
+    <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
       <!-- 由 JS 渲染 -->
     </aside>
 
-    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-transparent">
-      <div class="text-center py-24 text-white font-bold text-xs drop-shadow">Cargando delicias...</div>
+    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
+      <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
   <!-- 4. 底部悬浮购物车 (Floating Dock Bar) -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
-    <footer class="pointer-events-auto max-w-md mx-auto bg-gray-950/90 backdrop-blur-xl text-white p-3 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.5)] border border-white/15 flex items-center justify-between transition-transform active:scale-[0.99]">
+    <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
         <div class="relative">
           <div id="cart-icon-box" class="w-10 h-10 rounded-xl theme-bg-primary flex items-center justify-center text-lg shadow-md">
@@ -202,8 +187,8 @@
   </div>
 
   <!-- 5. 菜品定制弹窗 (Option Modal) -->
-  <div id="option-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white/95 backdrop-blur-xl w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto border border-white/40">
+  <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
 
       <div class="flex justify-between items-start border-b pb-3 mb-3.5">
@@ -215,12 +200,12 @@
       </div>
 
       <!-- A. 套餐专属换菜备注栏 (Menús 专属) -->
-      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200 shadow-sm">
+      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/80 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
             <span>🔄</span> Cambios de plato (换菜要求)
           </label>
-          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
+          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
         <p class="text-[10px] text-amber-800/80 mb-2 leading-tight">
           ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado por carne, chapsui por chaumín, etc.).
@@ -264,11 +249,11 @@
             <span class="text-[10px] text-gray-400 font-semibold">(Opcional)</span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-aji" value="Con ají" class="hidden" onclick="handleAjiToggle(this)">
               <span>Con ají 🔥</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-aji" value="Ají aparte" class="hidden" onclick="handleAjiToggle(this)">
               <span>Ají aparte</span>
             </label>
@@ -278,19 +263,19 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🧂 Preferencias de cocina</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="pref-sal" value="Bajo en sal" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Bajo en sal</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="pref-sillao" value="Poco sillao" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Poco sillao</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="pref-diente" value="Sin diente" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Sin diente dragón</span>
             </label>
@@ -303,19 +288,19 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
               <input type="checkbox" id="sushi-soya" value="Salsa Soya" checked class="w-4 h-4 rounded">
               <span class="font-bold">Soya (酱油)</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
               <input type="checkbox" id="sushi-teriyaki" value="Salsa Teriyaki" checked class="w-4 h-4 rounded">
               <span class="font-bold">Teriyaki (甜酱)</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Wasabi (芥末)</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Jengibre (红姜)</span>
             </label>
@@ -325,11 +310,11 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 ¿Deseas Palitos de madera?</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
               <span>🥢 Sí, con palitos</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
               <span>🌱 Sin palitos</span>
             </label>
@@ -339,19 +324,19 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥑 Detalles del Roll</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Sin queso crema</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Sin sésamo</span>
             </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
               <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="w-4 h-4 rounded">
               <span class="font-semibold text-gray-700">Bien dorado 🔥</span>
             </label>
@@ -364,11 +349,11 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Fría / Helada" checked class="hidden">
               <span>❄️ Bien Fría / Helada</span>
             </label>
-            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 bg-white text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Al tiempo" class="hidden">
               <span>🌤️ Al tiempo</span>
             </label>
@@ -393,8 +378,8 @@
   </div>
 
   <!-- 6. 结账结算弹窗 -->
-  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white/95 backdrop-blur-xl w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto border border-white/40">
+  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
 
       <div class="flex justify-between items-center mb-3 border-b pb-2.5">
@@ -408,7 +393,7 @@
       <div id="cart-items-preview" class="space-y-2 mb-3.5 max-h-40 overflow-y-auto divide-y divide-gray-100 text-xs pr-1"></div>
 
       <!-- 履约方式选择 -->
-      <div class="mb-3.5 bg-gray-50/80 p-2.5 rounded-2xl border border-gray-100">
+      <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🛵 Método de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
           <button type="button" id="btn-pickup" onclick="setOrderType('pickup')" class="p-2.5 rounded-xl border-2 theme-border-primary bg-white theme-text-primary shadow-sm text-center transition">
@@ -423,11 +408,11 @@
       <div class="space-y-2.5 text-xs">
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre Completo *</label>
-          <input id="cust-name" type="text" placeholder="Ej: Marcela González" class="w-full border border-gray-200 bg-white rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 transition">
+          <input id="cust-name" type="text" placeholder="Ej: Marcela González" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Teléfono WhatsApp *</label>
-          <input id="cust-phone" type="tel" placeholder="Ej: 56912345678" class="w-full border border-gray-200 bg-white rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 transition">
+          <input id="cust-phone" type="tel" placeholder="Ej: 56912345678" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
         
         <div id="address-box" class="hidden">
@@ -437,7 +422,7 @@
 
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de pago *</label>
-          <select id="pay-method" onchange="toggleCashInput()" class="w-full border border-gray-200 bg-white rounded-xl p-2.5 text-xs outline-none font-semibold text-gray-700">
+          <select id="pay-method" onchange="toggleCashInput()" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none font-semibold text-gray-700">
             <option value="efectivo">💵 Efectivo al recibir</option>
             <option value="tarjeta">💳 Tarjeta Débito / Crédito POS (现场刷卡)</option>
             <option value="transferencia">🏦 Transferencia Bancaria (转账)</option>
@@ -446,12 +431,12 @@
 
         <div id="cash-amount-box">
           <label class="block text-[11px] font-bold text-gray-700 mb-1">¿Con cuánto efectivo pagarás? (Vuelto)</label>
-          <input id="cust-cash" type="number" placeholder="Ej: 20000" class="w-full border border-gray-200 bg-white rounded-xl p-2.5 text-xs outline-none transition">
+          <input id="cust-cash" type="number" placeholder="Ej: 20000" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none transition">
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Comentarios / Instrucciones</label>
-          <input id="cust-notes" type="text" placeholder="Ej: Timbre no funciona, llamar al llegar..." class="w-full border border-gray-200 bg-white rounded-xl p-2.5 text-xs outline-none transition">
+          <input id="cust-notes" type="text" placeholder="Ej: Timbre no funciona, llamar al llegar..." class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none transition">
         </div>
       </div>
 
@@ -538,7 +523,9 @@
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
-      document.getElementById('store-header').className = "bg-gradient-to-r " + t.headerGradient + " text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 backdrop-blur-md transition-all";
+      
+      // 更新门头背景遮罩渐变
+      document.getElementById('store-header').style.backgroundImage = t.headerOverlay + ", url('bg.jpg')";
 
       if (STORE_CONFIG.promoBanner) {
         document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
@@ -562,11 +549,11 @@
       const btnSushi = document.getElementById('btn-tab-sushi');
 
       if (mode === 'china') {
-        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white/90 theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-gray-900 flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       } else {
-        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white/90 theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-gray-900 flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       }
       renderCurrentMenu();
     }
@@ -576,7 +563,7 @@
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
 
       if (error) {
-        container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold text-xs">Error de conexión: ' + error.message + '</div>';
+        container.innerHTML = '<div class="text-center py-20 text-red-500 text-xs">Error de conexión: ' + error.message + '</div>';
         return;
       }
 
@@ -596,8 +583,8 @@
       let html = '';
       cats.forEach((cat, idx) => {
         const isFirst = idx === 0;
-        const activeClass = isFirst ? 'bg-white/90 theme-text-primary font-black border-l-4 theme-border-primary shadow-sm' : 'text-gray-700 font-semibold hover:bg-white/40';
-        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/30 ' + activeClass + '">';
+        const activeClass = isFirst ? 'bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm' : 'text-gray-500 font-semibold hover:bg-gray-200/60';
+        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 ' + activeClass + '">';
         html += '  <span class="text-lg leading-none">' + cat.icon + '</span>';
         html += '  <span class="leading-tight break-words text-[10px]">' + cat.short + '</span>';
         html += '</button>';
@@ -613,7 +600,7 @@
       const dish = allDishes.find(d => d.id === dishId);
       if (!dish) return '';
       if (!dish.is_available) {
-        return '<button class="w-8 h-8 rounded-full bg-gray-200/80 text-gray-400 font-black text-base flex items-center justify-center shrink-0">✕</button>';
+        return '<button class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 font-black text-base flex items-center justify-center shrink-0">✕</button>';
       }
 
       const qty = getDishCartQty(dishId);
@@ -629,7 +616,7 @@
       }
 
       return `
-        <div class="flex items-center gap-1.5 bg-white/90 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
+        <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
           <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
             -
           </button>
@@ -652,8 +639,8 @@
         html += '<section id="' + cat.id + '" class="scroll-mt-3 dish-section" data-cat-id="' + cat.id + '">';
         html += '<div class="flex items-center gap-2 mb-2 px-1">';
         html += '  <span class="text-sm">' + cat.icon + '</span>';
-        html += '  <h2 class="text-xs font-black text-white uppercase tracking-wider drop-shadow">' + cat.title + '</h2>';
-        html += '  <span class="text-[10px] font-bold text-gray-200 ml-auto bg-black/40 px-2 py-0.5 rounded-full border border-white/20">' + items.length + '</span>';
+        html += '  <h2 class="text-xs font-black text-gray-800 uppercase tracking-wider">' + cat.title + '</h2>';
+        html += '  <span class="text-[10px] font-bold text-gray-400 ml-auto bg-gray-200/60 px-2 py-0.5 rounded-full">' + items.length + '</span>';
         html += '</div>';
         html += '<div class="space-y-2">';
 
@@ -666,8 +653,8 @@
 
           const clickAttr = isSoldOut ? '' : 'onclick="' + cardClickAction + '"';
           const cardStyle = isSoldOut 
-            ? 'glass-card p-3 rounded-2xl flex justify-between items-center opacity-60 cursor-not-allowed bg-gray-100/70' 
-            : 'glass-card p-3 rounded-2xl flex justify-between items-center active:scale-[0.99] transition cursor-pointer';
+            ? 'bg-white/60 p-3 rounded-2xl border border-gray-200/50 flex justify-between items-center opacity-60 cursor-not-allowed' 
+            : 'bg-white p-3 rounded-2xl border border-gray-150 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md flex justify-between items-center active:scale-[0.99] transition cursor-pointer';
           const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded-md font-black tracking-wider">AGOTADO</span>' : '';
           const descText = dish.description || '';
           const priceStr = Number(dish.price).toLocaleString('es-CL');
@@ -679,12 +666,12 @@
           html +=        badge;
           html += '    </div>';
           if (descText) {
-            html += '    <p class="text-[10px] text-gray-500 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
+            html += '    <p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
           }
           html += '    <div class="mt-1.5 flex items-baseline gap-1">';
           html += '      <span class="text-[10px] font-bold theme-text-primary">$</span>';
           html += '      <span class="text-sm font-black theme-text-primary tracking-tight">' + priceStr + '</span>';
-          html += '      <span class="text-[9px] font-semibold text-gray-500">CLP</span>';
+          html += '      <span class="text-[9px] font-semibold text-gray-400">CLP</span>';
           html += '    </div>';
           html += '  </div>';
 
@@ -699,7 +686,7 @@
       });
 
       if (!html) {
-        html = '<div class="text-center py-20 text-white font-bold text-xs">No hay platos disponibles por el momento.</div>';
+        html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
       }
 
       container.innerHTML = html;
@@ -799,12 +786,12 @@
       if (!sidebar) return;
 
       sidebar.querySelectorAll('button').forEach(btn => {
-        btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/30 text-gray-700 font-semibold hover:bg-white/40";
+        btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
       });
 
       const activeBtn = document.getElementById('side-btn-' + catId);
       if (activeBtn) {
-        activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/30 bg-white/95 theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
+        activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
         if (shouldScrollSidebar) {
           activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
