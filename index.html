@@ -15,7 +15,6 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 动态品牌主题注入变量 */
     :root {
       --color-primary: #DC2626;
       --color-primary-dark: #991B1B;
@@ -31,28 +30,27 @@
 <body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
 
   <!-- ======================================================== -->
-  <!-- 🎨 店铺个性化配置中心 (每家店只需在这里修改几行即可全套换装) -->
+  <!-- 🎨 店铺个性化配置中心 -->
   <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
       // 1. 基础品牌信息
-      storeName: "DRAGÓN DE ORO",                // 店铺名称
-      slogan: "Comida China Tradicional & Sushi", // 宣传标语
-      logoIcon: "🐉",                           // 店标 Emoji 或图片 URL
-      whatsapp: "56974142810",                   // 该店接单 WhatsApp 电话号码
-      orderCodePrefix: "DRAGON",                 // 订单号前缀 (如 DRAGON-1082)
+      storeName: "DRAGÓN DE ORO",
+      slogan: "Comida China Tradicional & Sushi",
+      logoIcon: "🐉",
+      whatsapp: "56974142810",
+      orderCodePrefix: "DRAGON",
 
       // 2. 视觉主题预设: 'red'(中国红) | 'black_gold'(黑金) | 'orange'(活力橙) | 'emerald'(和风绿)
-      theme: "black_gold",
+      theme: "red",
 
       // 3. 门店运营参数
-      ratingText: "⭐ 4.9 (210+ reseñas)",       // 评分背书
-      prepTimeText: "⏱️ 20-30 min",             // 出餐预估时间
-      deliveryFee: 1800,                         // 配送费 (CLP)
-      promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!" // 顶部跑马灯特惠
+      ratingText: "⭐ 4.9 (210+ reseñas)",
+      prepTimeText: "⏱️ 20-30 min",
+      deliveryFee: 1800,
+      promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!"
     };
 
-    // 主题色彩映射表
     const THEMES = {
       red: {
         primary: "#DC2626",
@@ -85,7 +83,7 @@
     };
   </script>
 
-  <!-- 1. 顶部个性化品牌招牌 -->
+  <!-- 1. 顶部招牌 -->
   <header id="store-header" class="bg-gradient-to-r text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
@@ -101,14 +99,13 @@
           </p>
         </div>
       </div>
-      <!-- 营业状态指示灯 -->
       <div class="flex items-center gap-1.5 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 px-2.5 py-1 rounded-full shadow-sm">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="text-[10px] font-black text-emerald-100 tracking-wide">Abierto</span>
       </div>
     </div>
 
-    <!-- 顶部特惠横幅 (Promo Hook) -->
+    <!-- 顶部特惠横幅 -->
     <div id="store-promo-bar" class="mb-2 bg-black/25 backdrop-blur-sm border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
       <span class="shrink-0">📢</span>
       <span id="store-promo-text" class="truncate leading-tight"></span>
@@ -146,11 +143,11 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏布局：左侧品类直达 + 右侧菜品瀑布 -->
+  <!-- 3. 双栏布局 -->
   <div class="flex flex-1 overflow-hidden">
     <!-- 左侧竖向导航栏 -->
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
-      <!-- 由 JS 渲染 -->
+      <!-- JS 渲染 -->
     </aside>
 
     <!-- 右侧菜品卡片展示区 -->
@@ -224,21 +221,24 @@
         </div>
       </div>
 
-      <!-- 中餐专属定制 -->
+      <!-- 中餐专属定制 (辣度现在为纯选填，默认全不选中) -->
       <div id="box-china-options" class="space-y-4">
         <div>
-          <label class="block text-xs font-black text-gray-800 mb-2">🌶️ Nivel de Ají *</label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-black text-gray-800">🌶️ Nivel de Ají</label>
+            <span class="text-[10px] text-gray-400 font-semibold">(Opcional • Toca para seleccionar o cancelar)</span>
+          </div>
           <div class="grid grid-cols-3 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Sin ají" checked class="hidden">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-aji" value="Sin ají" class="hidden" onclick="handleAjiToggle(this)">
               <span>Sin ají</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Con ají" class="hidden">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-aji" value="Con ají" class="hidden" onclick="handleAjiToggle(this)">
               <span>Con ají 🔥</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Ají aparte" class="hidden">
+            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-aji" value="Ají aparte" class="hidden" onclick="handleAjiToggle(this)">
               <span>Ají aparte</span>
             </label>
           </div>
@@ -294,11 +294,11 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 ¿Deseas Palitos de madera?</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
               <span>🥢 Sí, con palitos</span>
             </label>
-            <label class="flex items-center justify-center py-2.5 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-2.5 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
               <span>🌱 Sin palitos</span>
             </label>
@@ -333,11 +333,11 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-3 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Fría / Helada" checked class="hidden">
               <span>❄️ Bien Fría / Helada</span>
             </label>
-            <label class="flex items-center justify-center py-3 rounded-xl border text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
               <input type="radio" name="opt-drink-temp" value="Al tiempo" class="hidden">
               <span>🌤️ Al tiempo</span>
             </label>
@@ -361,7 +361,7 @@
     </div>
   </div>
 
-  <!-- 6. 结账结算弹窗 (Checkout Modal) -->
+  <!-- 6. 结账结算弹窗 -->
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -389,7 +389,6 @@
         </div>
       </div>
 
-      <!-- 顾客表单信息填写 -->
       <div class="space-y-2.5 text-xs">
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre Completo *</label>
@@ -442,13 +441,11 @@
   </div>
 
   <script>
-    // 云端通信密钥配置
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 中餐品类字典
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
@@ -466,7 +463,6 @@
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
-    // 寿司品类字典
     const categoriesSushi = [
       { id: "cat-sushi-promos", title: "🍱 PROMOS SUSHI", icon: "🍱", short: "Promos" },
       { id: "cat-sushi-hot", title: "🔥 HOT ROLLS (Fritos)", icon: "🔥", short: "Hot Rolls" },
@@ -484,23 +480,31 @@
     let modalQty = 1;
     let orderType = 'pickup';
 
-    // 动态应用品牌主题和参数
+    // 追踪当前选中的辣度，实现“再点一次取消勾选”
+    let currentActiveAjiRadio = null;
+
+    function handleAjiToggle(radio) {
+      if (currentActiveAjiRadio === radio) {
+        radio.checked = false;
+        currentActiveAjiRadio = null;
+      } else {
+        currentActiveAjiRadio = radio;
+      }
+    }
+
     function applyStoreConfig() {
       const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
 
-      // 1. 设置 CSS 变量
       document.documentElement.style.setProperty('--color-primary', t.primary);
       document.documentElement.style.setProperty('--color-primary-dark', t.primaryDark);
       document.documentElement.style.setProperty('--color-primary-light', t.primaryLight);
 
-      // 2. 页面标题与品牌信息
       document.title = STORE_CONFIG.storeName + " - Menú Online";
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
       document.getElementById('store-header').className = "bg-gradient-to-r " + t.headerGradient + " text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all";
 
-      // 3. 优惠横幅与标签
       if (STORE_CONFIG.promoBanner) {
         document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
       } else {
@@ -511,7 +515,6 @@
       document.getElementById('badge-delivery').innerText = "🛵 Envío $" + Number(STORE_CONFIG.deliveryFee).toLocaleString('es-CL') + " CLP";
       document.getElementById('label-delivery-fee').innerText = "+$" + Number(STORE_CONFIG.deliveryFee).toLocaleString('es-CL') + " CLP";
 
-      // 4. 按钮渐变色注入
       const btnCheckout = document.getElementById('btn-checkout-dock');
       btnCheckout.className = "bg-gradient-to-r " + t.btnGradient + " text-white font-extrabold py-2.5 px-5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition";
       const btnModalAdd = document.getElementById('btn-modal-add');
@@ -651,6 +654,7 @@
       }
     }
 
+    // 打开定制弹窗 (彻底解决默认高亮问题)
     function openOptionModal(dishId) {
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
@@ -669,6 +673,10 @@
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
+      // 核心调整：清空全部辣度单选状态，默认任何一个都不亮
+      document.querySelectorAll('input[name="opt-aji"]').forEach(r => r.checked = false);
+      currentActiveAjiRadio = null;
+
       if (isSushi) {
         document.getElementById('sushi-soya').checked = true;
         document.getElementById('sushi-teriyaki').checked = true;
@@ -682,7 +690,7 @@
       } else if (isDrink) {
         document.querySelector('input[name="opt-drink-temp"][value="Fría / Helada"]').checked = true;
       } else {
-        document.querySelector('input[name="opt-aji"][value="Sin ají"]').checked = true;
+        // 重置中餐口味多选框
         document.getElementById('pref-sal').checked = false;
         document.getElementById('pref-sillao').checked = false;
         document.getElementById('pref-cebollin').checked = false;
@@ -737,8 +745,11 @@
         const tempChoice = document.querySelector('input[name="opt-drink-temp"]:checked').value;
         optionsList.push(tempChoice);
       } else {
-        const ajiChoice = document.querySelector('input[name="opt-aji"]:checked').value;
-        if (ajiChoice !== 'Sin ají') optionsList.push(ajiChoice);
+        // 核心调整：仅当客人主动点选了某个辣度时才记录，不点则完全不记录！
+        const ajiRadio = document.querySelector('input[name="opt-aji"]:checked');
+        if (ajiRadio) {
+          optionsList.push(ajiRadio.value);
+        }
 
         if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
         if (document.getElementById('pref-sillao').checked) optionsList.push('Poco sillao');
@@ -868,7 +879,6 @@
         return;
       }
 
-      // 生成带店铺自定义前缀的订单号
       const orderCode = STORE_CONFIG.orderCodePrefix + '-' + Math.floor(1000000000 + Math.random() * 9000000000);
       const dt = getChileDateTime();
 
@@ -878,6 +888,7 @@
         const itemTotal = item.unitPrice * item.qty;
         subtotal += itemTotal;
         let line = 'X' + item.qty + ' ' + item.name + ' $ ' + itemTotal.toLocaleString('es-CL');
+        // 仅当 optionsList 有选项时才换行输出圆点明细，如果没选辣度这里直接干净略过
         if (item.options.length > 0) line += '\n   • ' + item.options.join(', ');
         productsList.push(line);
       });
@@ -922,7 +933,6 @@
       window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
 
-    // 初始化运行
     applyStoreConfig();
     loadLiveMenu();
   </script>
