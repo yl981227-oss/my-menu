@@ -121,7 +121,7 @@
     </div>
 
     <div class="mt-2 relative">
-      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Arroz, Wantán, Carne...)" class="w-full bg-black/25 placeholder-white/60 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
+      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/25 placeholder-white/60 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/15 focus:bg-black/40 focus:border-white/40 transition">
       <span class="absolute left-2.5 top-2.5 text-xs text-white/70">🔍</span>
     </div>
   </header>
@@ -138,7 +138,7 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏黄金布局：左侧竖向分类导航 + 右侧菜品瀑布 -->
+  <!-- 3. 双栏布局：左侧竖向分类导航 + 右侧菜品瀑布 -->
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
       <!-- 由 JS 渲染 -->
@@ -173,7 +173,7 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 (Option Modal - Aperitivos, Sopas, Arroz 排除此弹窗) -->
+  <!-- 5. 菜品定制弹窗 (Option Modal) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -186,7 +186,21 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- 便当配餐加价选项 -->
+      <!-- A. 套餐专属换菜备注栏 (Menús 专属) -->
+      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/80 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
+        <div class="flex justify-between items-center mb-1">
+          <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
+            <span>🔄</span> Cambios de plato (换菜要求)
+          </label>
+          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-full">Opcional</span>
+        </div>
+        <p class="text-[10px] text-amber-800/80 mb-2 leading-tight">
+          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado por carne, chapsui por chaumín, etc.).
+        </p>
+        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado primavera por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
+      </div>
+
+      <!-- B. 便当配餐加价选项 (Colaciones 专属) -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -214,7 +228,7 @@
         </div>
       </div>
 
-      <!-- 中餐专属定制 (辣度非必填，默认全不亮) -->
+      <!-- C. 中餐专属定制 (辣度非必填，默认全不亮) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -260,7 +274,7 @@
         </div>
       </div>
 
-      <!-- 寿司专属定制 -->
+      <!-- D. 寿司专属定制 -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
@@ -321,7 +335,7 @@
         </div>
       </div>
 
-      <!-- 饮料专属定制 -->
+      <!-- E. 饮料专属定制 -->
       <div id="box-drink-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
@@ -442,12 +456,12 @@
     // 免弹窗直接加购的白名单分类：Aperitivos、Sopas、Arroz
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
-    // 中餐品类字典（已将 Vacuno 改为 Carne）
+    // 中餐品类字典（Vacuno 统一改为 Carne）
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
       { id: "cat-aperitivos", title: "🥟 APERITIVOS", icon: "🥟", short: "Aperitivos" },
-      { id: "cat-vacuno", title: "🥩 CARNE", icon: "🥩", short: "Carne" }, // 改为 CARNE
+      { id: "cat-vacuno", title: "🥩 CARNE", icon: "🥩", short: "Carne" },
       { id: "cat-pollo", title: "🍗 POLLO", icon: "🍗", short: "Pollo" },
       { id: "cat-cerdo", title: "🐷 CERDO", icon: "🐷", short: "Cerdo" },
       { id: "cat-chaumin", title: "🍜 CHAUMÍN", icon: "🍜", short: "Chaumín" },
@@ -476,7 +490,7 @@
     let currentSelectedDish = null;
     let modalQty = 1;
     let orderType = 'pickup';
-    let isUserClickingCategory = false; // 用于抑制点击滚动引发的重复高亮循环
+    let isUserClickingCategory = false;
 
     let currentActiveAjiRadio = null;
 
@@ -544,7 +558,7 @@
 
       allDishes = data || [];
       renderCurrentMenu();
-      setupScrollSpy(); // 挂载左右滚动联动监听
+      setupScrollSpy();
     }
 
     function renderCurrentMenu() {
@@ -567,12 +581,10 @@
       sidebar.innerHTML = html;
     }
 
-    // 计算某个菜品在购物车里的总数量
     function getDishCartQty(dishId) {
       return cart.filter(item => item.dishId === dishId).reduce((sum, item) => sum + item.qty, 0);
     }
 
-    // 核心渲染：加减计数器按钮胶囊
     function renderDishActionBtn(dishId) {
       const dish = allDishes.find(d => d.id === dishId);
       if (!dish) return '';
@@ -652,7 +664,6 @@
           html += '    </div>';
           html += '  </div>';
 
-          // 右侧加减按钮挂载区
           html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">';
           html +=      renderDishActionBtn(dish.id);
           html += '  </div>';
@@ -670,7 +681,6 @@
       container.innerHTML = html;
     }
 
-    // 快捷直接加购（Aperitivos / Sopas / Arroz 均走此函数）
     function handleDirectAdd(dishId, event) {
       if (event) event.stopPropagation();
       const dish = allDishes.find(i => i.id === dishId);
@@ -691,7 +701,6 @@
       updateCartUI();
     }
 
-    // 快捷直接减购
     function handleDishMinus(dishId, event) {
       if (event) event.stopPropagation();
       for (let i = cart.length - 1; i >= 0; i--) {
@@ -737,9 +746,6 @@
       });
     }
 
-    // ==========================================
-    // 🧭 左右双向联动滚动监听系统 (ScrollSpy)
-    // ==========================================
     function setupScrollSpy() {
       const menuContainer = document.getElementById('menu-container');
       if (!menuContainer) return;
@@ -753,7 +759,6 @@
 
         sections.forEach(sec => {
           const rect = sec.getBoundingClientRect();
-          // 如果分类标题距离容器顶部在合理范围内，判定为当前活跃分类
           if (rect.top - containerTop <= 90) {
             currentCatId = sec.getAttribute('data-cat-id');
           }
@@ -776,7 +781,6 @@
       const activeBtn = document.getElementById('side-btn-' + catId);
       if (activeBtn) {
         activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
-        // 让左侧高亮项自动跟随滚动到可见视野中
         if (shouldScrollSidebar) {
           activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -790,19 +794,18 @@
         highlightSidebarCategory(catId, true);
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // 滚动动画结束后恢复右滑监听
         setTimeout(() => {
           isUserClickingCategory = false;
         }, 500);
       }
     }
 
+    // 打开定制弹窗 (重点：为套餐展现换菜备注输入框)
     function openOptionModal(dishId, event) {
       if (event) event.stopPropagation();
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
-      // 双重保护：如果属于免弹窗分类，直接加购
       if (DIRECT_ADD_CATEGORIES.includes(currentSelectedDish.category)) {
         handleDirectAdd(dishId, event);
         return;
@@ -813,9 +816,15 @@
       document.getElementById('opt-dish-name').innerText = currentSelectedDish.name;
       document.getElementById('opt-dish-desc').innerText = currentSelectedDish.description || '';
 
+      const isMenu = currentSelectedDish.category === 'cat-menus';
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
+
+      // 套餐换菜备注框控制
+      const boxMenuNotes = document.getElementById('box-menu-notes');
+      boxMenuNotes.classList.toggle('hidden', !isMenu);
+      document.getElementById('menu-swap-input').value = '';
 
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
       document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink);
@@ -862,6 +871,15 @@
       let extraPrice = 0;
       let optionsList = [];
 
+      // 1. 如果是套餐，提取换菜备注并前置
+      if (currentSelectedDish.category === 'cat-menus') {
+        const swapText = document.getElementById('menu-swap-input').value.trim();
+        if (swapText) {
+          optionsList.push('Cambio: ' + swapText);
+        }
+      }
+
+      // 2. 如果是便当，提取配餐选项
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
