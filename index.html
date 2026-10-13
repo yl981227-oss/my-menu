@@ -28,7 +28,7 @@
     .theme-border-primary { border-color: var(--color-primary); }
     .theme-bg-light { background-color: var(--color-primary-light); }
 
-    /* 顶部门头招牌专属背景大图（图二位置） */
+    /* 顶部门头招牌专属背景 */
     #store-header {
       background-image: linear-gradient(to bottom, rgba(153, 27, 27, 0.82), rgba(17, 24, 39, 0.88)), url('bg.jpg.jpg');
       background-size: cover;
@@ -56,7 +56,16 @@
       ratingText: "⭐ 4.9 (210+ reseñas)",
       prepTimeText: "⏱️ 20-30 min",
       deliveryFee: 1800,
-      promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!"
+      promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!",
+
+      // 🌟 迎宾进店弹窗配置
+      welcomeModal: {
+        show: true,                                       // 是否开启进店欢迎弹窗 (true 开启 / false 关闭)
+        image: "bg.jpg.jpg",                              // 弹窗顶部封面图片
+        title: "¡Bienvenidos a DRAGÓN DE ORO!",          // 欢迎标题
+        subtitle: "Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.", // 欢迎语
+        btnText: "Ver Menú y Pedir 🥢"                    // 确认按钮文本
+      }
     };
 
     const THEMES = {
@@ -91,7 +100,51 @@
     };
   </script>
 
-  <!-- 1. 顶部招牌大门头（背景图已注入在此） -->
+  <!-- 🌟 0. 扫码进店居中迎宾弹窗 (Pop-up de Bienvenida) -->
+  <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
+    <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all animate-[scaleIn_0.25s_ease-out]">
+      
+      <!-- 右上角小 × 关闭按钮 -->
+      <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-10 transition backdrop-blur-sm shadow-md" title="Cerrar">
+        &times;
+      </button>
+
+      <!-- 弹窗封面图片 -->
+      <div class="relative h-44 w-full overflow-hidden bg-gray-900">
+        <img id="welcome-img" src="bg.jpg.jpg" alt="Bienvenidos" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-2.5 left-3.5 flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-lg shadow-sm">
+            🍜
+          </div>
+          <span class="text-xs font-black tracking-wider text-amber-300 uppercase">Restaurant & Sushi</span>
+        </div>
+      </div>
+
+      <!-- 弹窗文字内容 -->
+      <div class="p-5 text-center">
+        <h2 id="welcome-title" class="text-base font-black text-gray-900 leading-snug mb-1.5">
+          ¡Bienvenidos a DRAGÓN DE ORO!
+        </h2>
+        <p id="welcome-subtitle" class="text-xs text-gray-500 leading-relaxed mb-4">
+          Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.
+        </p>
+        
+        <!-- 满赠/福利小标签 -->
+        <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 mb-4 text-[11px] font-bold text-amber-800 flex items-center justify-center gap-1.5">
+          <span>🎁</span>
+          <span>¡Por compras sobre $20.000 te regalamos Wantán frito!</span>
+        </div>
+
+        <!-- 确认进入按钮（同样带关闭功能） -->
+        <button id="btn-welcome-close" onclick="closeWelcomeModal()" class="w-full text-white font-black py-3 rounded-2xl shadow-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+          <span id="welcome-btn-text">Ver Menú y Pedir 🥢</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. 顶部招牌大门头 -->
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-2">
       <div class="flex items-center gap-2.5">
@@ -151,7 +204,7 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏黄金布局：左侧清爽分类栏 + 右侧清爽菜品瀑布 -->
+  <!-- 3. 双栏黄金布局 -->
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5">
       <!-- 由 JS 渲染 -->
@@ -208,9 +261,9 @@
           <span class="text-[10px] text-amber-700 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
         <p class="text-[10px] text-amber-800/80 mb-2 leading-tight">
-          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado primacera por wantán frito etc.).
+          ¿Deseas cambiar algún plato del menú? Escríbelo aquí (ej. cambiar arrollado por carne, chapsui por chaumín, etc.).
         </p>
-        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado marisco por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
+        <input id="menu-swap-input" type="text" placeholder="Ej: Cambiar arrollado primavera por carne mongoliana" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 transition placeholder-gray-400">
       </div>
 
       <!-- B. 便当配餐加价选项 (Colaciones 专属) -->
@@ -222,7 +275,7 @@
               <input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0">
               <span class="font-bold">Arroz Chaufán / Blanco</span>
             </div>
-            <span class="text-[11px] font-black text-gray-400">+$0</span>        
+            <span class="text-[11px] font-black text-gray-400">+$0</span>
           </label>
           <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-gray-400">
             <div class="flex items-center gap-2">
@@ -503,6 +556,26 @@
 
     let currentActiveAjiRadio = null;
 
+    // 🌟 控制迎宾弹窗显示与关闭
+    function initWelcomeModal() {
+      if (STORE_CONFIG.welcomeModal && STORE_CONFIG.welcomeModal.show) {
+        document.getElementById('welcome-img').src = STORE_CONFIG.welcomeModal.image || 'bg.jpg.jpg';
+        document.getElementById('welcome-title').innerText = STORE_CONFIG.welcomeModal.title;
+        document.getElementById('welcome-subtitle').innerText = STORE_CONFIG.welcomeModal.subtitle;
+        document.getElementById('welcome-btn-text').innerText = STORE_CONFIG.welcomeModal.btnText;
+        
+        const btnWelcome = document.getElementById('btn-welcome-close');
+        const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
+        btnWelcome.className = "w-full bg-gradient-to-r " + t.btnGradient + " text-white font-black py-3 rounded-2xl shadow-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition";
+
+        document.getElementById('welcome-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeWelcomeModal() {
+      document.getElementById('welcome-modal').classList.add('hidden');
+    }
+
     function handleAjiToggle(radio) {
       if (currentActiveAjiRadio === radio) {
         radio.checked = false;
@@ -525,7 +598,7 @@
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
       
       // 更新门头背景遮罩渐变
-      document.getElementById('store-header').style.backgroundImage = t.headerOverlay + ", url('bg.jpg')";
+      document.getElementById('store-header').style.backgroundImage = t.headerOverlay + ", url('bg.jpg.jpg')";
 
       if (STORE_CONFIG.promoBanner) {
         document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
@@ -1094,6 +1167,7 @@
 
     applyStoreConfig();
     loadLiveMenu();
+    initWelcomeModal(); // 初始化运行迎宾弹窗
   </script>
 </body>
 </html>
