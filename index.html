@@ -2,7 +2,7 @@
 <html lang="es" class="notranslate" translate="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="google" content="notranslate">
   <title id="page-title">Menú Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,9 +11,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body { 
+    /* 彻底锁定手机端页面，防止橡皮筋滚动导致顶部被卡在屏幕外 */
+    html, body {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
+
+    /* 内部滚动容器专属防溢出 */
+    #sidebar-categories, #menu-container {
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -35,7 +54,7 @@
     }
   </style>
 </head>
-<body class="bg-[#F8F9FA] text-gray-800 h-screen flex flex-col overflow-hidden notranslate" translate="no">
+<body class="bg-[#F8F9FA] text-gray-800 flex flex-col notranslate" translate="no">
 
   <!-- ======================================================== -->
   <!-- 🎨 店铺个性化配置中心 -->
@@ -131,72 +150,78 @@
   </div>
 
   <!-- 1. 顶部招牌大门头 -->
-  <header id="store-header" class="text-white px-3.5 pt-3 pb-2.5 shadow-lg shrink-0 z-20 transition-all">
-    <div class="flex justify-between items-center mb-2">
+  <header id="store-header" class="text-white px-3.5 pt-3 pb-2 shadow-lg shrink-0 z-20 transition-all">
+    <div class="flex justify-between items-center mb-1.5">
       <div class="flex items-center gap-2.5">
-        <div id="store-logo" class="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl shadow-inner shrink-0">
+        <div id="store-logo" class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">
           🐉
         </div>
         <div>
           <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow">
             DRAGÓN DE ORO
           </h1>
-          <p id="store-slogan" class="text-[11px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">
+          <p id="store-slogan" class="text-[10px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">
             Comida China Tradicional & Sushi
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-1.5 bg-emerald-500/30 backdrop-blur-md border border-emerald-400/40 px-2.5 py-1 rounded-full shadow-sm">
+      <div class="flex items-center gap-1.5 bg-emerald-500/30 backdrop-blur-md border border-emerald-400/40 px-2 py-0.5 rounded-full shadow-sm">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="text-[10px] font-black text-emerald-100 tracking-wide">Abierto</span>
       </div>
     </div>
 
-    <div id="store-promo-bar" class="mb-2 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
+    <!-- 优惠信息栏 -->
+    <div id="store-promo-bar" class="mb-1.5 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
       <span class="shrink-0">📢</span>
       <span id="store-promo-text" class="truncate leading-tight"></span>
     </div>
 
+    <!-- 标签 -->
     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/95">
-      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
-        ⭐ 4.9 (210+ reseñas)
+      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+        ⭐ 4.9 (210+)
       </span>
-      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         ⏱️ 20-30 min
       </span>
-      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
+      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
         🛵 Envío $1.800 CLP
       </span>
     </div>
 
-    <div class="mt-2 relative">
+    <!-- 搜索输入框 -->
+    <div class="mt-1.5 relative">
       <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
-      <span class="absolute left-2.5 top-2.5 text-xs text-white/80">🔍</span>
+      <span class="absolute left-2.5 top-2 text-xs text-white/80">🔍</span>
     </div>
   </header>
 
   <!-- 2. 主分类切换卡槽 -->
-  <nav class="bg-white px-3 py-2 border-b border-gray-150 shrink-0 z-20 shadow-sm">
+  <nav class="bg-white px-3 py-1.5 border-b border-gray-150 shrink-0 z-20 shadow-sm">
     <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
-      <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-2 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
+      <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-1.5 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
         <span class="text-sm">🥢</span> Comida China
       </button>
-      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200">
+      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200">
         <span class="text-sm">🍣</span> Sushi
       </button>
     </div>
   </nav>
 
   <!-- 3. 双栏黄金布局 -->
-  <div class="flex flex-1 overflow-hidden">
+  <div class="flex flex-1 overflow-hidden relative">
+    <!-- 左侧分类侧边栏 -->
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
-    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 pb-32 space-y-5 bg-[#F8F9FA]">
+    
+    <!-- 右侧菜品瀑布区 -->
+    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 space-y-5 bg-[#F8F9FA]">
       <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
-  <!-- 4. 底部悬浮购物车 -->
-  <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none">
+  <!-- 4. 底部悬浮购物车 (增加安全底边距，适配 iPhone 底部条) -->
+  <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
         <div class="relative">
@@ -463,7 +488,7 @@
         </div>
       </div>
 
-      <!-- 🌟 新增：预约时间选择模块（尽快 vs 预约时间） -->
+      <!-- 预约时间选择模块（尽快 vs 预约时间） -->
       <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">⏰ Horario de entrega / retiro *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -475,7 +500,6 @@
           </button>
         </div>
 
-        <!-- 预约时间输入框（选择预约时自动滑出） -->
         <div id="schedule-time-box" class="hidden mt-2.5 pt-2 border-t border-gray-200/60">
           <label class="block text-[11px] font-bold text-gray-700 mb-1">¿A qué hora deseas retirar o recibir? *</label>
           <div class="flex items-center gap-2">
@@ -578,12 +602,17 @@
     let currentSelectedDish = null;
     let modalQty = 1;
     let orderType = 'pickup';
-    let timingType = 'asap'; // 'asap' (尽快) | 'schedule' (预约时间)
+    let timingType = 'asap';
     let isUserClickingCategory = false;
     let currentActiveAjiRadio = null;
     let currentMenuSwapDifference = 0;
 
     let activeFoodBannerUrl = "bg.jpg.jpg";
+
+    // 严防手机端 window 被顶起
+    window.addEventListener('scroll', () => {
+      if (window.scrollY !== 0) window.scrollTo(0, 0);
+    });
 
     function autoDetectAndSetBanner() {
       const candidates = ["bg.jpg.jpg", "bg.jpg", "./bg.jpg.jpg", "./bg.jpg"];
@@ -670,11 +699,11 @@
       const btnSushi = document.getElementById('btn-tab-sushi');
 
       if (mode === 'china') {
-        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       } else {
-        btnSushi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnChina.className = "flex-1 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
+        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
       }
       renderCurrentMenu();
     }
@@ -699,17 +728,20 @@
       renderDishesList(activeCats);
     }
 
+    // 渲染左侧分类（底部增加实体垫层，防止被购物车遮挡）
     function renderSidebar(cats) {
       const sidebar = document.getElementById('sidebar-categories');
       let html = '';
       cats.forEach((cat, idx) => {
         const isFirst = idx === 0;
         const activeClass = isFirst ? 'bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm' : 'text-gray-500 font-semibold hover:bg-gray-200/60';
-        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 ' + activeClass + '">';
-        html += '  <span class="text-lg leading-none">' + cat.icon + '</span>';
-        html += '  <span class="leading-tight break-words text-[10px]">' + cat.short + '</span>';
+        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 ' + activeClass + '">';
+        html += '  <span class="text-base leading-none">' + cat.icon + '</span>';
+        html += '  <span class="leading-tight break-words text-[9.5px]">' + cat.short + '</span>';
         html += '</button>';
       });
+      // 🌟 实体空白垫，确保最后一项分类（如 Bebidas）永远能露在购物车上面
+      html += '<div class="h-36 w-full shrink-0 pointer-events-none"></div>';
       sidebar.innerHTML = html;
     }
 
@@ -749,6 +781,7 @@
       `;
     }
 
+    // 渲染右侧菜品列表（底部增加 176px 实体防遮挡垫层）
     function renderDishesList(cats) {
       const container = document.getElementById('menu-container');
       let html = '';
@@ -809,6 +842,9 @@
       if (!html) {
         html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
       }
+
+      // 🌟 核心防遮挡垫层：无论手机屏幕长宽比例如何，最底部的饮料永远能完整滑出在购物车上方！
+      html += '<div class="h-44 w-full shrink-0 pointer-events-none"></div>';
 
       container.innerHTML = html;
     }
@@ -907,12 +943,12 @@
       if (!sidebar) return;
 
       sidebar.querySelectorAll('button').forEach(btn => {
-        btn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
+        btn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
       });
 
       const activeBtn = document.getElementById('side-btn-' + catId);
       if (activeBtn) {
-        activeBtn.className = "w-full text-left px-2 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
+        activeBtn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
         if (shouldScrollSidebar) {
           activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -1237,7 +1273,6 @@
       refreshCheckoutTotal();
     }
 
-    // 🌟 控制自提/送达时间切换（尽快 vs 预约）
     function setTimingType(type) {
       timingType = type;
       const btnAsap = document.getElementById('btn-time-asap');
@@ -1334,7 +1369,6 @@
         return;
       }
 
-      // 校验预约时间
       let scheduleTimeVal = "";
       if (timingType === 'schedule') {
         scheduleTimeVal = document.getElementById('cust-schedule-time').value;
@@ -1377,7 +1411,6 @@
       const serviceType = orderType === 'pickup' ? 'Para llevar (Retiro en local)' : 'Delivery (Envío a domicilio)';
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
 
-      // 智能生成预约/尽快出餐文案
       const timingLine = timingType === 'asap' 
         ? '⚡ Lo antes posible (Inmediato)' 
         : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
