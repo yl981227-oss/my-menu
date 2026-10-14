@@ -27,7 +27,6 @@
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
-    /* 内部滚动容器专属防溢出 */
     #sidebar-categories, #menu-container {
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
@@ -211,16 +210,13 @@
 
   <!-- 3. 双栏黄金布局 -->
   <div class="flex flex-1 overflow-hidden relative">
-    <!-- 左侧分类侧边栏 -->
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
-    
-    <!-- 右侧菜品瀑布区 -->
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 space-y-5 bg-[#F8F9FA]">
       <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
     </main>
   </div>
 
-  <!-- 4. 底部悬浮购物车 (增加安全底边距，适配 iPhone 底部条) -->
+  <!-- 4. 底部悬浮购物车 -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
@@ -257,7 +253,76 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- A. 专属换菜改价（仅限套餐内有菜，新菜仅限中餐） -->
+      <!-- 🌟 A. BAO 专属口味定制模块（支持 1个装单选，以及 3个装三行精准自选） -->
+      <div id="box-bao-options" class="hidden mb-4 bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200 shadow-sm space-y-3">
+        <!-- 单只装 BAO -->
+        <div id="bao-single-box">
+          <label class="block text-xs font-black text-orange-950 mb-2 flex items-center justify-between">
+            <span>🥟 Elige el sabor de tu BAO *</span>
+            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full">Obligatorio</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-bao-flavor" value="Cerdo (猪肉)" checked class="hidden">
+              <span>🐷 Cerdo (猪肉)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-bao-flavor" value="Pollo (鸡肉)" class="hidden">
+              <span>🍗 Pollo (鸡肉)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-bao-flavor" value="Verduras (蔬菜)" class="hidden">
+              <span>🥬 Verduras (蔬菜)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
+              <input type="radio" name="opt-bao-flavor" value="Poroto dulce (豆沙)" class="hidden">
+              <span>🫘 Poroto dulce (豆沙)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 3个装优惠套餐 BAO（分别选择 1/2/3 号各个口味） -->
+        <div id="bao-triple-box" class="hidden space-y-2.5">
+          <label class="block text-xs font-black text-orange-950 flex items-center justify-between">
+            <span>🥟 Selecciona los sabores de tus 3 BAO *</span>
+            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full">3 Unidades</span>
+          </label>
+          
+          <div class="space-y-2">
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
+              <span class="text-xs font-black text-orange-900 shrink-0">1° BAO:</span>
+              <select id="bao-select-1" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
+                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
+                <option value="Pollo (鸡肉)">🍗 Pollo (鸡肉)</option>
+                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
+                <option value="Poroto dulce (豆沙)">🫘 Poroto dulce (豆沙)</option>
+              </select>
+            </div>
+
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
+              <span class="text-xs font-black text-orange-900 shrink-0">2° BAO:</span>
+              <select id="bao-select-2" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
+                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
+                <option value="Pollo (鸡肉)" selected>🍗 Pollo (鸡肉)</option>
+                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
+                <option value="Poroto dulce (豆沙)">🫘 Poroto dulce (豆沙)</option>
+              </select>
+            </div>
+
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
+              <span class="text-xs font-black text-orange-900 shrink-0">3° BAO:</span>
+              <select id="bao-select-3" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
+                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
+                <option value="Pollo (鸡肉)">🍗 Pollo (鸡肉)</option>
+                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
+                <option value="Poroto dulce (豆沙)" selected>🫘 Poroto dulce (豆沙)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B. 专属换菜改价（仅限套餐内有菜，新菜仅限中餐） -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1.5">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
@@ -296,7 +361,7 @@
         </div>
       </div>
 
-      <!-- B. 便当配餐加价选项 -->
+      <!-- C. 便当配餐加价选项 -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -324,7 +389,7 @@
         </div>
       </div>
 
-      <!-- C. 中餐专属定制 (双按钮对称布局) -->
+      <!-- D. 中餐专属定制 (双按钮对称布局) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -366,7 +431,7 @@
         </div>
       </div>
 
-      <!-- D. 寿司专属定制 -->
+      <!-- E. 寿司专属定制 -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
@@ -427,7 +492,7 @@
         </div>
       </div>
 
-      <!-- E. 饮料专属定制 -->
+      <!-- F. 饮料专属定制 -->
       <div id="box-drink-options" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
@@ -609,7 +674,6 @@
 
     let activeFoodBannerUrl = "bg.jpg.jpg";
 
-    // 严防手机端 window 被顶起
     window.addEventListener('scroll', () => {
       if (window.scrollY !== 0) window.scrollTo(0, 0);
     });
@@ -728,7 +792,6 @@
       renderDishesList(activeCats);
     }
 
-    // 渲染左侧分类（底部增加实体垫层，防止被购物车遮挡）
     function renderSidebar(cats) {
       const sidebar = document.getElementById('sidebar-categories');
       let html = '';
@@ -740,13 +803,16 @@
         html += '  <span class="leading-tight break-words text-[9.5px]">' + cat.short + '</span>';
         html += '</button>';
       });
-      // 🌟 实体空白垫，确保最后一项分类（如 Bebidas）永远能露在购物车上面
       html += '<div class="h-36 w-full shrink-0 pointer-events-none"></div>';
       sidebar.innerHTML = html;
     }
 
     function getDishCartQty(dishId) {
       return cart.filter(item => item.dishId === dishId).reduce((sum, item) => sum + item.qty, 0);
+    }
+
+    function checkIsBao(dish) {
+      return (dish.name || '').toUpperCase().includes('BAO');
     }
 
     function renderDishActionBtn(dishId) {
@@ -757,7 +823,8 @@
       }
 
       const qty = getDishCartQty(dishId);
-      const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category);
+      const isBao = checkIsBao(dish);
+      const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category) && !isBao;
       const addCall = isDirectAdd ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
 
       if (qty === 0) {
@@ -781,7 +848,6 @@
       `;
     }
 
-    // 渲染右侧菜品列表（底部增加 176px 实体防遮挡垫层）
     function renderDishesList(cats) {
       const container = document.getElementById('menu-container');
       let html = '';
@@ -800,7 +866,8 @@
 
         items.forEach(dish => {
           const isSoldOut = !dish.is_available;
-          const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category);
+          const isBao = checkIsBao(dish);
+          const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category) && !isBao;
           const cardClickAction = isDirectAdd 
             ? 'handleDirectAdd(' + dish.id + ', event)' 
             : 'openOptionModal(' + dish.id + ', event)';
@@ -843,9 +910,7 @@
         html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
       }
 
-      // 🌟 核心防遮挡垫层：无论手机屏幕长宽比例如何，最底部的饮料永远能完整滑出在购物车上方！
       html += '<div class="h-44 w-full shrink-0 pointer-events-none"></div>';
-
       container.innerHTML = html;
     }
 
@@ -968,7 +1033,6 @@
       }
     }
 
-    // 智能解析套餐内菜品 + 限定新菜仅限中餐
     function populateMenuSwapSelectors(currentDish) {
       const selectFrom = document.getElementById('swap-dish-from');
       const selectTo = document.getElementById('swap-dish-to');
@@ -1109,7 +1173,9 @@
       currentSelectedDish = allDishes.find(i => i.id === dishId);
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
-      if (DIRECT_ADD_CATEGORIES.includes(currentSelectedDish.category)) {
+      const isBao = checkIsBao(currentSelectedDish);
+
+      if (DIRECT_ADD_CATEGORIES.includes(currentSelectedDish.category) && !isBao) {
         handleDirectAdd(dishId, event);
         return;
       }
@@ -1124,15 +1190,36 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
+      // 🌟 控制 BAO 专属口味模块（区分 1个装 vs 3个装）
+      const boxBao = document.getElementById('box-bao-options');
+      boxBao.classList.toggle('hidden', !isBao);
+      if (isBao) {
+        const isTriple = (currentSelectedDish.name.includes('3') || currentSelectedDish.name.toLowerCase().includes('promo'));
+        document.getElementById('bao-single-box').classList.toggle('hidden', isTriple);
+        document.getElementById('bao-triple-box').classList.toggle('hidden', !isTriple);
+
+        if (!isTriple) {
+          const defaultSingle = document.querySelector('input[name="opt-bao-flavor"][value="Cerdo (猪肉)"]');
+          if (defaultSingle) defaultSingle.checked = true;
+        } else {
+          document.getElementById('bao-select-1').value = "Cerdo (猪肉)";
+          document.getElementById('bao-select-2').value = "Pollo (鸡肉)";
+          document.getElementById('bao-select-3').value = "Poroto dulce (豆沙)";
+        }
+      }
+
+      // 控制套餐换菜
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isMenu);
-
       if (isMenu) {
         populateMenuSwapSelectors(currentSelectedDish);
       }
 
+      // 控制便当配餐
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
-      document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink);
+
+      // 控制常规中餐选项（BAO 自动隐藏辣度、少盐等炒菜选项）
+      document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink || isBao);
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
@@ -1151,7 +1238,7 @@
         document.getElementById('sushi-bien-dorado').checked = false;
       } else if (isDrink) {
         document.querySelector('input[name="opt-drink-temp"][value="Fría / Helada"]').checked = true;
-      } else {
+      } else if (!isBao) {
         document.getElementById('pref-sal').checked = false;
         document.getElementById('pref-sillao').checked = false;
         document.getElementById('pref-cebollin').checked = false;
@@ -1176,6 +1263,25 @@
       let extraPrice = 0;
       let optionsList = [];
 
+      const isBao = checkIsBao(currentSelectedDish);
+
+      // 🌟 提取 BAO 口味选项
+      if (isBao) {
+        const isTriple = (currentSelectedDish.name.includes('3') || currentSelectedDish.name.toLowerCase().includes('promo'));
+        if (isTriple) {
+          const s1 = document.getElementById('bao-select-1').value;
+          const s2 = document.getElementById('bao-select-2').value;
+          const s3 = document.getElementById('bao-select-3').value;
+          optionsList.push(`Sabores: 1° ${s1}, 2° ${s2}, 3° ${s3}`);
+        } else {
+          const selectedFlavor = document.querySelector('input[name="opt-bao-flavor"]:checked');
+          if (selectedFlavor) {
+            optionsList.push(`Sabor: ${selectedFlavor.value}`);
+          }
+        }
+      }
+
+      // 套餐换菜计价
       if (currentSelectedDish.category === 'cat-menus') {
         const fromSelect = document.getElementById('swap-dish-from');
         const toSelect = document.getElementById('swap-dish-to');
@@ -1200,6 +1306,7 @@
         }
       }
 
+      // 便当
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -1229,7 +1336,7 @@
       } else if (isDrink) {
         const tempChoice = document.querySelector('input[name="opt-drink-temp"]:checked').value;
         optionsList.push(tempChoice);
-      } else {
+      } else if (!isBao) {
         const ajiRadio = document.querySelector('input[name="opt-aji"]:checked');
         if (ajiRadio) {
           optionsList.push(ajiRadio.value);
@@ -1417,7 +1524,7 @@
 
       const message = orderCode + '\n' +
         '📅 ' + dt.date + ' ⏰ ' + dt.time + '\n\n' +
-        'Tipo de servicio: ' + serviceType + '\n' +
+        'Tipo de servicio: ' + serviceType + '\n\n' +
         'Horario de entrega: ' + timingLine + '\n\n' +
         'Nombre: ' + name + '\n' +
         'Teléfono: ' + phone + addressLine + '\n\n' +
