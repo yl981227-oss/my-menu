@@ -253,69 +253,65 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- 🌟 A. BAO 专属口味定制模块（支持 1个装单选，以及 3个装三行精准自选） -->
+      <!-- 🌟 A. BAO 专属口味定制模块（纯原生可点按钮 + 纯西文无中文） -->
       <div id="box-bao-options" class="hidden mb-4 bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200 shadow-sm space-y-3">
         <!-- 单只装 BAO -->
         <div id="bao-single-box">
-          <label class="block text-xs font-black text-orange-950 mb-2 flex items-center justify-between">
-            <span>🥟 Elige el sabor de tu BAO *</span>
-            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full">Obligatorio</span>
-          </label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-black text-gray-800">🥟 Elige el sabor de tu BAO *</label>
+            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full border border-orange-200">Obligatorio</span>
+          </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-bao-flavor" value="Cerdo (猪肉)" checked class="hidden">
-              <span>🐷 Cerdo (猪肉)</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-bao-flavor" value="Pollo (鸡肉)" class="hidden">
-              <span>🍗 Pollo (鸡肉)</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-bao-flavor" value="Verduras (蔬菜)" class="hidden">
-              <span>🥬 Verduras (蔬菜)</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-white cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-bao-flavor" value="Poroto dulce (豆沙)" class="hidden">
-              <span>🫘 Poroto dulce (豆沙)</span>
-            </label>
+            <button type="button" onclick="selectSingleBaoFlavor('Cerdo')" id="bao-btn-Cerdo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
+              <span>🐷 Cerdo</span>
+            </button>
+            <button type="button" onclick="selectSingleBaoFlavor('Pollo')" id="bao-btn-Pollo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
+              <span>🍗 Pollo</span>
+            </button>
+            <button type="button" onclick="selectSingleBaoFlavor('Verduras')" id="bao-btn-Verduras" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
+              <span>🥬 Verduras</span>
+            </button>
+            <button type="button" onclick="selectSingleBaoFlavor('Poroto dulce')" id="bao-btn-Poroto-dulce" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
+              <span>🫘 Poroto dulce</span>
+            </button>
           </div>
         </div>
 
-        <!-- 3个装优惠套餐 BAO（分别选择 1/2/3 号各个口味） -->
+        <!-- 3只装优惠套餐 BAO（三行独立点选） -->
         <div id="bao-triple-box" class="hidden space-y-2.5">
-          <label class="block text-xs font-black text-orange-950 flex items-center justify-between">
-            <span>🥟 Selecciona los sabores de tus 3 BAO *</span>
-            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full">3 Unidades</span>
-          </label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-black text-gray-800">🥟 Elige el sabor de tus 3 BAO *</label>
+            <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full border border-orange-200">3 Unidades</span>
+          </div>
           
           <div class="space-y-2">
-            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
-              <span class="text-xs font-black text-orange-900 shrink-0">1° BAO:</span>
-              <select id="bao-select-1" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
-                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
-                <option value="Pollo (鸡肉)">🍗 Pollo (鸡肉)</option>
-                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
-                <option value="Poroto dulce (豆沙)">🫘 Poroto dulce (豆沙)</option>
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+              <span class="text-xs font-black text-gray-800 shrink-0">1° BAO:</span>
+              <select id="bao-select-1" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
+                <option value="Cerdo">🐷 Cerdo</option>
+                <option value="Pollo">🍗 Pollo</option>
+                <option value="Verduras">🥬 Verduras</option>
+                <option value="Poroto dulce">🫘 Poroto dulce</option>
               </select>
             </div>
 
-            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
-              <span class="text-xs font-black text-orange-900 shrink-0">2° BAO:</span>
-              <select id="bao-select-2" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
-                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
-                <option value="Pollo (鸡肉)" selected>🍗 Pollo (鸡肉)</option>
-                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
-                <option value="Poroto dulce (豆沙)">🫘 Poroto dulce (豆沙)</option>
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+              <span class="text-xs font-black text-gray-800 shrink-0">2° BAO:</span>
+              <select id="bao-select-2" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
+                <option value="Cerdo">🐷 Cerdo</option>
+                <option value="Pollo" selected>🍗 Pollo</option>
+                <option value="Verduras">🥬 Verduras</option>
+                <option value="Poroto dulce">🫘 Poroto dulce</option>
               </select>
             </div>
 
-            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center justify-between gap-2 shadow-xs">
-              <span class="text-xs font-black text-orange-900 shrink-0">3° BAO:</span>
-              <select id="bao-select-3" class="flex-1 bg-orange-50/60 border border-orange-200 rounded-lg p-1.5 text-xs font-bold text-gray-800 outline-none focus:border-orange-500">
-                <option value="Cerdo (猪肉)">🐷 Cerdo (猪肉)</option>
-                <option value="Pollo (鸡肉)">🍗 Pollo (鸡肉)</option>
-                <option value="Verduras (蔬菜)">🥬 Verduras (蔬菜)</option>
-                <option value="Poroto dulce (豆沙)" selected>🫘 Poroto dulce (豆沙)</option>
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+              <span class="text-xs font-black text-gray-800 shrink-0">3° BAO:</span>
+              <select id="bao-select-3" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
+                <option value="Cerdo">🐷 Cerdo</option>
+                <option value="Pollo">🍗 Pollo</option>
+                <option value="Verduras">🥬 Verduras</option>
+                <option value="Poroto dulce" selected>🫘 Poroto dulce</option>
               </select>
             </div>
           </div>
@@ -672,6 +668,24 @@
     let currentActiveAjiRadio = null;
     let currentMenuSwapDifference = 0;
 
+    // 🌟 单只装 BAO 选中的口味变量（默认 Cerdo）
+    let selectedSingleBaoFlavor = 'Cerdo';
+
+    function selectSingleBaoFlavor(flavor) {
+      selectedSingleBaoFlavor = flavor;
+      const flavors = ['Cerdo', 'Pollo', 'Verduras', 'Poroto dulce'];
+      flavors.forEach(f => {
+        const btnId = f === 'Poroto dulce' ? 'bao-btn-Poroto-dulce' : 'bao-btn-' + f;
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (f === flavor) {
+          btn.className = "flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
+        } else {
+          btn.className = "flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
+        }
+      });
+    }
+
     let activeFoodBannerUrl = "bg.jpg.jpg";
 
     window.addEventListener('scroll', () => {
@@ -813,6 +827,11 @@
 
     function checkIsBao(dish) {
       return (dish.name || '').toUpperCase().includes('BAO');
+    }
+
+    function checkIsTripleBao(dish) {
+      const n = (dish.name || '').toLowerCase();
+      return n.includes('3') || n.includes('promo') || n.includes('tres');
     }
 
     function renderDishActionBtn(dishId) {
@@ -1190,21 +1209,20 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
-      // 🌟 控制 BAO 专属口味模块（区分 1个装 vs 3个装）
+      // 🌟 控制 BAO 专属口味模块
       const boxBao = document.getElementById('box-bao-options');
       boxBao.classList.toggle('hidden', !isBao);
       if (isBao) {
-        const isTriple = (currentSelectedDish.name.includes('3') || currentSelectedDish.name.toLowerCase().includes('promo'));
+        const isTriple = checkIsTripleBao(currentSelectedDish);
         document.getElementById('bao-single-box').classList.toggle('hidden', isTriple);
         document.getElementById('bao-triple-box').classList.toggle('hidden', !isTriple);
 
         if (!isTriple) {
-          const defaultSingle = document.querySelector('input[name="opt-bao-flavor"][value="Cerdo (猪肉)"]');
-          if (defaultSingle) defaultSingle.checked = true;
+          selectSingleBaoFlavor('Cerdo'); // 默认选中 Cerdo 并渲染红框高亮
         } else {
-          document.getElementById('bao-select-1').value = "Cerdo (猪肉)";
-          document.getElementById('bao-select-2').value = "Pollo (鸡肉)";
-          document.getElementById('bao-select-3').value = "Poroto dulce (豆沙)";
+          document.getElementById('bao-select-1').value = "Cerdo";
+          document.getElementById('bao-select-2').value = "Pollo";
+          document.getElementById('bao-select-3').value = "Poroto dulce";
         }
       }
 
@@ -1265,19 +1283,16 @@
 
       const isBao = checkIsBao(currentSelectedDish);
 
-      // 🌟 提取 BAO 口味选项（单只 vs 3只装三行提取）
+      // 🌟 提取 BAO 口味选项（纯西文）
       if (isBao) {
-        const isTriple = (currentSelectedDish.name.includes('3') || currentSelectedDish.name.toLowerCase().includes('promo'));
+        const isTriple = checkIsTripleBao(currentSelectedDish);
         if (isTriple) {
           const s1 = document.getElementById('bao-select-1').value;
           const s2 = document.getElementById('bao-select-2').value;
           const s3 = document.getElementById('bao-select-3').value;
           optionsList.push(`Sabores: 1° ${s1}, 2° ${s2}, 3° ${s3}`);
         } else {
-          const selectedFlavor = document.querySelector('input[name="opt-bao-flavor"]:checked');
-          if (selectedFlavor) {
-            optionsList.push(`Sabor: ${selectedFlavor.value}`);
-          }
+          optionsList.push(`Sabor: ${selectedSingleBaoFlavor}`);
         }
       }
 
