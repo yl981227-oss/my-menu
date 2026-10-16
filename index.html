@@ -251,7 +251,7 @@
         </div>
       </div>
 
-      <!-- 🌟 B. 套餐换菜自动算差价（同时支持中餐套餐 & 寿司套餐） -->
+      <!-- B. 套餐换菜自动算差价（中餐套餐 & 寿司套餐通用） -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1.5">
           <label class="block text-xs font-black text-amber-900 flex items-center gap-1"><span>🔄</span> Cambio de plato / roll con recálculo</label>
@@ -314,7 +314,7 @@
             </button>
             <button type="button" id="btn-aji-aparte" onclick="toggleAjiChoice('Ají aparte')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>Ají aparte</span>
-            </label>
+            </button>
           </div>
         </div>
 
@@ -337,7 +337,7 @@
         </div>
       </div>
 
-      <!-- 🌟 E. 寿司专属定制（按块数配额自选酱料，取消默认选中） -->
+      <!-- E. 寿司专属定制 -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <!-- California Roll 专属外皮选择 -->
         <div id="sushi-california-wrap-box" class="hidden bg-amber-50/80 p-3 rounded-2xl border border-amber-200">
@@ -362,27 +362,36 @@
           </label>
         </div>
 
-        <!-- 🌟 寿司酱料自选区（单品选1个，套餐按每10块配1个自选不同款） -->
+        <!-- 1. 寿司原有免费配额酱料自选区 -->
         <div class="bg-gray-50/90 p-3 rounded-2xl border border-gray-200">
           <div class="flex justify-between items-center mb-2">
-            <label id="sushi-sauce-title" class="block text-xs font-black text-gray-800">🥢 Elige tu Salsa (1 por cada 10 pzs)</label>
-            <span id="sushi-sauce-badge" class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Máx. 1 salsa</span>
+            <label id="sushi-sauce-title" class="block text-xs font-black text-gray-800">🥢 Elige tu Salsa Incluida</label>
+            <span id="sushi-sauce-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Gratis</span>
           </div>
           <div id="sushi-sauces-dynamic-container" class="space-y-2"></div>
+
+          <!-- 2. 选定好原有酱料后，自动展开“第二酱料起 $200 CLP/个”加购区 -->
+          <div id="sushi-extra-sauces-box" class="hidden mt-3 pt-3 border-t border-amber-200 bg-amber-50/70 -mx-3 -mb-3 p-3 rounded-b-2xl">
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-black text-amber-950">➕ ¿Deseas salsa adicional?</label>
+              <span class="text-[10px] font-black text-red-600 bg-white px-2 py-0.5 rounded-full border border-red-200 shadow-2xs">+$200 CLP c/u</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs" id="extra-sauces-controls"></div>
+          </div>
         </div>
 
-        <!-- 芥末与红姜（默认不勾选，客人按需自选） -->
+        <!-- 3. 芥末与红姜（$500 CLP 一个，客人自主选择加不加购） -->
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🌿 Acompañamientos de Sushi</label>
-            <span class="text-[10px] text-gray-400 font-semibold">(Opcional • Toca para elegir)</span>
+            <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$500 CLP c/u</span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-sushi-wasabi" onclick="toggleSushiExtra('wasabi')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
-              <span>🟢 Con Wasabi</span>
+              <span>🟢 Con Wasabi (+$500)</span>
             </button>
             <button type="button" id="btn-sushi-jengibre" onclick="toggleSushiExtra('jengibre')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
-              <span>🌸 Con Jengibre</span>
+              <span>🌸 Con Jengibre (+$500)</span>
             </button>
           </div>
         </div>
@@ -541,6 +550,13 @@
 
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
+    // 屏蔽删除图1中的三个旧套餐名称
+    const REMOVED_DISH_NAMES = new Set([
+      'promo 30 piezas mixtas',
+      'promo 40 piezas especial',
+      'promo 60 piezas familiar'
+    ]);
+
     const categoriesChina = [
       { id: "cat-menus", title: "🍱 MENÚS COMBINADOS", icon: "🍱", short: "Menús" },
       { id: "cat-colaciones", title: "🍛 COLACIONES", icon: "🍛", short: "Colaciones" },
@@ -687,7 +703,6 @@
       { id: 9101, name: "Calamar Apanado (12 unidades)", description: "Piqueo de aros de calamar apanados", price: 8800, category: "cat-sushi-piqueos", is_available: true }
     ];
 
-    // 🌟 寿司套餐内包含的单品精确映射表（确保换菜差价 100% 精准）
     const SUSHI_COMBO_ITEMS_MAP = {
       9001: [
         { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
@@ -753,7 +768,6 @@
     let isUserClickingCategory = false;
     let currentMenuSwapDifference = 0;
 
-    // 弹窗按钮状态变量
     let selectedSingleBaoFlavor = 'Cerdo';
     let selectedAjiValue = '';
     let selectedPalitosValue = 'Con palitos';
@@ -762,13 +776,13 @@
     let selectedSushiWasabi = false;
     let selectedSushiJengibre = false;
 
-    // 🌟 寿司酱料状态数组（长度 = 该菜品允许选的酱料个数，初始全部为空 ''，由客人自己点击选择）
     let currentSushiSauceChoices = [];
+    let extraSoyaCount = 0;
+    let extraTeriyakiCount = 0;
 
     const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
     const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
 
-    // 🌟 计算寿司菜品允许选择的酱料配额
     function getSushiSauceQuota(dish) {
       if (dish.category === 'cat-sushi-promos') {
         const match = (dish.name || '').match(/(\d+)\s*piezas/i);
@@ -778,24 +792,24 @@
         }
         return 2;
       }
-      // 单条10piezas、8piezas、8cortes或其他单品：统一可选 1 个酱料
       return 1;
     }
 
-    // 🌟 渲染寿司酱料点击选择区（默认全部未选中）
     function initSushiSauceSelector(dish) {
       const quota = getSushiSauceQuota(dish);
       currentSushiSauceChoices = new Array(quota).fill('');
+      extraSoyaCount = 0;
+      extraTeriyakiCount = 0;
 
       const titleEl = document.getElementById('sushi-sauce-title');
       const badgeEl = document.getElementById('sushi-sauce-badge');
 
       if (quota === 1) {
-        titleEl.innerText = "🥢 Elige tu Salsa (Toca para elegir)";
-        badgeEl.innerText = "Máx. 1 salsa";
+        titleEl.innerText = "🥢 Elige tu Salsa Incluida (1 gratis)";
+        badgeEl.innerText = "1 Incluida";
       } else {
-        titleEl.innerText = `🥢 Elige tus ${quota} Salsas (1 cada 10 pzs)`;
-        badgeEl.innerText = `Elige ${quota} salsas`;
+        titleEl.innerText = `🥢 Elige tus ${quota} Salsas Incluidas`;
+        badgeEl.innerText = `${quota} Incluidas`;
       }
 
       renderSushiSauceButtons();
@@ -803,11 +817,81 @@
 
     function selectSushiSauceSlot(slotIndex, sauceName) {
       if (currentSushiSauceChoices[slotIndex] === sauceName) {
-        currentSushiSauceChoices[slotIndex] = ''; // 再点一次取消选中
+        currentSushiSauceChoices[slotIndex] = '';
       } else {
         currentSushiSauceChoices[slotIndex] = sauceName;
       }
       renderSushiSauceButtons();
+    }
+
+    function changeExtraSauce(type, delta, event) {
+      if (event) event.stopPropagation();
+      if (type === 'soya') {
+        extraSoyaCount = Math.max(0, extraSoyaCount + delta);
+      } else {
+        extraTeriyakiCount = Math.max(0, extraTeriyakiCount + delta);
+      }
+      renderExtraSauceControls();
+    }
+
+    function renderExtraSauceControls() {
+      const box = document.getElementById('sushi-extra-sauces-box');
+      const controls = document.getElementById('extra-sauces-controls');
+      if (!box || !controls) return;
+
+      const allFreeSelected = currentSushiSauceChoices.length > 0 && currentSushiSauceChoices.every(s => s !== '');
+      if (!allFreeSelected) {
+        box.classList.add('hidden');
+        extraSoyaCount = 0;
+        extraTeriyakiCount = 0;
+        return;
+      }
+
+      box.classList.remove('hidden');
+
+      let html = '';
+
+      if (extraSoyaCount === 0) {
+        html += `
+          <button type="button" onclick="changeExtraSauce('soya', 1, event)" class="py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-red-400 transition flex flex-col items-center justify-center leading-tight">
+            <span>🥢 + Salsa Soya</span>
+            <span class="text-[10px] text-red-600 font-black mt-0.5">+$200 CLP</span>
+          </button>
+        `;
+      } else {
+        html += `
+          <div class="py-1.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 flex flex-col items-center justify-center">
+            <span class="text-[10px] font-black text-red-700 mb-1">🥢 Soya Extra (+$${(extraSoyaCount * 200).toLocaleString('es-CL')})</span>
+            <div class="flex items-center gap-2.5">
+              <button type="button" onclick="changeExtraSauce('soya', -1, event)" class="w-6 h-6 rounded-lg bg-white text-gray-800 font-black shadow-xs flex items-center justify-center text-xs">-</button>
+              <span class="font-black text-xs text-red-700">${extraSoyaCount}</span>
+              <button type="button" onclick="changeExtraSauce('soya', 1, event)" class="w-6 h-6 rounded-lg bg-red-600 text-white font-black shadow-xs flex items-center justify-center text-xs">+</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (extraTeriyakiCount === 0) {
+        html += `
+          <button type="button" onclick="changeExtraSauce('teriyaki', 1, event)" class="py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-red-400 transition flex flex-col items-center justify-center leading-tight">
+            <span>🍯 + Salsa Teriyaki</span>
+            <span class="text-[10px] text-red-600 font-black mt-0.5">+$200 CLP</span>
+          </button>
+        `;
+      } else {
+        html += `
+          <div class="py-1.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 flex flex-col items-center justify-center">
+            <span class="text-[10px] font-black text-red-700 mb-1">🍯 Teriyaki Extra (+$${(extraTeriyakiCount * 200).toLocaleString('es-CL')})</span>
+            <div class="flex items-center gap-2.5">
+              <button type="button" onclick="changeExtraSauce('teriyaki', -1, event)" class="w-6 h-6 rounded-lg bg-white text-gray-800 font-black shadow-xs flex items-center justify-center text-xs">-</button>
+              <span class="font-black text-xs text-red-700">${extraTeriyakiCount}</span>
+              <button type="button" onclick="changeExtraSauce('teriyaki', 1, event)" class="w-6 h-6 rounded-lg bg-red-600 text-white font-black shadow-xs flex items-center justify-center text-xs">+</button>
+            </div>
+          </div>
+        `;
+      }
+
+      controls.innerHTML = html;
     }
 
     function renderSushiSauceButtons() {
@@ -853,9 +937,9 @@
       }
 
       container.innerHTML = html;
+      renderExtraSauceControls();
     }
 
-    // 芥末 / 红姜 切换按钮
     function toggleSushiExtra(type) {
       if (type === 'wasabi') selectedSushiWasabi = !selectedSushiWasabi;
       if (type === 'jengibre') selectedSushiJengibre = !selectedSushiJengibre;
@@ -1001,7 +1085,7 @@
 
     async function loadLiveMenu() {
       const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
-      const dbDishes = data || [];
+      const dbDishes = (data || []).filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
       const existingNames = new Set(dbDishes.map(d => (d.name || '').toLowerCase().trim()));
       const mergedDishes = [...dbDishes];
 
@@ -1202,7 +1286,6 @@
       }
     }
 
-    // 🌟 智能套餐换菜引擎（同时支持：中餐套餐只换中餐 & 寿司套餐只换寿司）
     function populateMenuSwapSelectors(currentDish) {
       const selectFrom = document.getElementById('swap-dish-from');
       const selectTo = document.getElementById('swap-dish-to');
@@ -1365,7 +1448,6 @@
       document.getElementById('opt-dish-name').innerText = currentSelectedDish.name;
       document.getElementById('opt-dish-desc').innerText = currentSelectedDish.description || '';
 
-      // 🌟 中餐套餐 & 寿司套餐 均支持换菜算差价
       const isComboMenu = (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos');
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
@@ -1404,7 +1486,6 @@
         document.getElementById('sushi-sin-arroz-box').classList.toggle('hidden', !canSinArroz);
         document.getElementById('sushi-sin-arroz').checked = false;
 
-        // 🌟 初始化寿司酱料自选（默认全不选，根据单品1个/套餐每10块1个生成）
         initSushiSauceSelector(currentSelectedDish);
 
         selectedSushiWasabi = false;
@@ -1458,7 +1539,6 @@
         }
       }
 
-      // 🌟 提取套餐换菜差价（中餐套餐 & 寿司套餐通用）
       if (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos') {
         const fromSelect = document.getElementById('swap-dish-from');
         const toSelect = document.getElementById('swap-dish-to');
@@ -1497,23 +1577,36 @@
           extraPrice += 1800;
         }
 
-        // 🌟 汇总客人自选的寿司酱料
         const chosenSauces = currentSushiSauceChoices.filter(Boolean);
         if (chosenSauces.length === 1 && currentSushiSauceChoices.length === 1) {
-          optionsList.push('Salsa: ' + chosenSauces[0]);
+          optionsList.push('Salsa incluida: ' + chosenSauces[0]);
         } else if (chosenSauces.length > 0) {
           const soyaCount = chosenSauces.filter(s => s === 'Salsa Soya').length;
           const teriCount = chosenSauces.filter(s => s === 'Salsa Teriyaki').length;
           const parts = [];
           if (soyaCount > 0) parts.push(`${soyaCount}x Salsa Soya`);
           if (teriCount > 0) parts.push(`${teriCount}x Salsa Teriyaki`);
-          optionsList.push('Salsas: ' + parts.join(', '));
+          optionsList.push('Salsas incluidas: ' + parts.join(', '));
         }
 
-        const extras = [];
-        if (selectedSushiWasabi) extras.push('Wasabi');
-        if (selectedSushiJengibre) extras.push('Jengibre');
-        if (extras.length > 0) optionsList.push('Acompañamiento: ' + extras.join(', '));
+        const totalExtraSauces = extraSoyaCount + extraTeriyakiCount;
+        if (totalExtraSauces > 0) {
+          const extraSauceCost = totalExtraSauces * 200;
+          extraPrice += extraSauceCost;
+          const extraParts = [];
+          if (extraSoyaCount > 0) extraParts.push(`${extraSoyaCount}x Soya Extra`);
+          if (extraTeriyakiCount > 0) extraParts.push(`${extraTeriyakiCount}x Teriyaki Extra`);
+          optionsList.push(`Salsa adicional: ${extraParts.join(', ')} (+$${extraSauceCost.toLocaleString('es-CL')})`);
+        }
+
+        if (selectedSushiWasabi) {
+          extraPrice += 500;
+          optionsList.push('Con Wasabi (+$500)');
+        }
+        if (selectedSushiJengibre) {
+          extraPrice += 500;
+          optionsList.push('Con Jengibre (+$500)');
+        }
 
         optionsList.push(selectedPalitosValue);
 
