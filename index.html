@@ -102,7 +102,7 @@
     };
   </script>
 
-  <!-- 0. 进店迎宾弹窗 -->
+  <!-- 0. 迎宾弹窗 -->
   <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
     <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all">
       <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">&times;</button>
@@ -127,7 +127,7 @@
     </div>
   </div>
 
-  <!-- 1. 顶部招牌大门头 -->
+  <!-- 1. 顶部招牌 -->
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-1.5">
       <div class="flex items-center gap-2.5">
@@ -156,7 +156,7 @@
     </div>
   </header>
 
-  <!-- 2. 主分类切换卡槽 -->
+  <!-- 2. 主分类切换 -->
   <nav class="bg-white px-3 py-1.5 border-b border-gray-150 shrink-0 z-20 shadow-sm">
     <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
       <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-1.5 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
@@ -168,7 +168,7 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏布局 -->
+  <!-- 3. 双栏菜单区 -->
   <div class="flex flex-1 overflow-hidden relative">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 space-y-5 bg-[#F8F9FA]">
@@ -208,7 +208,7 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- A. BAO 专属口味定制模块 -->
+      <!-- A. BAO 专属口味定制 -->
       <div id="box-bao-options" class="hidden mb-4 bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200 shadow-sm space-y-3">
         <div id="bao-single-box">
           <div class="flex justify-between items-center mb-2">
@@ -251,24 +251,24 @@
         </div>
       </div>
 
-      <!-- B. 套餐专属换菜改价 -->
+      <!-- 🌟 B. 套餐换菜自动算差价（同时支持中餐套餐 & 寿司套餐） -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1.5">
-          <label class="block text-xs font-black text-amber-900 flex items-center gap-1"><span>🔄</span> Cambio de plato con recálculo automático</label>
+          <label class="block text-xs font-black text-amber-900 flex items-center gap-1"><span>🔄</span> Cambio de plato / roll con recálculo</label>
           <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
-        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">Selecciona qué plato retiras de este menú y por cuál lo reemplazas. El sistema calculará la diferencia exacta de precio.</p>
+        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">Selecciona qué plato o roll retiras de este menú y por cuál lo reemplazas. El sistema calculará la diferencia exacta de precio.</p>
         <div class="space-y-2.5 text-xs">
           <div>
-            <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato quitas de este menú?</label>
+            <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato / roll quitas de este menú?</label>
             <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 font-semibold">
               <option value="">-- Sin cambio (Menú estándar) --</option>
             </select>
           </div>
           <div>
-            <label class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál plato de comida china lo reemplazas?</label>
+            <label id="swap-to-label" class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál lo reemplazas?</label>
             <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 font-semibold">
-              <option value="">-- Selecciona el plato nuevo deseado --</option>
+              <option value="">-- Selecciona el nuevo deseado --</option>
             </select>
           </div>
           <div id="swap-diff-badge" class="hidden bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
@@ -277,7 +277,7 @@
           </div>
           <div>
             <label class="block text-[10px] font-bold text-amber-900/80 mb-1">Nota adicional sobre el cambio (opcional):</label>
-            <input id="menu-swap-note" type="text" placeholder="Ej: Sin cebollín en el plato nuevo..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 placeholder-gray-400">
+            <input id="menu-swap-note" type="text" placeholder="Ej: Detalle adicional del cambio..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 placeholder-gray-400">
           </div>
         </div>
       </div>
@@ -301,7 +301,7 @@
         </div>
       </div>
 
-      <!-- 🌟 D. 中餐专属定制 (已彻底修复 Nivel de Ají 点击高亮反应！) -->
+      <!-- D. 中餐专属定制 -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -314,7 +314,7 @@
             </button>
             <button type="button" id="btn-aji-aparte" onclick="toggleAjiChoice('Ají aparte')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>Ají aparte</span>
-            </button>
+            </label>
           </div>
         </div>
 
@@ -337,7 +337,7 @@
         </div>
       </div>
 
-      <!-- 🌟 E. 寿司专属定制（新增 California 外皮选择 & 无米饭 +$1.800 选项） -->
+      <!-- 🌟 E. 寿司专属定制（按块数配额自选酱料，取消默认选中） -->
       <div id="box-sushi-options" class="space-y-4 hidden">
         <!-- California Roll 专属外皮选择 -->
         <div id="sushi-california-wrap-box" class="hidden bg-amber-50/80 p-3 rounded-2xl border border-amber-200">
@@ -362,21 +362,28 @@
           </label>
         </div>
 
+        <!-- 🌟 寿司酱料自选区（单品选1个，套餐按每10块配1个自选不同款） -->
+        <div class="bg-gray-50/90 p-3 rounded-2xl border border-gray-200">
+          <div class="flex justify-between items-center mb-2">
+            <label id="sushi-sauce-title" class="block text-xs font-black text-gray-800">🥢 Elige tu Salsa (1 por cada 10 pzs)</label>
+            <span id="sushi-sauce-badge" class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Máx. 1 salsa</span>
+          </div>
+          <div id="sushi-sauces-dynamic-container" class="space-y-2"></div>
+        </div>
+
+        <!-- 芥末与红姜（默认不勾选，客人按需自选） -->
         <div>
-          <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-black text-gray-800">🌿 Acompañamientos de Sushi</label>
+            <span class="text-[10px] text-gray-400 font-semibold">(Opcional • Toca para elegir)</span>
+          </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
-              <input type="checkbox" id="sushi-soya" value="Soya" checked class="w-4 h-4 rounded"><span class="font-bold">Salsa Soya</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
-              <input type="checkbox" id="sushi-teriyaki" value="Teriyaki" checked class="w-4 h-4 rounded"><span class="font-bold">Salsa Teriyaki</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Wasabi</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Jengibre</span>
-            </label>
+            <button type="button" id="btn-sushi-wasabi" onclick="toggleSushiExtra('wasabi')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
+              <span>🟢 Con Wasabi</span>
+            </button>
+            <button type="button" id="btn-sushi-jengibre" onclick="toggleSushiExtra('jengibre')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
+              <span>🌸 Con Jengibre</span>
+            </button>
           </div>
         </div>
 
@@ -551,7 +558,6 @@
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
-    // 🌟 完整对齐纸质寿司菜单的分类
     const categoriesSushi = [
       { id: "cat-sushi-promos", title: "🍱 MENÚS Y PROMOS SUSHI", icon: "🍱", short: "Promos" },
       { id: "cat-sushi-nuevos", title: "✨ NUEVOS LANZAMIENTOS", icon: "✨", short: "Nuevos" },
@@ -567,9 +573,7 @@
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
-    // 🌟 完整录入纸质菜单全部 85 道寿司与日料数据
     const BUILT_IN_SUSHI_DISHES = [
-      // 1. MENÚS Y PROMOS SUSHI
       { id: 9001, name: "Promoción Tempura 1 (20 piezas)", description: "Ebi Tempura, Chicken Tempura", price: 12000, category: "cat-sushi-promos", is_available: true },
       { id: 9002, name: "Promoción Tempura 2 (30 piezas)", description: "Ebi Tempura, Chicken Tempura, Sake Tempura", price: 18600, category: "cat-sushi-promos", is_available: true },
       { id: 9003, name: "Promoción Tempura 3 (40 piezas)", description: "Ebi Tempura, Chicken Tempura, Sake Tempura, Tako Tempura", price: 24900, category: "cat-sushi-promos", is_available: true },
@@ -578,14 +582,12 @@
       { id: 9006, name: "Menú Sushi 3 (49 piezas)", description: "1 Hosomaki, 1 Sake Roll (envuelto en palta), 1 California Ebi (sésamo, masago o ciboulette), 1 Ebi Tempura Roll, 1 Gyosas Mixtas (8 u.)", price: 27200, category: "cat-sushi-promos", is_available: true },
       { id: 9007, name: "Menú Sushi 4 (68 piezas)", description: "2 Hosomaki, 1 Sake Roll, 1 California Ebi, 1 Ebi Tempura Roll, 2 Nigiri Salmón, 2 Nigiri Camarón, 4 Sashimi Salmón, 4 Sashimi Pulpo, 1 Gyosas Mixtas (10 u.)", price: 44900, category: "cat-sushi-promos", is_available: true },
 
-      // 2. NUEVOS LANZAMIENTOS
       { id: 9008, name: "Ceviche Clásico", description: "Pescado blanco del día marinado al estilo peruano acompañado de choclo", price: 12500, category: "cat-sushi-nuevos", is_available: true },
       { id: 9009, name: "Ceviche Mixto", description: "Mix de pescados frescos y camarones marinado al estilo peruano acompañado de choclo", price: 14300, category: "cat-sushi-nuevos", is_available: true },
       { id: 9010, name: "Acevichado Roll (10 piezas)", description: "Camarones, palta, envuelto en ciboulette bañado de salsa acevichada", price: 6800, category: "cat-sushi-nuevos", is_available: true },
       { id: 9011, name: "Roll Ceviche (10 piezas)", description: "Pulpo, palta envuelto en ciboulette coronado de ceviche clásico", price: 8800, category: "cat-sushi-nuevos", is_available: true },
       { id: 9012, name: "Spicy Roll (10 piezas)", description: "Pollo, palta, cebollín, envuelto en sésamo bañado de salsa Spicy picante", price: 6000, category: "cat-sushi-nuevos", is_available: true },
 
-      // 3. CALIFORNIA ROLLS (10 piezas)
       { id: 9013, name: "California Kani", description: "Kanikama y palta (10 piezas)", price: 5600, category: "cat-sushi-california", is_available: true },
       { id: 9014, name: "California Ebi", description: "Camarón y palta (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
       { id: 9015, name: "California Sake", description: "Salmón y palta (10 piezas)", price: 6300, category: "cat-sushi-california", is_available: true },
@@ -597,7 +599,6 @@
       { id: 9021, name: "California Meat", description: "Carne, queso crema y ciboulette (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
       { id: 9022, name: "California Tuna", description: "Atún, queso crema y ciboulette (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
 
-      // 4. ESPECIAL PALTA (10 piezas - envuelto en palta)
       { id: 9023, name: "Teri Roll", description: "Pollo, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6300, category: "cat-sushi-palta", is_available: true },
       { id: 9024, name: "Tako Roll", description: "Pulpo, queso crema y cebollín envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
       { id: 9025, name: "Sake Roll", description: "Salmón, queso crema y cebollín envuelto en palta (10 piezas)", price: 6900, category: "cat-sushi-palta", is_available: true },
@@ -609,7 +610,6 @@
       { id: 9031, name: "Meat Roll", description: "Carne, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
       { id: 9032, name: "Tuna Roll", description: "Atún, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
 
-      // 5. ESPECIAL QUESO CREMA (10 piezas - envuelto en queso crema)
       { id: 9033, name: "Chicken Cheese Roll", description: "Pollo, palta y pimentón envuelto en queso crema (10 piezas)", price: 6300, category: "cat-sushi-queso", is_available: true },
       { id: 9034, name: "Tempura Cheese Roll", description: "Camarón tempura y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
       { id: 9035, name: "Mix Cheese Roll", description: "Salmón, camarón y palta envuelto en queso crema (10 piezas)", price: 6900, category: "cat-sushi-queso", is_available: true },
@@ -620,7 +620,6 @@
       { id: 9040, name: "Tuna Cheese", description: "Atún y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
       { id: 9041, name: "Meat Cheese", description: "Carne y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
 
-      // 6. ROLLS CALIENTES (10 piezas)
       { id: 9042, name: "Ebi Tempura Roll", description: "Camarón, queso crema, cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
       { id: 9043, name: "Sake Tempura Roll", description: "Salmón, queso crema, cebollín frito en tempura (10 piezas)", price: 6900, category: "cat-sushi-hot", is_available: true },
       { id: 9044, name: "Mix Tempura Roll", description: "Salmón, camarón, queso crema, cebollín frito en tempura (10 piezas)", price: 6900, category: "cat-sushi-hot", is_available: true },
@@ -633,7 +632,6 @@
       { id: 9051, name: "Meat Tempura", description: "Carne, queso crema y cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
       { id: 9052, name: "Tuna Tempura", description: "Atún, queso crema y cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
 
-      // 7. ESPECIAL SALMÓN (10 piezas - envuelto en salmón)
       { id: 9053, name: "Doble Sake Roll", description: "Salmón, queso crema y palta envuelto en salmón (10 piezas)", price: 7300, category: "cat-sushi-salmon", is_available: true },
       { id: 9054, name: "Kani Sake Roll", description: "Kanikama, masago y palta envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
       { id: 9055, name: "Avocado Sake Roll", description: "Palta y queso crema envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
@@ -645,14 +643,12 @@
       { id: 9061, name: "Meat Sake Roll", description: "Carne, queso crema y ciboulette envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
       { id: 9062, name: "Tuna Sake Roll", description: "Atún, queso crema y ciboulette envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
 
-      // 8. VEGETALES (10 piezas)
       { id: 9063, name: "Mushroom Roll", description: "Champiñón, lechuga, queso crema, cebollín envuelto en palta (10 piezas)", price: 5900, category: "cat-sushi-vegetales", is_available: true },
       { id: 9064, name: "Nogado Roll", description: "Palmito, palta envuelto en maní (10 piezas)", price: 5300, category: "cat-sushi-vegetales", is_available: true },
       { id: 9065, name: "Futo Tempura", description: "Pimentón, palta, queso crema, champiñón, palmito env. en nori apanado en tempura (10 piezas)", price: 5900, category: "cat-sushi-vegetales", is_available: true },
       { id: 9066, name: "Salad Roll", description: "Palta, pepino, palmito cubierto en nori (10 piezas)", price: 5300, category: "cat-sushi-vegetales", is_available: true },
       { id: 9067, name: "Kapa Tempura", description: "Palta, queso y pepino en tempura (10 piezas)", price: 5700, category: "cat-sushi-vegetales", is_available: true },
 
-      // 9. HAND ROLLS & TEMAKI
       { id: 9068, name: "Hand Roll Pollo, Queso Crema y Cebollín", description: "Hand Roll apanado crujiente", price: 3900, category: "cat-sushi-handrolls", is_available: true },
       { id: 9069, name: "Hand Roll Kanikama y Queso Crema", description: "Hand Roll apanado crujiente", price: 3900, category: "cat-sushi-handrolls", is_available: true },
       { id: 9070, name: "Hand Roll Carne y Palta", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
@@ -666,7 +662,6 @@
       { id: 9078, name: "Temaki Camarón, Queso Crema y Pepino", description: "En cono de nori", price: 4600, category: "cat-sushi-handrolls", is_available: true },
       { id: 9079, name: "Temaki Vegetal (en cono)", description: "Pepino, zanahoria y lechuga en cono de nori", price: 4000, category: "cat-sushi-handrolls", is_available: true },
 
-      // 10. HOSOMAKI (8 piezas)
       { id: 9080, name: "Hoso Kani (8 piezas)", description: "Kanikama y palta", price: 3700, category: "cat-sushi-hosomaki", is_available: true },
       { id: 9081, name: "Hoso Sake (8 piezas)", description: "Salmón y palta", price: 4200, category: "cat-sushi-hosomaki", is_available: true },
       { id: 9082, name: "Hoso Ebi (8 piezas)", description: "Camarón y palta", price: 4000, category: "cat-sushi-hosomaki", is_available: true },
@@ -674,7 +669,6 @@
       { id: 9084, name: "Hosomaki Queso Crema y Camarón (8 piezas)", description: "Queso crema y camarón", price: 4000, category: "cat-sushi-hosomaki", is_available: true },
       { id: 9085, name: "Hosomaki Queso Crema y Salmón (8 piezas)", description: "Queso crema y salmón", price: 4200, category: "cat-sushi-hosomaki", is_available: true },
 
-      // 11. GYOSAS, NIGIRI, SASHIMI & PIQUEOS
       { id: 9086, name: "Gyosas de Pollo (5 unidades)", description: "Empanaditas japonesas de pollo", price: 4000, category: "cat-sushi-piqueos", is_available: true },
       { id: 9087, name: "Gyosas de Cerdo (5 unidades)", description: "Empanaditas japonesas de cerdo", price: 4000, category: "cat-sushi-piqueos", is_available: true },
       { id: 9088, name: "Gyosas de Camarón (5 unidades)", description: "Empanaditas japonesas de camarón", price: 4000, category: "cat-sushi-piqueos", is_available: true },
@@ -693,7 +687,58 @@
       { id: 9101, name: "Calamar Apanado (12 unidades)", description: "Piqueo de aros de calamar apanados", price: 8800, category: "cat-sushi-piqueos", is_available: true }
     ];
 
-    // 支持“无米饭 +$1.800”的寿司卷分类
+    // 🌟 寿司套餐内包含的单品精确映射表（确保换菜差价 100% 精准）
+    const SUSHI_COMBO_ITEMS_MAP = {
+      9001: [
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300 }
+      ],
+      9002: [
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300 },
+        { id: 9043, name: "Sake Tempura Roll", price: 6900 }
+      ],
+      9003: [
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300 },
+        { id: 9043, name: "Sake Tempura Roll", price: 6900 },
+        { id: 9046, name: "Tako Tempura Roll", price: 6600 }
+      ],
+      9004: [
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
+        { id: 9081, name: "1 Hosomaki (Salmón y palta)", price: 4200 },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
+        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000 }
+      ],
+      9005: [
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
+        { id: 9081, name: "1 Hosomaki (Salmón y palta)", price: 4200 },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
+        { id: 9014, name: "1 California Ebi", price: 6000 },
+        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000 }
+      ],
+      9006: [
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
+        { id: 9081, name: "1 Hosomaki (Salmón y palta)", price: 4200 },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
+        { id: 9014, name: "1 California Ebi", price: 6000 },
+        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600 },
+        { id: 9089, name: "1 Gyosas Mixtas (8 u.)", price: 6300 }
+      ],
+      9007: [
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
+        { id: 9081, name: "1 Hosomaki (Salmón y palta)", price: 4200 },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
+        { id: 9014, name: "1 California Ebi", price: 6000 },
+        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600 },
+        { id: "nigiri_salmon_2", name: "2 Nigiri Salmón", price: 3200 },
+        { id: "nigiri_camaron_2", name: "2 Nigiri Camarón", price: 2900 },
+        { id: "sashimi_salmon_4", name: "4 Sashimi Salmón", price: 4800 },
+        { id: "sashimi_pulpo_4", name: "4 Sashimi Pulpo", price: 4500 },
+        { id: "gyosas_10", name: "1 Gyosas Mixtas (10 u.)", price: 8000 }
+      ]
+    };
+
     const SIN_ARROZ_SUSHI_CATS = [
       'cat-sushi-california', 'cat-sushi-palta', 'cat-sushi-queso', 'cat-sushi-hot', 'cat-sushi-salmon'
     ];
@@ -708,23 +753,124 @@
     let isUserClickingCategory = false;
     let currentMenuSwapDifference = 0;
 
-    // 🌟 弹窗内所有按钮的明确选中状态变量
+    // 弹窗按钮状态变量
     let selectedSingleBaoFlavor = 'Cerdo';
-    let selectedAjiValue = ''; // 默认不选（灰白），点击高亮红框，再点取消
+    let selectedAjiValue = '';
     let selectedPalitosValue = 'Con palitos';
     let selectedCaliforniaWrap = 'Sésamo';
     let selectedDrinkTempValue = 'Fría / Helada';
+    let selectedSushiWasabi = false;
+    let selectedSushiJengibre = false;
+
+    // 🌟 寿司酱料状态数组（长度 = 该菜品允许选的酱料个数，初始全部为空 ''，由客人自己点击选择）
+    let currentSushiSauceChoices = [];
 
     const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
     const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
 
-    // 🌟 1. 辣度切换（点一下高亮，再点一下取消选中）
-    function toggleAjiChoice(val) {
-      if (selectedAjiValue === val) {
-        selectedAjiValue = '';
-      } else {
-        selectedAjiValue = val;
+    // 🌟 计算寿司菜品允许选择的酱料配额
+    function getSushiSauceQuota(dish) {
+      if (dish.category === 'cat-sushi-promos') {
+        const match = (dish.name || '').match(/(\d+)\s*piezas/i);
+        if (match) {
+          const pieces = parseInt(match[1], 10);
+          return Math.max(1, Math.floor(pieces / 10));
+        }
+        return 2;
       }
+      // 单条10piezas、8piezas、8cortes或其他单品：统一可选 1 个酱料
+      return 1;
+    }
+
+    // 🌟 渲染寿司酱料点击选择区（默认全部未选中）
+    function initSushiSauceSelector(dish) {
+      const quota = getSushiSauceQuota(dish);
+      currentSushiSauceChoices = new Array(quota).fill('');
+
+      const titleEl = document.getElementById('sushi-sauce-title');
+      const badgeEl = document.getElementById('sushi-sauce-badge');
+
+      if (quota === 1) {
+        titleEl.innerText = "🥢 Elige tu Salsa (Toca para elegir)";
+        badgeEl.innerText = "Máx. 1 salsa";
+      } else {
+        titleEl.innerText = `🥢 Elige tus ${quota} Salsas (1 cada 10 pzs)`;
+        badgeEl.innerText = `Elige ${quota} salsas`;
+      }
+
+      renderSushiSauceButtons();
+    }
+
+    function selectSushiSauceSlot(slotIndex, sauceName) {
+      if (currentSushiSauceChoices[slotIndex] === sauceName) {
+        currentSushiSauceChoices[slotIndex] = ''; // 再点一次取消选中
+      } else {
+        currentSushiSauceChoices[slotIndex] = sauceName;
+      }
+      renderSushiSauceButtons();
+    }
+
+    function renderSushiSauceButtons() {
+      const container = document.getElementById('sushi-sauces-dynamic-container');
+      if (!container) return;
+
+      const quota = currentSushiSauceChoices.length;
+      let html = '';
+
+      if (quota === 1) {
+        const currentVal = currentSushiSauceChoices[0];
+        const soyaStyle = currentVal === 'Salsa Soya' ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const teriStyle = currentVal === 'Salsa Teriyaki' ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+
+        html += `
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button type="button" onclick="selectSushiSauceSlot(0, 'Salsa Soya')" class="${soyaStyle}">
+              <span>🥢 Salsa Soya</span>
+            </button>
+            <button type="button" onclick="selectSushiSauceSlot(0, 'Salsa Teriyaki')" class="${teriStyle}">
+              <span>🍯 Salsa Teriyaki</span>
+            </button>
+          </div>
+        `;
+      } else {
+        for (let i = 0; i < quota; i++) {
+          const currentVal = currentSushiSauceChoices[i];
+          const soyaStyle = currentVal === 'Salsa Soya'
+            ? "flex-1 py-2 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black text-xs shadow-xs transition"
+            : "flex-1 py-2 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold text-xs transition";
+          const teriStyle = currentVal === 'Salsa Teriyaki'
+            ? "flex-1 py-2 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black text-xs shadow-xs transition"
+            : "flex-1 py-2 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold text-xs transition";
+
+          html += `
+            <div class="bg-white p-2 rounded-xl border border-gray-200 flex items-center gap-2">
+              <span class="text-[11px] font-black text-gray-700 w-16 shrink-0">${i + 1}° Salsa:</span>
+              <button type="button" onclick="selectSushiSauceSlot(${i}, 'Salsa Soya')" class="${soyaStyle}">🥢 Soya</button>
+              <button type="button" onclick="selectSushiSauceSlot(${i}, 'Salsa Teriyaki')" class="${teriStyle}">🍯 Teriyaki</button>
+            </div>
+          `;
+        }
+      }
+
+      container.innerHTML = html;
+    }
+
+    // 芥末 / 红姜 切换按钮
+    function toggleSushiExtra(type) {
+      if (type === 'wasabi') selectedSushiWasabi = !selectedSushiWasabi;
+      if (type === 'jengibre') selectedSushiJengibre = !selectedSushiJengibre;
+      renderSushiExtraButtons();
+    }
+
+    function renderSushiExtraButtons() {
+      const btnW = document.getElementById('btn-sushi-wasabi');
+      const btnJ = document.getElementById('btn-sushi-jengibre');
+      if (btnW) btnW.className = selectedSushiWasabi ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      if (btnJ) btnJ.className = selectedSushiJengibre ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+    }
+
+    function toggleAjiChoice(val) {
+      selectedAjiValue = (selectedAjiValue === val) ? '' : val;
       renderAjiButtons();
     }
 
@@ -735,18 +881,15 @@
       if (btnAparte) btnAparte.className = (selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
     }
 
-    // 🌟 2. BAO 单只口味切换
     function selectSingleBaoFlavor(flavor) {
       selectedSingleBaoFlavor = flavor;
-      const flavors = ['Cerdo', 'Pollo', 'Verduras', 'Poroto dulce'];
-      flavors.forEach(f => {
+      ['Cerdo', 'Pollo', 'Verduras', 'Poroto dulce'].forEach(f => {
         const btnId = f === 'Poroto dulce' ? 'bao-btn-Poroto-dulce' : 'bao-btn-' + f;
         const btn = document.getElementById(btnId);
         if (btn) btn.className = (f === flavor) ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
       });
     }
 
-    // 🌟 3. 寿司筷子切换
     function selectPalitosChoice(val) {
       selectedPalitosValue = val;
       const btnSi = document.getElementById('btn-palitos-si');
@@ -755,7 +898,6 @@
       if (btnNo) btnNo.className = (val === 'Sin palitos') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
     }
 
-    // 🌟 4. California Roll 外皮切换
     function selectCaliforniaWrap(wrap) {
       selectedCaliforniaWrap = wrap;
       const map = { 'Sésamo': 'wrap-btn-Sesamo', 'Masago': 'wrap-btn-Masago', 'Ciboulette': 'wrap-btn-Ciboulette', 'Nori': 'wrap-btn-Nori', 'Maní': 'wrap-btn-Mani' };
@@ -769,7 +911,6 @@
       });
     }
 
-    // 🌟 5. 饮料温度切换
     function selectDrinkTemp(val) {
       selectedDrinkTempValue = val;
       const btnFria = document.getElementById('btn-drink-fria');
@@ -859,11 +1000,8 @@
     }
 
     async function loadLiveMenu() {
-      const container = document.getElementById('menu-container');
-      const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
-
+      const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
       const dbDishes = data || [];
-      // 将内置的 85 道寿司菜单与数据库菜品智能合并（防重复）
       const existingNames = new Set(dbDishes.map(d => (d.name || '').toLowerCase().trim()));
       const mergedDishes = [...dbDishes];
 
@@ -1064,70 +1202,115 @@
       }
     }
 
+    // 🌟 智能套餐换菜引擎（同时支持：中餐套餐只换中餐 & 寿司套餐只换寿司）
     function populateMenuSwapSelectors(currentDish) {
       const selectFrom = document.getElementById('swap-dish-from');
       const selectTo = document.getElementById('swap-dish-to');
-      const validChineseCatIds = [
-        'cat-aperitivos', 'cat-vacuno', 'cat-pollo', 'cat-cerdo',
-        'cat-chaumin', 'cat-arroz', 'cat-sopas', 'cat-chapsui',
-        'cat-dragon', 'cat-mariscos', 'cat-parrilladas'
-      ];
-      const singleChineseDishes = allDishes.filter(d => validChineseCatIds.includes(d.category) && !d.is_colacion && d.is_available);
+      const swapToLabel = document.getElementById('swap-to-label');
 
-      let fromHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
-      const desc = currentDish.description || '';
-      const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
-      const normalizeStr = str => (str || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-      const matchedItems = [];
+      const isSushiPromo = currentDish.category === 'cat-sushi-promos';
 
-      rawParts.forEach(raw => {
-        const clean = raw.replace(/^\d+[\s\.\-xX]*(unidades|u|uds)?\s*/i, '').replace(/\([^)]*\)/g, '').trim();
-        const normClean = normalizeStr(clean);
-        if (!normClean) return;
-        let matched = singleChineseDishes.find(d => normalizeStr(d.name) === normClean);
-        if (!matched) matched = singleChineseDishes.find(d => normalizeStr(d.name).includes(normClean) || normClean.includes(normalizeStr(d.name)));
-        if (!matched) {
-          const cleanTokens = normClean.split(" ").filter(t => t.length > 2);
-          let bestOverlap = 0;
-          singleChineseDishes.forEach(d => {
-            const dTokens = normalizeStr(d.name).split(" ").filter(t => t.length > 2);
-            const overlap = cleanTokens.filter(t => dTokens.includes(t)).length;
-            if (overlap > bestOverlap && overlap >= 2) { bestOverlap = overlap; matched = d; }
+      if (isSushiPromo) {
+        swapToLabel.innerText = "2. ¿Por cuál roll o plato de sushi lo reemplazas?";
+        const validSushiCatIds = [
+          'cat-sushi-california', 'cat-sushi-palta', 'cat-sushi-queso',
+          'cat-sushi-hot', 'cat-sushi-salmon', 'cat-sushi-vegetales',
+          'cat-sushi-nuevos', 'cat-sushi-hosomaki', 'cat-sushi-handrolls', 'cat-sushi-piqueos'
+        ];
+        const singleSushiDishes = allDishes.filter(d => validSushiCatIds.includes(d.category) && d.is_available);
+
+        let fromHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
+        const presetItems = SUSHI_COMBO_ITEMS_MAP[currentDish.id] || [];
+
+        if (presetItems.length > 0) {
+          presetItems.forEach(item => {
+            fromHtml += `<option value="${item.id}" data-price="${item.price}" data-name="${item.name}">${item.name} ($${Number(item.price).toLocaleString('es-CL')})</option>`;
           });
-        }
-        if (matched) {
-          if (!matchedItems.some(item => item.id === matched.id)) {
-            matchedItems.push({ id: matched.id, name: matched.name, price: matched.price, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
-          }
         } else {
-          matchedItems.push({ id: 'custom_' + normClean, name: clean, price: 0, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
-        }
-      });
-
-      if (matchedItems.length > 0) {
-        matchedItems.forEach(item => {
-          const priceText = item.price > 0 ? ` ($${Number(item.price).toLocaleString('es-CL')})` : '';
-          fromHtml += `<option value="${item.id}" data-price="${item.price}" data-name="${item.name}">${item.displayName}${priceText}</option>`;
-        });
-      } else {
-        singleChineseDishes.forEach(d => {
-          fromHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
-        });
-      }
-      selectFrom.innerHTML = fromHtml;
-
-      let toHtml = '<option value="">-- Selecciona el plato nuevo deseado --</option>';
-      categoriesChina.filter(c => validChineseCatIds.includes(c.id)).forEach(cat => {
-        const catDishes = singleChineseDishes.filter(d => d.category === cat.id);
-        if (catDishes.length > 0) {
-          toHtml += `<optgroup label="${cat.title}">`;
-          catDishes.forEach(d => {
-            toHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+          singleSushiDishes.forEach(d => {
+            fromHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
           });
-          toHtml += `</optgroup>`;
         }
-      });
-      selectTo.innerHTML = toHtml;
+        selectFrom.innerHTML = fromHtml;
+
+        let toHtml = '<option value="">-- Selecciona el nuevo roll / plato deseado --</option>';
+        categoriesSushi.filter(c => validSushiCatIds.includes(c.id)).forEach(cat => {
+          const catDishes = singleSushiDishes.filter(d => d.category === cat.id);
+          if (catDishes.length > 0) {
+            toHtml += `<optgroup label="${cat.title}">`;
+            catDishes.forEach(d => {
+              toHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+            });
+            toHtml += `</optgroup>`;
+          }
+        });
+        selectTo.innerHTML = toHtml;
+
+      } else {
+        swapToLabel.innerText = "2. ¿Por cuál plato de comida china lo reemplazas?";
+        const validChineseCatIds = [
+          'cat-aperitivos', 'cat-vacuno', 'cat-pollo', 'cat-cerdo',
+          'cat-chaumin', 'cat-arroz', 'cat-sopas', 'cat-chapsui',
+          'cat-dragon', 'cat-mariscos', 'cat-parrilladas'
+        ];
+        const singleChineseDishes = allDishes.filter(d => validChineseCatIds.includes(d.category) && !d.is_colacion && d.is_available);
+
+        let fromHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
+        const desc = currentDish.description || '';
+        const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
+        const normalizeStr = str => (str || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+        const matchedItems = [];
+
+        rawParts.forEach(raw => {
+          const clean = raw.replace(/^\d+[\s\.\-xX]*(unidades|u|uds)?\s*/i, '').replace(/\([^)]*\)/g, '').trim();
+          const normClean = normalizeStr(clean);
+          if (!normClean) return;
+          let matched = singleChineseDishes.find(d => normalizeStr(d.name) === normClean);
+          if (!matched) matched = singleChineseDishes.find(d => normalizeStr(d.name).includes(normClean) || normClean.includes(normalizeStr(d.name)));
+          if (!matched) {
+            const cleanTokens = normClean.split(" ").filter(t => t.length > 2);
+            let bestOverlap = 0;
+            singleChineseDishes.forEach(d => {
+              const dTokens = normalizeStr(d.name).split(" ").filter(t => t.length > 2);
+              const overlap = cleanTokens.filter(t => dTokens.includes(t)).length;
+              if (overlap > bestOverlap && overlap >= 2) { bestOverlap = overlap; matched = d; }
+            });
+          }
+          if (matched) {
+            if (!matchedItems.some(item => item.id === matched.id)) {
+              matchedItems.push({ id: matched.id, name: matched.name, price: matched.price, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
+            }
+          } else {
+            matchedItems.push({ id: 'custom_' + normClean, name: clean, price: 0, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
+          }
+        });
+
+        if (matchedItems.length > 0) {
+          matchedItems.forEach(item => {
+            const priceText = item.price > 0 ? ` ($${Number(item.price).toLocaleString('es-CL')})` : '';
+            fromHtml += `<option value="${item.id}" data-price="${item.price}" data-name="${item.name}">${item.displayName}${priceText}</option>`;
+          });
+        } else {
+          singleChineseDishes.forEach(d => {
+            fromHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+          });
+        }
+        selectFrom.innerHTML = fromHtml;
+
+        let toHtml = '<option value="">-- Selecciona el plato nuevo deseado --</option>';
+        categoriesChina.filter(c => validChineseCatIds.includes(c.id)).forEach(cat => {
+          const catDishes = singleChineseDishes.filter(d => d.category === cat.id);
+          if (catDishes.length > 0) {
+            toHtml += `<optgroup label="${cat.title}">`;
+            catDishes.forEach(d => {
+              toHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+            });
+            toHtml += `</optgroup>`;
+          }
+        });
+        selectTo.innerHTML = toHtml;
+      }
+
       selectFrom.value = "";
       selectTo.value = "";
       currentMenuSwapDifference = 0;
@@ -1182,12 +1365,12 @@
       document.getElementById('opt-dish-name').innerText = currentSelectedDish.name;
       document.getElementById('opt-dish-desc').innerText = currentSelectedDish.description || '';
 
-      const isMenu = currentSelectedDish.category === 'cat-menus';
+      // 🌟 中餐套餐 & 寿司套餐 均支持换菜算差价
+      const isComboMenu = (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos');
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
-      // 1. BAO 控制
       const boxBao = document.getElementById('box-bao-options');
       boxBao.classList.toggle('hidden', !isBao);
       if (isBao) {
@@ -1203,34 +1386,31 @@
         }
       }
 
-      // 2. 套餐换菜控制
       const boxMenuNotes = document.getElementById('box-menu-notes');
-      boxMenuNotes.classList.toggle('hidden', !isMenu);
-      if (isMenu) populateMenuSwapSelectors(currentSelectedDish);
+      boxMenuNotes.classList.toggle('hidden', !isComboMenu);
+      if (isComboMenu) populateMenuSwapSelectors(currentSelectedDish);
 
-      // 3. 便当配餐控制
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
-
-      // 4. 显示/隐藏各大面板
       document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink || isBao);
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
       if (isSushi) {
-        // 判断是否为 California Roll（显示外皮选择）
         const isCalifornia = currentSelectedDish.category === 'cat-sushi-california';
         document.getElementById('sushi-california-wrap-box').classList.toggle('hidden', !isCalifornia);
         if (isCalifornia) selectCaliforniaWrap('Sésamo');
 
-        // 判断是否支持“Sin arroz +$1.800”
         const canSinArroz = SIN_ARROZ_SUSHI_CATS.includes(currentSelectedDish.category);
         document.getElementById('sushi-sin-arroz-box').classList.toggle('hidden', !canSinArroz);
         document.getElementById('sushi-sin-arroz').checked = false;
 
-        document.getElementById('sushi-soya').checked = true;
-        document.getElementById('sushi-teriyaki').checked = true;
-        document.getElementById('sushi-wasabi').checked = false;
-        document.getElementById('sushi-jengibre').checked = false;
+        // 🌟 初始化寿司酱料自选（默认全不选，根据单品1个/套餐每10块1个生成）
+        initSushiSauceSelector(currentSelectedDish);
+
+        selectedSushiWasabi = false;
+        selectedSushiJengibre = false;
+        renderSushiExtraButtons();
+
         selectPalitosChoice('Con palitos');
         document.getElementById('sushi-no-queso').checked = false;
         document.getElementById('sushi-no-cebollin').checked = false;
@@ -1239,7 +1419,6 @@
       } else if (isDrink) {
         selectDrinkTemp('Fría / Helada');
       } else if (!isBao) {
-        // 重置中餐辣度为未选中（不亮）
         selectedAjiValue = '';
         renderAjiButtons();
         document.getElementById('pref-sal').checked = false;
@@ -1279,7 +1458,8 @@
         }
       }
 
-      if (currentSelectedDish.category === 'cat-menus') {
+      // 🌟 提取套餐换菜差价（中餐套餐 & 寿司套餐通用）
+      if (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos') {
         const fromSelect = document.getElementById('swap-dish-from');
         const toSelect = document.getElementById('swap-dish-to');
         const swapNote = document.getElementById('menu-swap-note').value.trim();
@@ -1316,12 +1496,24 @@
           optionsList.push('Sin arroz (+$1.800)');
           extraPrice += 1800;
         }
-        let salsas = [];
-        if (document.getElementById('sushi-soya').checked) salsas.push('Soya');
-        if (document.getElementById('sushi-teriyaki').checked) salsas.push('Teriyaki');
-        if (document.getElementById('sushi-wasabi').checked) salsas.push('Wasabi');
-        if (document.getElementById('sushi-jengibre').checked) salsas.push('Jengibre');
-        if (salsas.length > 0) optionsList.push('Salsas: ' + salsas.join(', '));
+
+        // 🌟 汇总客人自选的寿司酱料
+        const chosenSauces = currentSushiSauceChoices.filter(Boolean);
+        if (chosenSauces.length === 1 && currentSushiSauceChoices.length === 1) {
+          optionsList.push('Salsa: ' + chosenSauces[0]);
+        } else if (chosenSauces.length > 0) {
+          const soyaCount = chosenSauces.filter(s => s === 'Salsa Soya').length;
+          const teriCount = chosenSauces.filter(s => s === 'Salsa Teriyaki').length;
+          const parts = [];
+          if (soyaCount > 0) parts.push(`${soyaCount}x Salsa Soya`);
+          if (teriCount > 0) parts.push(`${teriCount}x Salsa Teriyaki`);
+          optionsList.push('Salsas: ' + parts.join(', '));
+        }
+
+        const extras = [];
+        if (selectedSushiWasabi) extras.push('Wasabi');
+        if (selectedSushiJengibre) extras.push('Jengibre');
+        if (extras.length > 0) optionsList.push('Acompañamiento: ' + extras.join(', '));
 
         optionsList.push(selectedPalitosValue);
 
