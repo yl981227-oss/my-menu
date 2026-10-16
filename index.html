@@ -11,7 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* 彻底锁定手机端页面，防止橡皮筋滚动导致顶部被卡在屏幕外 */
     html, body {
       position: fixed;
       top: 0;
@@ -26,15 +25,12 @@
       -webkit-overflow-scrolling: touch;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
-
     #sidebar-categories, #menu-container {
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
-
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
     :root {
       --color-primary: #DC2626;
       --color-primary-dark: #991B1B;
@@ -45,7 +41,6 @@
     .theme-text-primary { color: var(--color-primary); }
     .theme-border-primary { border-color: var(--color-primary); }
     .theme-bg-light { background-color: var(--color-primary-light); }
-
     #store-header {
       background-size: cover;
       background-position: center;
@@ -55,9 +50,6 @@
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 flex flex-col notranslate" translate="no">
 
-  <!-- ======================================================== -->
-  <!-- 🎨 店铺个性化配置中心 -->
-  <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
       storeName: "DRAGÓN DE ORO",
@@ -110,37 +102,24 @@
     };
   </script>
 
-  <!-- 🌟 0. 进店居中迎宾弹窗 -->
+  <!-- 0. 进店迎宾弹窗 -->
   <div id="welcome-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
     <div class="relative bg-white rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl border border-white/30 transform transition-all">
-      <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">
-        &times;
-      </button>
-
+      <button onclick="closeWelcomeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center text-lg font-bold z-20 transition backdrop-blur-sm shadow-md" title="Cerrar">&times;</button>
       <div class="relative h-44 w-full overflow-hidden bg-gray-900">
         <img id="welcome-img" src="" alt="Bienvenidos" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
         <div class="absolute bottom-2.5 left-3.5 flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-lg shadow-sm">
-            🍜
-          </div>
-          <span class="text-xs font-black tracking-wider text-amber-300 uppercase">comida china & Sushi</span>
+          <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-lg shadow-sm">🍜</div>
+          <span class="text-xs font-black tracking-wider text-amber-300 uppercase">Restaurant & Sushi</span>
         </div>
       </div>
-
       <div class="p-5 text-center">
-        <h2 id="welcome-title" class="text-base font-black text-gray-900 leading-snug mb-1.5">
-          ¡Bienvenidos a DRAGÓN DE ORO!
-        </h2>
-        <p id="welcome-subtitle" class="text-xs text-gray-500 leading-relaxed mb-4">
-          Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.
-        </p>
-        
+        <h2 id="welcome-title" class="text-base font-black text-gray-900 leading-snug mb-1.5">¡Bienvenidos a DRAGÓN DE ORO!</h2>
+        <p id="welcome-subtitle" class="text-xs text-gray-500 leading-relaxed mb-4">Auténticos sabores de Comida China tradicional y el mejor Sushi fresco. Pide directo por WhatsApp sin comisiones.</p>
         <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 mb-4 text-[11px] font-bold text-amber-800 flex items-center justify-center gap-1.5">
-          <span>🎁</span>
-          <span>¡Por compras sobre $20.000 te regalamos Wantán frito!</span>
+          <span>🎁</span><span>¡Por compras sobre $20.000 te regalamos Wantán frito!</span>
         </div>
-
         <button id="btn-welcome-close" onclick="closeWelcomeModal()" class="w-full text-white font-black py-3 rounded-2xl shadow-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
           <span id="welcome-btn-text">Ver Menú y Pedir 🥢</span>
         </button>
@@ -152,16 +131,10 @@
   <header id="store-header" class="text-white px-3.5 pt-3 pb-2 shadow-lg shrink-0 z-20 transition-all">
     <div class="flex justify-between items-center mb-1.5">
       <div class="flex items-center gap-2.5">
-        <div id="store-logo" class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">
-          🐉
-        </div>
+        <div id="store-logo" class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">🐉</div>
         <div>
-          <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow">
-            DRAGÓN DE ORO
-          </h1>
-          <p id="store-slogan" class="text-[10px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">
-            Comida China Tradicional & Sushi
-          </p>
+          <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow">DRAGÓN DE ORO</h1>
+          <p id="store-slogan" class="text-[10px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">Comida China Tradicional & Sushi</p>
         </div>
       </div>
       <div class="flex items-center gap-1.5 bg-emerald-500/30 backdrop-blur-md border border-emerald-400/40 px-2 py-0.5 rounded-full shadow-sm">
@@ -169,29 +142,16 @@
         <span class="text-[10px] font-black text-emerald-100 tracking-wide">Abierto</span>
       </div>
     </div>
-
-    <!-- 优惠信息栏 -->
     <div id="store-promo-bar" class="mb-1.5 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
-      <span class="shrink-0">📢</span>
-      <span id="store-promo-text" class="truncate leading-tight"></span>
+      <span class="shrink-0">📢</span><span id="store-promo-text" class="truncate leading-tight"></span>
     </div>
-
-    <!-- 标签 -->
     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/95">
-      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
-        ⭐ 4.9 (210+)
-      </span>
-      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
-        ⏱️ 20-30 min
-      </span>
-      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">
-        🛵 Envío $1.800 CLP
-      </span>
+      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">⭐ 4.9 (210+)</span>
+      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">⏱️ 20-30 min</span>
+      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">🛵 Envío $1.800 CLP</span>
     </div>
-
-    <!-- 搜索输入框 -->
     <div class="mt-1.5 relative">
-      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. Menú, Wantán, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
+      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. California, Tempura, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
       <span class="absolute left-2.5 top-2 text-xs text-white/80">🔍</span>
     </div>
   </header>
@@ -208,7 +168,7 @@
     </div>
   </nav>
 
-  <!-- 3. 双栏黄金布局 -->
+  <!-- 3. 双栏布局 -->
   <div class="flex flex-1 overflow-hidden relative">
     <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
     <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 space-y-5 bg-[#F8F9FA]">
@@ -216,26 +176,21 @@
     </main>
   </div>
 
-  <!-- 4. 底部悬浮购物车 (防遮挡安全垫) -->
+  <!-- 4. 底部悬浮购物车 -->
   <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
     <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
       <div class="flex items-center gap-3 pl-1">
         <div class="relative">
-          <div id="cart-icon-box" class="w-10 h-10 rounded-xl theme-bg-primary flex items-center justify-center text-lg shadow-md">
-            🛒
-          </div>
+          <div id="cart-icon-box" class="w-10 h-10 rounded-xl theme-bg-primary flex items-center justify-center text-lg shadow-md">🛒</div>
           <span id="cart-total-count" class="absolute -top-1.5 -right-1.5 bg-amber-400 text-gray-950 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md">0</span>
         </div>
         <div>
           <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Subtotal</div>
-          <div class="text-base font-black tracking-tight text-white leading-tight">
-            $ <span id="cart-total-price">0</span> <span class="text-[10px] font-normal text-gray-400">CLP</span>
-          </div>
+          <div class="text-base font-black tracking-tight text-white leading-tight">$ <span id="cart-total-price">0</span> <span class="text-[10px] font-normal text-gray-400">CLP</span></div>
         </div>
       </div>
       <button id="btn-checkout-dock" onclick="openCheckoutModal()" class="text-white font-extrabold py-2.5 px-5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition">
-        <span>Ver pedido</span>
-        <span>→</span>
+        <span>Ver pedido</span><span>→</span>
       </button>
     </footer>
   </div>
@@ -253,106 +208,76 @@
         <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-lg leading-none shrink-0">&times;</button>
       </div>
 
-      <!-- 🌟 A. BAO 专属口味定制模块（纯原生可点按钮 + 纯西文无中文） -->
+      <!-- A. BAO 专属口味定制模块 -->
       <div id="box-bao-options" class="hidden mb-4 bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200 shadow-sm space-y-3">
-        <!-- 单只装 BAO -->
         <div id="bao-single-box">
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🥟 Elige el sabor de tu BAO *</label>
             <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full border border-orange-200">Obligatorio</span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <button type="button" onclick="selectSingleBaoFlavor('Cerdo')" id="bao-btn-Cerdo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
-              <span>🐷 Cerdo</span>
-            </button>
-            <button type="button" onclick="selectSingleBaoFlavor('Pollo')" id="bao-btn-Pollo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
-              <span>🍗 Pollo</span>
-            </button>
-            <button type="button" onclick="selectSingleBaoFlavor('Verduras')" id="bao-btn-Verduras" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
-              <span>🥬 Verduras</span>
-            </button>
-            <button type="button" onclick="selectSingleBaoFlavor('Poroto dulce')" id="bao-btn-Poroto-dulce" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition">
-              <span>🫘 Poroto dulce</span>
-            </button>
+            <button type="button" onclick="selectSingleBaoFlavor('Cerdo')" id="bao-btn-Cerdo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition"><span>🐷 Cerdo</span></button>
+            <button type="button" onclick="selectSingleBaoFlavor('Pollo')" id="bao-btn-Pollo" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition"><span>🍗 Pollo</span></button>
+            <button type="button" onclick="selectSingleBaoFlavor('Verduras')" id="bao-btn-Verduras" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition"><span>🥬 Verduras</span></button>
+            <button type="button" onclick="selectSingleBaoFlavor('Poroto dulce')" id="bao-btn-Poroto-dulce" class="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition"><span>🫘 Poroto dulce</span></button>
           </div>
         </div>
 
-        <!-- 3只装优惠套餐 BAO（三行独立点选） -->
         <div id="bao-triple-box" class="hidden space-y-2.5">
           <div class="flex justify-between items-center mb-1">
             <label class="block text-xs font-black text-gray-800">🥟 Elige el sabor de tus 3 BAO *</label>
             <span class="text-[10px] text-orange-700 font-bold bg-orange-100 px-2 py-0.5 rounded-full border border-orange-200">3 Unidades</span>
           </div>
-          
           <div class="space-y-2">
-            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3">
               <span class="text-xs font-black text-gray-800 shrink-0">1° BAO:</span>
-              <select id="bao-select-1" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
-                <option value="Cerdo">🐷 Cerdo</option>
-                <option value="Pollo">🍗 Pollo</option>
-                <option value="Verduras">🥬 Verduras</option>
-                <option value="Poroto dulce">🫘 Poroto dulce</option>
+              <select id="bao-select-1" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600">
+                <option value="Cerdo">🐷 Cerdo</option><option value="Pollo">🍗 Pollo</option><option value="Verduras">🥬 Verduras</option><option value="Poroto dulce">🫘 Poroto dulce</option>
               </select>
             </div>
-
-            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3">
               <span class="text-xs font-black text-gray-800 shrink-0">2° BAO:</span>
-              <select id="bao-select-2" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
-                <option value="Cerdo">🐷 Cerdo</option>
-                <option value="Pollo" selected>🍗 Pollo</option>
-                <option value="Verduras">🥬 Verduras</option>
-                <option value="Poroto dulce">🫘 Poroto dulce</option>
+              <select id="bao-select-2" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600">
+                <option value="Cerdo">🐷 Cerdo</option><option value="Pollo" selected>🍗 Pollo</option><option value="Verduras">🥬 Verduras</option><option value="Poroto dulce">🫘 Poroto dulce</option>
               </select>
             </div>
-
-            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3 shadow-xs">
+            <div class="bg-white p-2.5 rounded-2xl border border-gray-200 flex items-center justify-between gap-3">
               <span class="text-xs font-black text-gray-800 shrink-0">3° BAO:</span>
-              <select id="bao-select-3" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600 transition">
-                <option value="Cerdo">🐷 Cerdo</option>
-                <option value="Pollo">🍗 Pollo</option>
-                <option value="Verduras">🥬 Verduras</option>
-                <option value="Poroto dulce" selected>🫘 Poroto dulce</option>
+              <select id="bao-select-3" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-red-600">
+                <option value="Cerdo">🐷 Cerdo</option><option value="Pollo">🍗 Pollo</option><option value="Verduras">🥬 Verduras</option><option value="Poroto dulce" selected>🫘 Poroto dulce</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- B. 专属换菜改价（仅限套餐内有菜，新菜仅限中餐） -->
+      <!-- B. 套餐专属换菜改价 -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
         <div class="flex justify-between items-center mb-1.5">
-          <label class="block text-xs font-black text-amber-900 flex items-center gap-1">
-            <span>🔄</span> Cambio de plato con recálculo automático
-          </label>
+          <label class="block text-xs font-black text-amber-900 flex items-center gap-1"><span>🔄</span> Cambio de plato con recálculo automático</label>
           <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
         </div>
-        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">
-          Selecciona qué plato retiras de este menú y por cuál lo reemplazas. El sistema calculará la diferencia exacta de precio.
-        </p>
-
+        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">Selecciona qué plato retiras de este menú y por cuál lo reemplazas. El sistema calculará la diferencia exacta de precio.</p>
         <div class="space-y-2.5 text-xs">
           <div>
             <label class="block text-[11px] font-bold text-amber-950 mb-1">1. ¿Qué plato quitas de este menú?</label>
-            <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 transition font-semibold">
+            <select id="swap-dish-from" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 font-semibold">
               <option value="">-- Sin cambio (Menú estándar) --</option>
             </select>
           </div>
-
           <div>
             <label class="block text-[11px] font-bold text-amber-950 mb-1">2. ¿Por cuál plato de comida china lo reemplazas?</label>
-            <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 transition font-semibold">
+            <select id="swap-dish-to" onchange="calculateMenuSwapDifference()" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs text-gray-800 outline-none focus:border-amber-600 font-semibold">
               <option value="">-- Selecciona el plato nuevo deseado --</option>
             </select>
           </div>
-
           <div id="swap-diff-badge" class="hidden bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
             <span class="font-bold text-gray-700">Diferencia de precio:</span>
             <span id="swap-diff-amount" class="font-black text-rose-600">+$0 CLP</span>
           </div>
-
           <div>
             <label class="block text-[10px] font-bold text-amber-900/80 mb-1">Nota adicional sobre el cambio (opcional):</label>
-            <input id="menu-swap-note" type="text" placeholder="Ej: Sin cebollín en el plato nuevo..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 transition placeholder-gray-400">
+            <input id="menu-swap-note" type="text" placeholder="Ej: Sin cebollín en el plato nuevo..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 placeholder-gray-400">
           </div>
         </div>
       </div>
@@ -362,45 +287,34 @@
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
           <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-gray-400">
-            <div class="flex items-center gap-2">
-              <input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0">
-              <span class="font-bold">Arroz Chaufán / Blanco</span>
-            </div>
+            <div class="flex items-center gap-2"><input type="radio" name="side-choice" value="Con Arroz" checked data-addprice="0"><span class="font-bold">Arroz Chaufán / Blanco</span></div>
             <span class="text-[11px] font-black text-gray-400">+$0</span>
           </label>
           <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-gray-400">
-            <div class="flex items-center gap-2">
-              <input type="radio" name="side-choice" value="Con Papas Fritas" data-addprice="500">
-              <span class="font-bold">Papas Fritas</span>
-            </div>
+            <div class="flex items-center gap-2"><input type="radio" name="side-choice" value="Con Papas Fritas" data-addprice="500"><span class="font-bold">Papas Fritas</span></div>
             <span class="text-[11px] font-black theme-text-primary">+ $500</span>
           </label>
           <label class="flex items-center justify-between p-2.5 rounded-xl border bg-white cursor-pointer hover:border-gray-400">
-            <div class="flex items-center gap-2">
-              <input type="radio" name="side-choice" value="Con Fideo Chaumín" data-addprice="800">
-              <span class="font-bold">Fideo Chaumín</span>
-            </div>
+            <div class="flex items-center gap-2"><input type="radio" name="side-choice" value="Con Fideo Chaumín" data-addprice="800"><span class="font-bold">Fideo Chaumín</span></div>
             <span class="text-[11px] font-black theme-text-primary">+ $800</span>
           </label>
         </div>
       </div>
 
-      <!-- D. 中餐专属定制 (双按钮对称布局) -->
+      <!-- 🌟 D. 中餐专属定制 (已彻底修复 Nivel de Ají 点击高亮反应！) -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🌶️ Nivel de Ají</label>
-            <span class="text-[10px] text-gray-400 font-semibold">(Opcional)</span>
+            <span class="text-[10px] text-gray-400 font-semibold">(Opcional • Toca para elegir)</span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Con ají" class="hidden" onclick="handleAjiToggle(this)">
+            <button type="button" id="btn-aji-con" onclick="toggleAjiChoice('Con ají')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>Con ají 🔥</span>
-            </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-aji" value="Ají aparte" class="hidden" onclick="handleAjiToggle(this)">
+            </button>
+            <button type="button" id="btn-aji-aparte" onclick="toggleAjiChoice('Ají aparte')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>Ají aparte</span>
-            </label>
+            </button>
           </div>
         </div>
 
@@ -408,45 +322,60 @@
           <label class="block text-xs font-black text-gray-800 mb-2">🧂 Preferencias de cocina</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Bajo en sal</span>
+              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Bajo en sal</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Poco sillao</span>
+              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Poco sillao</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Sin cebollín</span>
+              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-diente" value="Sin diente" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Sin diente dragón</span>
+              <input type="checkbox" id="pref-diente" value="Sin diente" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin diente dragón</span>
             </label>
           </div>
         </div>
       </div>
 
-      <!-- E. 寿司专属定制 -->
+      <!-- 🌟 E. 寿司专属定制（新增 California 外皮选择 & 无米饭 +$1.800 选项） -->
       <div id="box-sushi-options" class="space-y-4 hidden">
+        <!-- California Roll 专属外皮选择 -->
+        <div id="sushi-california-wrap-box" class="hidden bg-amber-50/80 p-3 rounded-2xl border border-amber-200">
+          <label class="block text-xs font-black text-amber-950 mb-2">🥑 Elige envoltura California *</label>
+          <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+            <button type="button" onclick="selectCaliforniaWrap('Sésamo')" id="wrap-btn-Sesamo" class="py-2 px-1.5 rounded-xl border-2 font-bold transition">Sésamo</button>
+            <button type="button" onclick="selectCaliforniaWrap('Masago')" id="wrap-btn-Masago" class="py-2 px-1.5 rounded-xl border-2 font-bold transition">Masago</button>
+            <button type="button" onclick="selectCaliforniaWrap('Ciboulette')" id="wrap-btn-Ciboulette" class="py-2 px-1.5 rounded-xl border-2 font-bold transition">Ciboulette</button>
+            <button type="button" onclick="selectCaliforniaWrap('Nori')" id="wrap-btn-Nori" class="py-2 px-1.5 rounded-xl border-2 font-bold transition">Nori</button>
+            <button type="button" onclick="selectCaliforniaWrap('Maní')" id="wrap-btn-Mani" class="py-2 px-1.5 rounded-xl border-2 font-bold transition">Maní</button>
+          </div>
+        </div>
+
+        <!-- 10粒装寿司卷专属：无米饭 +$1.800 -->
+        <div id="sushi-sin-arroz-box" class="hidden">
+          <label class="flex items-center justify-between p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="sushi-sin-arroz" class="w-4 h-4 rounded">
+              <span class="text-xs font-black text-gray-800">¿Pedir Roll sin arroz?</span>
+            </div>
+            <span class="text-xs font-black text-red-600">+ $1.800</span>
+          </label>
+        </div>
+
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 Salsas incluidas para Sushi</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
-              <input type="checkbox" id="sushi-soya" value="Salsa Soya" checked class="w-4 h-4 rounded">
-              <span class="font-bold">Soya (酱油)</span>
+              <input type="checkbox" id="sushi-soya" value="Soya" checked class="w-4 h-4 rounded"><span class="font-bold">Salsa Soya</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50 cursor-pointer">
-              <input type="checkbox" id="sushi-teriyaki" value="Salsa Teriyaki" checked class="w-4 h-4 rounded">
-              <span class="font-bold">Teriyaki (甜酱)</span>
+              <input type="checkbox" id="sushi-teriyaki" value="Teriyaki" checked class="w-4 h-4 rounded"><span class="font-bold">Salsa Teriyaki</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Wasabi (芥末)</span>
+              <input type="checkbox" id="sushi-wasabi" value="Wasabi" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Wasabi</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Jengibre (红姜)</span>
+              <input type="checkbox" id="sushi-jengibre" value="Jengibre" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Jengibre</span>
             </label>
           </div>
         </div>
@@ -454,14 +383,8 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥢 ¿Deseas Palitos de madera?</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-palitos" value="Con palitos" checked class="hidden">
-              <span>🥢 Sí, con palitos</span>
-            </label>
-            <label class="flex items-center justify-center py-2.5 px-2 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-palitos" value="Sin palitos" class="hidden">
-              <span>🌱 Sin palitos</span>
-            </label>
+            <button type="button" id="btn-palitos-si" onclick="selectPalitosChoice('Con palitos')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 font-bold transition">🥢 Sí, con palitos</button>
+            <button type="button" id="btn-palitos-no" onclick="selectPalitosChoice('Sin palitos')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 font-bold transition">🌱 Sin palitos</button>
           </div>
         </div>
 
@@ -469,20 +392,16 @@
           <label class="block text-xs font-black text-gray-800 mb-2">🥑 Detalles del Roll</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Sin queso crema</span>
+              <input type="checkbox" id="sushi-no-queso" value="Sin queso crema" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin queso crema</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Sin cebollín</span>
+              <input type="checkbox" id="sushi-no-cebollin" value="Sin cebollín" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin cebollín</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Sin sésamo</span>
+              <input type="checkbox" id="sushi-no-sesamo" value="Sin sésamo" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin sésamo</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="w-4 h-4 rounded">
-              <span class="font-semibold text-gray-700">Bien dorado 🔥</span>
+              <input type="checkbox" id="sushi-bien-dorado" value="Bien dorado/crujiente" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Bien dorado 🔥</span>
             </label>
           </div>
         </div>
@@ -493,14 +412,8 @@
         <div>
           <label class="block text-xs font-black text-gray-800 mb-2">🥤 Temperatura *</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-drink-temp" value="Fría / Helada" checked class="hidden">
-              <span>❄️ Bien Fría / Helada</span>
-            </label>
-            <label class="flex items-center justify-center py-3 rounded-xl border border-gray-200 text-center cursor-pointer has-[:checked]:theme-bg-light has-[:checked]:theme-text-primary has-[:checked]:theme-border-primary font-bold transition">
-              <input type="radio" name="opt-drink-temp" value="Al tiempo" class="hidden">
-              <span>🌤️ Al tiempo</span>
-            </label>
+            <button type="button" id="btn-drink-fria" onclick="selectDrinkTemp('Fría / Helada')" class="flex items-center justify-center py-3 rounded-xl border-2 font-bold transition">❄️ Bien Fría / Helada</button>
+            <button type="button" id="btn-drink-tiempo" onclick="selectDrinkTemp('Al tiempo')" class="flex items-center justify-center py-3 rounded-xl border-2 font-bold transition">🌤️ Al tiempo</button>
           </div>
         </div>
       </div>
@@ -525,7 +438,6 @@
   <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
-
       <div class="flex justify-between items-center mb-3 border-b pb-2.5">
         <div>
           <h3 class="text-base font-black text-gray-900">Resumen de tu Pedido</h3>
@@ -536,7 +448,6 @@
 
       <div id="cart-items-preview" class="space-y-2 mb-3.5 max-h-40 overflow-y-auto divide-y divide-gray-100 text-xs pr-1"></div>
 
-      <!-- 履约方式选择（自提 vs 外送） -->
       <div class="mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🛵 Método de entrega *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -549,7 +460,6 @@
         </div>
       </div>
 
-      <!-- 预约时间选择模块（尽快 vs 预约时间） -->
       <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">⏰ Horario de entrega / retiro *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -560,7 +470,6 @@
             📅 Programar hora<br><span class="text-[10px] font-normal text-gray-500">Para más tarde</span>
           </button>
         </div>
-
         <div id="schedule-time-box" class="hidden mt-2.5 pt-2 border-t border-gray-200/60">
           <label class="block text-[11px] font-bold text-gray-700 mb-1">¿A qué hora deseas retirar o recibir? *</label>
           <div class="flex items-center gap-2">
@@ -580,26 +489,22 @@
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Teléfono WhatsApp *</label>
           <input id="cust-phone" type="tel" placeholder="Ej: 56912345678" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
-        
         <div id="address-box" class="hidden">
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Dirección de entrega (Calle, Número, Depto) *</label>
           <input id="cust-address" type="text" placeholder="Ej: Av. Recoleta 1234, Depto 402" class="w-full border theme-border-primary theme-bg-light rounded-xl p-2.5 text-xs outline-none focus:bg-white transition">
         </div>
-
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de pago *</label>
           <select id="pay-method" onchange="toggleCashInput()" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none font-semibold text-gray-700">
             <option value="efectivo">💵 Efectivo al recibir</option>
-            <option value="tarjeta">💳 Tarjeta Débito / Crédito POS (现场刷卡)</option>
-            <option value="transferencia">🏦 Transferencia Bancaria (转账)</option>
+            <option value="tarjeta">💳 Tarjeta Débito / Crédito POS</option>
+            <option value="transferencia">🏦 Transferencia Bancaria</option>
           </select>
         </div>
-
         <div id="cash-amount-box">
           <label class="block text-[11px] font-bold text-gray-700 mb-1">¿Con cuánto efectivo pagarás? (Vuelto)</label>
           <input id="cust-cash" type="number" placeholder="Ej: 20000" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none transition">
         </div>
-
         <div>
           <label class="block text-[11px] font-bold text-gray-700 mb-1">Comentarios / Instrucciones</label>
           <input id="cust-notes" type="text" placeholder="Ej: Timbre no funciona, llamar al llegar..." class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none transition">
@@ -615,8 +520,7 @@
           </div>
         </div>
         <button onclick="sendOrderToWhatsApp()" class="w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 text-white font-black py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-green-500/20 text-xs active:scale-95 transition">
-          <span class="text-base">📲</span>
-          <span>Enviar Pedido a WhatsApp</span>
+          <span class="text-base">📲</span><span>Enviar Pedido a WhatsApp</span>
         </button>
       </div>
     </div>
@@ -647,14 +551,151 @@
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
+    // 🌟 完整对齐纸质寿司菜单的分类
     const categoriesSushi = [
-      { id: "cat-sushi-promos", title: "🍱 PROMOS SUSHI", icon: "🍱", short: "Promos" },
-      { id: "cat-sushi-hot", title: "🔥 HOT ROLLS (Fritos)", icon: "🔥", short: "Hot Rolls" },
-      { id: "cat-sushi-california", title: "🥑 CALIFORNIA ROLLS", icon: "🥑", short: "California" },
-      { id: "cat-sushi-envueltos", title: "🍣 ENVUELTOS", icon: "🍣", short: "Envueltos" },
-      { id: "cat-sushi-handrolls", title: "🌯 HAND ROLLS", icon: "🌯", short: "Hand Rolls" },
-      { id: "cat-sushi-gohan", title: "🍚 GOHAN BOWLS", icon: "🍚", short: "Gohan" },
+      { id: "cat-sushi-promos", title: "🍱 MENÚS Y PROMOS SUSHI", icon: "🍱", short: "Promos" },
+      { id: "cat-sushi-nuevos", title: "✨ NUEVOS LANZAMIENTOS", icon: "✨", short: "Nuevos" },
+      { id: "cat-sushi-california", title: "🥑 CALIFORNIA ROLLS (10 pzs)", icon: "🥑", short: "California" },
+      { id: "cat-sushi-palta", title: "🥑 ESPECIAL PALTA (10 pzs)", icon: "🥑", short: "Esp. Palta" },
+      { id: "cat-sushi-queso", title: "🧀 ESPECIAL QUESO CREMA (10 pzs)", icon: "🧀", short: "Esp. Queso" },
+      { id: "cat-sushi-hot", title: "🔥 ROLLS CALIENTES (10 pzs)", icon: "🔥", short: "Calientes" },
+      { id: "cat-sushi-salmon", title: "🍣 ESPECIAL SALMÓN (10 pzs)", icon: "🍣", short: "Esp. Salmón" },
+      { id: "cat-sushi-vegetales", title: "🥬 VEGETALES (10 pzs)", icon: "🥬", short: "Vegetales" },
+      { id: "cat-sushi-handrolls", title: "🌯 HAND ROLLS & TEMAKI", icon: "🌯", short: "Hand Rolls" },
+      { id: "cat-sushi-hosomaki", title: "🍙 HOSOMAKI (8 pzs)", icon: "🍙", short: "Hosomaki" },
+      { id: "cat-sushi-piqueos", title: "🍤 GYOSAS, NIGIRI, SASHIMI & PIQUEOS", icon: "🍤", short: "Piqueos" },
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
+    ];
+
+    // 🌟 完整录入纸质菜单全部 85 道寿司与日料数据
+    const BUILT_IN_SUSHI_DISHES = [
+      // 1. MENÚS Y PROMOS SUSHI
+      { id: 9001, name: "Promoción Tempura 1 (20 piezas)", description: "Ebi Tempura, Chicken Tempura", price: 12000, category: "cat-sushi-promos", is_available: true },
+      { id: 9002, name: "Promoción Tempura 2 (30 piezas)", description: "Ebi Tempura, Chicken Tempura, Sake Tempura", price: 18600, category: "cat-sushi-promos", is_available: true },
+      { id: 9003, name: "Promoción Tempura 3 (40 piezas)", description: "Ebi Tempura, Chicken Tempura, Sake Tempura, Tako Tempura", price: 24900, category: "cat-sushi-promos", is_available: true },
+      { id: 9004, name: "Menú Sushi 1 (23 piezas)", description: "1 Hosomaki (camarón, palta o salmón y palta), 1 Sake Roll (envuelto en palta, salmón, queso crema y cebollín), 1 Gyosas Mixtas (5 u.)", price: 13300, category: "cat-sushi-promos", is_available: true },
+      { id: 9005, name: "Menú Sushi 2 (35 piezas)", description: "1 Hosomaki (camarón, palta o salmón y palta), 1 Sake Roll (envuelto en palta, salmón, queso crema y cebollín), 1 Gyosas Mixtas (5 u.), 1 California Ebi", price: 18700, category: "cat-sushi-promos", is_available: true },
+      { id: 9006, name: "Menú Sushi 3 (49 piezas)", description: "1 Hosomaki, 1 Sake Roll (envuelto en palta), 1 California Ebi (sésamo, masago o ciboulette), 1 Ebi Tempura Roll, 1 Gyosas Mixtas (8 u.)", price: 27200, category: "cat-sushi-promos", is_available: true },
+      { id: 9007, name: "Menú Sushi 4 (68 piezas)", description: "2 Hosomaki, 1 Sake Roll, 1 California Ebi, 1 Ebi Tempura Roll, 2 Nigiri Salmón, 2 Nigiri Camarón, 4 Sashimi Salmón, 4 Sashimi Pulpo, 1 Gyosas Mixtas (10 u.)", price: 44900, category: "cat-sushi-promos", is_available: true },
+
+      // 2. NUEVOS LANZAMIENTOS
+      { id: 9008, name: "Ceviche Clásico", description: "Pescado blanco del día marinado al estilo peruano acompañado de choclo", price: 12500, category: "cat-sushi-nuevos", is_available: true },
+      { id: 9009, name: "Ceviche Mixto", description: "Mix de pescados frescos y camarones marinado al estilo peruano acompañado de choclo", price: 14300, category: "cat-sushi-nuevos", is_available: true },
+      { id: 9010, name: "Acevichado Roll (10 piezas)", description: "Camarones, palta, envuelto en ciboulette bañado de salsa acevichada", price: 6800, category: "cat-sushi-nuevos", is_available: true },
+      { id: 9011, name: "Roll Ceviche (10 piezas)", description: "Pulpo, palta envuelto en ciboulette coronado de ceviche clásico", price: 8800, category: "cat-sushi-nuevos", is_available: true },
+      { id: 9012, name: "Spicy Roll (10 piezas)", description: "Pollo, palta, cebollín, envuelto en sésamo bañado de salsa Spicy picante", price: 6000, category: "cat-sushi-nuevos", is_available: true },
+
+      // 3. CALIFORNIA ROLLS (10 piezas)
+      { id: 9013, name: "California Kani", description: "Kanikama y palta (10 piezas)", price: 5600, category: "cat-sushi-california", is_available: true },
+      { id: 9014, name: "California Ebi", description: "Camarón y palta (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
+      { id: 9015, name: "California Sake", description: "Salmón y palta (10 piezas)", price: 6300, category: "cat-sushi-california", is_available: true },
+      { id: 9016, name: "California Tako", description: "Pulpo y palta (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
+      { id: 9017, name: "California Teri", description: "Pollo y palta (10 piezas)", price: 5600, category: "cat-sushi-california", is_available: true },
+      { id: 9018, name: "California Tempura", description: "Camarón tempura y palta (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
+      { id: 9019, name: "California Cheese", description: "Queso crema, cebollín y salmón (10 piezas)", price: 6300, category: "cat-sushi-california", is_available: true },
+      { id: 9020, name: "California Mix", description: "Camarón, salmón y queso crema (10 piezas)", price: 6300, category: "cat-sushi-california", is_available: true },
+      { id: 9021, name: "California Meat", description: "Carne, queso crema y ciboulette (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
+      { id: 9022, name: "California Tuna", description: "Atún, queso crema y ciboulette (10 piezas)", price: 6000, category: "cat-sushi-california", is_available: true },
+
+      // 4. ESPECIAL PALTA (10 piezas - envuelto en palta)
+      { id: 9023, name: "Teri Roll", description: "Pollo, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6300, category: "cat-sushi-palta", is_available: true },
+      { id: 9024, name: "Tako Roll", description: "Pulpo, queso crema y cebollín envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
+      { id: 9025, name: "Sake Roll", description: "Salmón, queso crema y cebollín envuelto en palta (10 piezas)", price: 6900, category: "cat-sushi-palta", is_available: true },
+      { id: 9026, name: "Tempura Roll", description: "Camarón tempura, queso crema y cebollín envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
+      { id: 9027, name: "Smoked Roll", description: "Salmón ahumado, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6900, category: "cat-sushi-palta", is_available: true },
+      { id: 9028, name: "Kani Roll", description: "Kanikama, masago y pepino envuelto en palta (10 piezas)", price: 6300, category: "cat-sushi-palta", is_available: true },
+      { id: 9029, name: "Ebi Roll", description: "Camarón, queso crema y palta envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
+      { id: 9030, name: "Mix Roll", description: "Camarón, salmón y queso crema envuelto en palta (10 piezas)", price: 6900, category: "cat-sushi-palta", is_available: true },
+      { id: 9031, name: "Meat Roll", description: "Carne, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
+      { id: 9032, name: "Tuna Roll", description: "Atún, queso crema y ciboulette envuelto en palta (10 piezas)", price: 6600, category: "cat-sushi-palta", is_available: true },
+
+      // 5. ESPECIAL QUESO CREMA (10 piezas - envuelto en queso crema)
+      { id: 9033, name: "Chicken Cheese Roll", description: "Pollo, palta y pimentón envuelto en queso crema (10 piezas)", price: 6300, category: "cat-sushi-queso", is_available: true },
+      { id: 9034, name: "Tempura Cheese Roll", description: "Camarón tempura y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9035, name: "Mix Cheese Roll", description: "Salmón, camarón y palta envuelto en queso crema (10 piezas)", price: 6900, category: "cat-sushi-queso", is_available: true },
+      { id: 9036, name: "Piña Cheese Roll", description: "Camarón apanado en coco, piña y masago envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9037, name: "Hotate Cheese Roll", description: "Camarón apanado, pimentón y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9038, name: "Ebi Cheese Roll", description: "Camarón y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9039, name: "Tako Cheese", description: "Pulpo y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9040, name: "Tuna Cheese", description: "Atún y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+      { id: 9041, name: "Meat Cheese", description: "Carne y palta envuelto en queso crema (10 piezas)", price: 6600, category: "cat-sushi-queso", is_available: true },
+
+      // 6. ROLLS CALIENTES (10 piezas)
+      { id: 9042, name: "Ebi Tempura Roll", description: "Camarón, queso crema, cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9043, name: "Sake Tempura Roll", description: "Salmón, queso crema, cebollín frito en tempura (10 piezas)", price: 6900, category: "cat-sushi-hot", is_available: true },
+      { id: 9044, name: "Mix Tempura Roll", description: "Salmón, camarón, queso crema, cebollín frito en tempura (10 piezas)", price: 6900, category: "cat-sushi-hot", is_available: true },
+      { id: 9045, name: "Chicken Tempura Roll", description: "Pollo, pimentón, queso crema frito en tempura (10 piezas)", price: 6300, category: "cat-sushi-hot", is_available: true },
+      { id: 9046, name: "Tako Tempura Roll", description: "Pulpo, queso crema, cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9047, name: "Ebi Furai Roll", description: "Camarón, queso crema, masago, palta, apanado en panko (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9048, name: "Teri Ebi Roll", description: "Pollo, camarón, queso crema, apanado en panko (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9049, name: "Emi Roll", description: "Queso crema, camarón, envuelto en salmón, apanado en panko (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9050, name: "Envuelto en Pollo Apanado", description: "Palta, queso crema y pollo apanado (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9051, name: "Meat Tempura", description: "Carne, queso crema y cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+      { id: 9052, name: "Tuna Tempura", description: "Atún, queso crema y cebollín frito en tempura (10 piezas)", price: 6600, category: "cat-sushi-hot", is_available: true },
+
+      // 7. ESPECIAL SALMÓN (10 piezas - envuelto en salmón)
+      { id: 9053, name: "Doble Sake Roll", description: "Salmón, queso crema y palta envuelto en salmón (10 piezas)", price: 7300, category: "cat-sushi-salmon", is_available: true },
+      { id: 9054, name: "Kani Sake Roll", description: "Kanikama, masago y palta envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9055, name: "Avocado Sake Roll", description: "Palta y queso crema envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9056, name: "Ebi Sake Roll", description: "Camarón, queso crema, palta y ciboulette envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9057, name: "Takosake Roll", description: "Pulpo, queso crema y palta envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9058, name: "Mix Sake Roll", description: "Camarón, salmón y palta envuelto en salmón (10 piezas)", price: 7300, category: "cat-sushi-salmon", is_available: true },
+      { id: 9059, name: "Chicken Sake Roll", description: "Pollo, palta y pimentón envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9060, name: "Tempura Sake Roll", description: "Camarón tempura, queso y cebollín envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9061, name: "Meat Sake Roll", description: "Carne, queso crema y ciboulette envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+      { id: 9062, name: "Tuna Sake Roll", description: "Atún, queso crema y ciboulette envuelto en salmón (10 piezas)", price: 6800, category: "cat-sushi-salmon", is_available: true },
+
+      // 8. VEGETALES (10 piezas)
+      { id: 9063, name: "Mushroom Roll", description: "Champiñón, lechuga, queso crema, cebollín envuelto en palta (10 piezas)", price: 5900, category: "cat-sushi-vegetales", is_available: true },
+      { id: 9064, name: "Nogado Roll", description: "Palmito, palta envuelto en maní (10 piezas)", price: 5300, category: "cat-sushi-vegetales", is_available: true },
+      { id: 9065, name: "Futo Tempura", description: "Pimentón, palta, queso crema, champiñón, palmito env. en nori apanado en tempura (10 piezas)", price: 5900, category: "cat-sushi-vegetales", is_available: true },
+      { id: 9066, name: "Salad Roll", description: "Palta, pepino, palmito cubierto en nori (10 piezas)", price: 5300, category: "cat-sushi-vegetales", is_available: true },
+      { id: 9067, name: "Kapa Tempura", description: "Palta, queso y pepino en tempura (10 piezas)", price: 5700, category: "cat-sushi-vegetales", is_available: true },
+
+      // 9. HAND ROLLS & TEMAKI
+      { id: 9068, name: "Hand Roll Pollo, Queso Crema y Cebollín", description: "Hand Roll apanado crujiente", price: 3900, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9069, name: "Hand Roll Kanikama y Queso Crema", description: "Hand Roll apanado crujiente", price: 3900, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9070, name: "Hand Roll Carne y Palta", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9071, name: "Hand Roll Pollo y Camarones", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9072, name: "Hand Roll Camarones y Queso Crema", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9073, name: "Hand Roll Salmón y Queso", description: "Hand Roll apanado crujiente", price: 4600, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9074, name: "Hand Roll Champiñón, Queso Crema y Cebollín", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9075, name: "Hand Roll Atún, Queso Crema y Cebollín", description: "Hand Roll apanado crujiente", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9076, name: "Temaki Sake (en cono)", description: "Salmón, palta y masago en cono de nori", price: 4800, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9077, name: "Temaki Ebi (en cono)", description: "Camarón, palta y masago en cono de nori", price: 4600, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9078, name: "Temaki Camarón, Queso Crema y Pepino", description: "En cono de nori", price: 4600, category: "cat-sushi-handrolls", is_available: true },
+      { id: 9079, name: "Temaki Vegetal (en cono)", description: "Pepino, zanahoria y lechuga en cono de nori", price: 4000, category: "cat-sushi-handrolls", is_available: true },
+
+      // 10. HOSOMAKI (8 piezas)
+      { id: 9080, name: "Hoso Kani (8 piezas)", description: "Kanikama y palta", price: 3700, category: "cat-sushi-hosomaki", is_available: true },
+      { id: 9081, name: "Hoso Sake (8 piezas)", description: "Salmón y palta", price: 4200, category: "cat-sushi-hosomaki", is_available: true },
+      { id: 9082, name: "Hoso Ebi (8 piezas)", description: "Camarón y palta", price: 4000, category: "cat-sushi-hosomaki", is_available: true },
+      { id: 9083, name: "Hoso Kapa (8 piezas)", description: "Pepino y palta", price: 3700, category: "cat-sushi-hosomaki", is_available: true },
+      { id: 9084, name: "Hosomaki Queso Crema y Camarón (8 piezas)", description: "Queso crema y camarón", price: 4000, category: "cat-sushi-hosomaki", is_available: true },
+      { id: 9085, name: "Hosomaki Queso Crema y Salmón (8 piezas)", description: "Queso crema y salmón", price: 4200, category: "cat-sushi-hosomaki", is_available: true },
+
+      // 11. GYOSAS, NIGIRI, SASHIMI & PIQUEOS
+      { id: 9086, name: "Gyosas de Pollo (5 unidades)", description: "Empanaditas japonesas de pollo", price: 4000, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9087, name: "Gyosas de Cerdo (5 unidades)", description: "Empanaditas japonesas de cerdo", price: 4000, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9088, name: "Gyosas de Camarón (5 unidades)", description: "Empanaditas japonesas de camarón", price: 4000, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9089, name: "Gyosas Mixtas (8 unidades)", description: "Surtido de gyosas", price: 6300, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9090, name: "Gyosas de Verduras (5 unidades)", description: "Empanaditas japonesas de verduras", price: 4000, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9091, name: "Nigiri Sake Salmón (3 unidades)", description: "Bocado de arroz cubierto con salmón fresco", price: 4800, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9092, name: "Nigiri Camarón (3 unidades)", description: "Bocado de arroz cubierto con camarón", price: 4300, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9093, name: "Nigiri Kanikama (3 unidades)", description: "Bocado de arroz cubierto con kanikama", price: 3900, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9094, name: "Nigiri Pulpo (3 unidades)", description: "Bocado de arroz cubierto con pulpo", price: 4300, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9095, name: "Sashimi de Salmón (8 cortes)", description: "Finos cortes de salmón fresco", price: 9500, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9096, name: "Sashimi de Pulpo (8 cortes)", description: "Finos cortes de pulpo fresco", price: 8900, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9097, name: "Sashimi de Atún (8 cortes)", description: "Finos cortes de atún fresco", price: 8900, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9098, name: "Camarón Tempura (10 unidades)", description: "Piqueo de camarones fritos en tempura", price: 9300, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9099, name: "Salmón en Panko (10 unidades)", description: "Piqueo de salmón apanado en panko", price: 9900, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9100, name: "Pollo en Panko (10 unidades)", description: "Piqueo de pollo apanado en panko", price: 9300, category: "cat-sushi-piqueos", is_available: true },
+      { id: 9101, name: "Calamar Apanado (12 unidades)", description: "Piqueo de aros de calamar apanados", price: 8800, category: "cat-sushi-piqueos", is_available: true }
+    ];
+
+    // 支持“无米饭 +$1.800”的寿司卷分类
+    const SIN_ARROZ_SUSHI_CATS = [
+      'cat-sushi-california', 'cat-sushi-palta', 'cat-sushi-queso', 'cat-sushi-hot', 'cat-sushi-salmon'
     ];
 
     let currentMenuMode = 'china';
@@ -665,25 +706,76 @@
     let orderType = 'pickup';
     let timingType = 'asap';
     let isUserClickingCategory = false;
-    let currentActiveAjiRadio = null;
     let currentMenuSwapDifference = 0;
 
-    // 🌟 单只装 BAO 选中的口味变量（默认 Cerdo）
+    // 🌟 弹窗内所有按钮的明确选中状态变量
     let selectedSingleBaoFlavor = 'Cerdo';
+    let selectedAjiValue = ''; // 默认不选（灰白），点击高亮红框，再点取消
+    let selectedPalitosValue = 'Con palitos';
+    let selectedCaliforniaWrap = 'Sésamo';
+    let selectedDrinkTempValue = 'Fría / Helada';
 
+    const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
+    const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
+
+    // 🌟 1. 辣度切换（点一下高亮，再点一下取消选中）
+    function toggleAjiChoice(val) {
+      if (selectedAjiValue === val) {
+        selectedAjiValue = '';
+      } else {
+        selectedAjiValue = val;
+      }
+      renderAjiButtons();
+    }
+
+    function renderAjiButtons() {
+      const btnCon = document.getElementById('btn-aji-con');
+      const btnAparte = document.getElementById('btn-aji-aparte');
+      if (btnCon) btnCon.className = (selectedAjiValue === 'Con ají') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      if (btnAparte) btnAparte.className = (selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+    }
+
+    // 🌟 2. BAO 单只口味切换
     function selectSingleBaoFlavor(flavor) {
       selectedSingleBaoFlavor = flavor;
       const flavors = ['Cerdo', 'Pollo', 'Verduras', 'Poroto dulce'];
       flavors.forEach(f => {
         const btnId = f === 'Poroto dulce' ? 'bao-btn-Poroto-dulce' : 'bao-btn-' + f;
         const btn = document.getElementById(btnId);
-        if (!btn) return;
-        if (f === flavor) {
-          btn.className = "flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
-        } else {
-          btn.className = "flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
+        if (btn) btn.className = (f === flavor) ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      });
+    }
+
+    // 🌟 3. 寿司筷子切换
+    function selectPalitosChoice(val) {
+      selectedPalitosValue = val;
+      const btnSi = document.getElementById('btn-palitos-si');
+      const btnNo = document.getElementById('btn-palitos-no');
+      if (btnSi) btnSi.className = (val === 'Con palitos') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      if (btnNo) btnNo.className = (val === 'Sin palitos') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+    }
+
+    // 🌟 4. California Roll 外皮切换
+    function selectCaliforniaWrap(wrap) {
+      selectedCaliforniaWrap = wrap;
+      const map = { 'Sésamo': 'wrap-btn-Sesamo', 'Masago': 'wrap-btn-Masago', 'Ciboulette': 'wrap-btn-Ciboulette', 'Nori': 'wrap-btn-Nori', 'Maní': 'wrap-btn-Mani' };
+      Object.keys(map).forEach(k => {
+        const el = document.getElementById(map[k]);
+        if (el) {
+          el.className = (k === wrap)
+            ? "py-2 px-1.5 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-xs transition"
+            : "py-2 px-1.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition";
         }
       });
+    }
+
+    // 🌟 5. 饮料温度切换
+    function selectDrinkTemp(val) {
+      selectedDrinkTempValue = val;
+      const btnFria = document.getElementById('btn-drink-fria');
+      const btnTiempo = document.getElementById('btn-drink-tiempo');
+      if (btnFria) btnFria.className = (val === 'Fría / Helada') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      if (btnTiempo) btnTiempo.className = (val === 'Al tiempo') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
     }
 
     let activeFoodBannerUrl = "bg.jpg.jpg";
@@ -702,16 +794,11 @@
           activeFoodBannerUrl = candidates[index];
           const welcomeImg = document.getElementById('welcome-img');
           if (welcomeImg) welcomeImg.src = activeFoodBannerUrl;
-
           const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
           const header = document.getElementById('store-header');
-          if (header) {
-            header.style.backgroundImage = t.headerOverlay + ", url('" + activeFoodBannerUrl + "')";
-          }
+          if (header) header.style.backgroundImage = t.headerOverlay + ", url('" + activeFoodBannerUrl + "')";
         };
-        testImg.onerror = function() {
-          tryCandidate(index + 1);
-        };
+        testImg.onerror = function() { tryCandidate(index + 1); };
       }
       tryCandidate(0);
     }
@@ -721,11 +808,9 @@
         document.getElementById('welcome-title').innerText = STORE_CONFIG.welcomeModal.title;
         document.getElementById('welcome-subtitle').innerText = STORE_CONFIG.welcomeModal.subtitle;
         document.getElementById('welcome-btn-text').innerText = STORE_CONFIG.welcomeModal.btnText;
-        
         const btnWelcome = document.getElementById('btn-welcome-close');
         const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
         btnWelcome.className = "w-full bg-gradient-to-r " + t.btnGradient + " text-white font-black py-3 rounded-2xl shadow-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition";
-
         document.getElementById('welcome-modal').classList.remove('hidden');
       }
     }
@@ -734,27 +819,15 @@
       document.getElementById('welcome-modal').classList.add('hidden');
     }
 
-    function handleAjiToggle(radio) {
-      if (currentActiveAjiRadio === radio) {
-        radio.checked = false;
-        currentActiveAjiRadio = null;
-      } else {
-        currentActiveAjiRadio = radio;
-      }
-    }
-
     function applyStoreConfig() {
       const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
-
       document.documentElement.style.setProperty('--color-primary', t.primary);
       document.documentElement.style.setProperty('--color-primary-dark', t.primaryDark);
       document.documentElement.style.setProperty('--color-primary-light', t.primaryLight);
-
       document.title = STORE_CONFIG.storeName + " - Menú Online";
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
-
       if (STORE_CONFIG.promoBanner) {
         document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
       } else {
@@ -775,7 +848,6 @@
       currentMenuMode = mode;
       const btnChina = document.getElementById('btn-tab-china');
       const btnSushi = document.getElementById('btn-tab-sushi');
-
       if (mode === 'china') {
         btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
         btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
@@ -790,12 +862,18 @@
       const container = document.getElementById('menu-container');
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
 
-      if (error) {
-        container.innerHTML = '<div class="text-center py-20 text-red-500 text-xs">Error de conexión: ' + error.message + '</div>';
-        return;
-      }
+      const dbDishes = data || [];
+      // 将内置的 85 道寿司菜单与数据库菜品智能合并（防重复）
+      const existingNames = new Set(dbDishes.map(d => (d.name || '').toLowerCase().trim()));
+      const mergedDishes = [...dbDishes];
 
-      allDishes = data || [];
+      BUILT_IN_SUSHI_DISHES.forEach(sushiItem => {
+        if (!existingNames.has(sushiItem.name.toLowerCase().trim())) {
+          mergedDishes.push(sushiItem);
+        }
+      });
+
+      allDishes = mergedDishes;
       renderCurrentMenu();
       setupScrollSpy();
     }
@@ -840,29 +918,19 @@
       if (!dish.is_available) {
         return '<button class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 font-black text-base flex items-center justify-center shrink-0">✕</button>';
       }
-
       const qty = getDishCartQty(dishId);
       const isBao = checkIsBao(dish);
       const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category) && !isBao;
       const addCall = isDirectAdd ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
 
       if (qty === 0) {
-        return `
-          <button onclick="${addCall}" class="w-8 h-8 rounded-full theme-bg-primary text-white font-black text-base flex items-center justify-center shrink-0 shadow-md active:scale-90 transition">
-            +
-          </button>
-        `;
+        return `<button onclick="${addCall}" class="w-8 h-8 rounded-full theme-bg-primary text-white font-black text-base flex items-center justify-center shrink-0 shadow-md active:scale-90 transition">+</button>`;
       }
-
       return `
         <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
-          <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
-            -
-          </button>
+          <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">-</button>
           <span class="text-xs font-black text-gray-900 px-1 min-w-[16px] text-center">${qty}</span>
-          <button onclick="${addCall}" class="w-7 h-7 rounded-full theme-bg-primary text-white font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">
-            +
-          </button>
+          <button onclick="${addCall}" class="w-7 h-7 rounded-full theme-bg-primary text-white font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">+</button>
         </div>
       `;
     }
@@ -870,7 +938,6 @@
     function renderDishesList(cats) {
       const container = document.getElementById('menu-container');
       let html = '';
-
       cats.forEach(cat => {
         const items = allDishes.filter(d => d.category === cat.id);
         if (items.length === 0) return;
@@ -880,17 +947,13 @@
         html += '  <span class="text-sm">' + cat.icon + '</span>';
         html += '  <h2 class="text-xs font-black text-gray-800 uppercase tracking-wider">' + cat.title + '</h2>';
         html += '  <span class="text-[10px] font-bold text-gray-400 ml-auto bg-gray-200/60 px-2 py-0.5 rounded-full">' + items.length + '</span>';
-        html += '</div>';
-        html += '<div class="space-y-2">';
+        html += '</div><div class="space-y-2">';
 
         items.forEach(dish => {
           const isSoldOut = !dish.is_available;
           const isBao = checkIsBao(dish);
           const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category) && !isBao;
-          const cardClickAction = isDirectAdd 
-            ? 'handleDirectAdd(' + dish.id + ', event)' 
-            : 'openOptionModal(' + dish.id + ', event)';
-
+          const cardClickAction = isDirectAdd ? 'handleDirectAdd(' + dish.id + ', event)' : 'openOptionModal(' + dish.id + ', event)';
           const clickAttr = isSoldOut ? '' : 'onclick="' + cardClickAction + '"';
           const cardStyle = isSoldOut 
             ? 'bg-white/60 p-3 rounded-2xl border border-gray-200/50 flex justify-between items-center opacity-60 cursor-not-allowed' 
@@ -901,34 +964,17 @@
 
           html += '<div ' + clickAttr + ' class="' + cardStyle + ' dish-card" data-dishname="' + dish.name.toLowerCase() + '" data-dishdesc="' + descText.toLowerCase() + '">';
           html += '  <div class="flex-1 pr-3">';
-          html += '    <div class="flex items-center gap-1.5">';
-          html += '      <h3 class="font-extrabold text-xs text-gray-900 leading-snug">' + dish.name + '</h3>';
-          html +=        badge;
-          html += '    </div>';
-          if (descText) {
-            html += '    <p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
-          }
-          html += '    <div class="mt-1.5 flex items-baseline gap-1">';
-          html += '      <span class="text-[10px] font-bold theme-text-primary">$</span>';
-          html += '      <span class="text-sm font-black theme-text-primary tracking-tight">' + priceStr + '</span>';
-          html += '      <span class="text-[9px] font-semibold text-gray-400">CLP</span>';
-          html += '    </div>';
+          html += '    <div class="flex items-center gap-1.5"><h3 class="font-extrabold text-xs text-gray-900 leading-snug">' + dish.name + '</h3>' + badge + '</div>';
+          if (descText) html += '<p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
+          html += '    <div class="mt-1.5 flex items-baseline gap-1"><span class="text-[10px] font-bold theme-text-primary">$</span><span class="text-sm font-black theme-text-primary tracking-tight">' + priceStr + '</span><span class="text-[9px] font-semibold text-gray-400">CLP</span></div>';
           html += '  </div>';
-
-          html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">';
-          html +=      renderDishActionBtn(dish.id);
-          html += '  </div>';
-
+          html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">' + renderDishActionBtn(dish.id) + '</div>';
           html += '</div>';
         });
-
         html += '</div></section>';
       });
 
-      if (!html) {
-        html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
-      }
-
+      if (!html) html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
       html += '<div class="h-44 w-full shrink-0 pointer-events-none"></div>';
       container.innerHTML = html;
     }
@@ -937,19 +983,9 @@
       if (event) event.stopPropagation();
       const dish = allDishes.find(i => i.id === dishId);
       if (!dish || !dish.is_available) return;
-
       const existing = cart.find(item => item.dishId === dish.id && item.options.length === 0);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({
-          dishId: dish.id,
-          name: dish.name,
-          unitPrice: dish.price,
-          qty: 1,
-          options: []
-        });
-      }
+      if (existing) existing.qty += 1;
+      else cart.push({ dishId: dish.id, name: dish.name, unitPrice: dish.price, qty: 1, options: [] });
       updateCartUI();
     }
 
@@ -957,11 +993,8 @@
       if (event) event.stopPropagation();
       for (let i = cart.length - 1; i >= 0; i--) {
         if (cart[i].dishId === dishId) {
-          if (cart[i].qty > 1) {
-            cart[i].qty -= 1;
-          } else {
-            cart.splice(i, 1);
-          }
+          if (cart[i].qty > 1) cart[i].qty -= 1;
+          else cart.splice(i, 1);
           break;
         }
       }
@@ -977,7 +1010,6 @@
       });
       document.getElementById('cart-total-count').innerText = totalQty;
       document.getElementById('cart-total-price').innerText = totalPrice.toLocaleString('es-CL');
-
       document.querySelectorAll('[data-dish-action-id]').forEach(el => {
         const id = parseInt(el.getAttribute('data-dish-action-id'));
         el.innerHTML = renderDishActionBtn(id);
@@ -986,56 +1018,39 @@
 
     function filterMenuItems() {
       const q = document.getElementById('quick-search').value.toLowerCase().trim();
-      const cards = document.querySelectorAll('.dish-card');
-      cards.forEach(card => {
+      document.querySelectorAll('.dish-card').forEach(card => {
         const name = card.getAttribute('data-dishname') || '';
         const desc = card.getAttribute('data-dishdesc') || '';
-        if (name.includes(q) || desc.includes(q)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
+        card.style.display = (name.includes(q) || desc.includes(q)) ? 'flex' : 'none';
       });
     }
 
     function setupScrollSpy() {
       const menuContainer = document.getElementById('menu-container');
       if (!menuContainer) return;
-
       menuContainer.addEventListener('scroll', () => {
         if (isUserClickingCategory) return;
-
         const sections = menuContainer.querySelectorAll('.dish-section');
         let currentCatId = '';
         const containerTop = menuContainer.getBoundingClientRect().top;
-
         sections.forEach(sec => {
           const rect = sec.getBoundingClientRect();
-          if (rect.top - containerTop <= 90) {
-            currentCatId = sec.getAttribute('data-cat-id');
-          }
+          if (rect.top - containerTop <= 90) currentCatId = sec.getAttribute('data-cat-id');
         });
-
-        if (currentCatId) {
-          highlightSidebarCategory(currentCatId, false);
-        }
+        if (currentCatId) highlightSidebarCategory(currentCatId, false);
       });
     }
 
     function highlightSidebarCategory(catId, shouldScrollSidebar = true) {
       const sidebar = document.getElementById('sidebar-categories');
       if (!sidebar) return;
-
       sidebar.querySelectorAll('button').forEach(btn => {
         btn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
       });
-
       const activeBtn = document.getElementById('side-btn-' + catId);
       if (activeBtn) {
         activeBtn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
-        if (shouldScrollSidebar) {
-          activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+        if (shouldScrollSidebar) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 
@@ -1045,79 +1060,47 @@
         isUserClickingCategory = true;
         highlightSidebarCategory(catId, true);
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        setTimeout(() => {
-          isUserClickingCategory = false;
-        }, 500);
+        setTimeout(() => { isUserClickingCategory = false; }, 500);
       }
     }
 
     function populateMenuSwapSelectors(currentDish) {
       const selectFrom = document.getElementById('swap-dish-from');
       const selectTo = document.getElementById('swap-dish-to');
-
       const validChineseCatIds = [
         'cat-aperitivos', 'cat-vacuno', 'cat-pollo', 'cat-cerdo',
         'cat-chaumin', 'cat-arroz', 'cat-sopas', 'cat-chapsui',
         'cat-dragon', 'cat-mariscos', 'cat-parrilladas'
       ];
-
-      const singleChineseDishes = allDishes.filter(d => 
-        validChineseCatIds.includes(d.category) && 
-        !d.is_colacion && 
-        d.is_available
-      );
+      const singleChineseDishes = allDishes.filter(d => validChineseCatIds.includes(d.category) && !d.is_colacion && d.is_available);
 
       let fromHtml = '<option value="">-- Sin cambio (Menú estándar) --</option>';
       const desc = currentDish.description || '';
       const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
-
-      const normalizeStr = str => (str || '').toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9\s]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-
+      const normalizeStr = str => (str || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
       const matchedItems = [];
 
       rawParts.forEach(raw => {
         const clean = raw.replace(/^\d+[\s\.\-xX]*(unidades|u|uds)?\s*/i, '').replace(/\([^)]*\)/g, '').trim();
         const normClean = normalizeStr(clean);
         if (!normClean) return;
-
         let matched = singleChineseDishes.find(d => normalizeStr(d.name) === normClean);
-        if (!matched) {
-          matched = singleChineseDishes.find(d => normalizeStr(d.name).includes(normClean) || normClean.includes(normalizeStr(d.name)));
-        }
+        if (!matched) matched = singleChineseDishes.find(d => normalizeStr(d.name).includes(normClean) || normClean.includes(normalizeStr(d.name)));
         if (!matched) {
           const cleanTokens = normClean.split(" ").filter(t => t.length > 2);
           let bestOverlap = 0;
           singleChineseDishes.forEach(d => {
             const dTokens = normalizeStr(d.name).split(" ").filter(t => t.length > 2);
             const overlap = cleanTokens.filter(t => dTokens.includes(t)).length;
-            if (overlap > bestOverlap && overlap >= 2) {
-              bestOverlap = overlap;
-              matched = d;
-            }
+            if (overlap > bestOverlap && overlap >= 2) { bestOverlap = overlap; matched = d; }
           });
         }
-
         if (matched) {
           if (!matchedItems.some(item => item.id === matched.id)) {
-            matchedItems.push({
-              id: matched.id,
-              name: matched.name,
-              price: matched.price,
-              displayName: clean.charAt(0).toUpperCase() + clean.slice(1)
-            });
+            matchedItems.push({ id: matched.id, name: matched.name, price: matched.price, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
           }
         } else {
-          matchedItems.push({
-            id: 'custom_' + normClean,
-            name: clean,
-            price: 0,
-            displayName: clean.charAt(0).toUpperCase() + clean.slice(1)
-          });
+          matchedItems.push({ id: 'custom_' + normClean, name: clean, price: 0, displayName: clean.charAt(0).toUpperCase() + clean.slice(1) });
         }
       });
 
@@ -1145,7 +1128,6 @@
         }
       });
       selectTo.innerHTML = toHtml;
-
       selectFrom.value = "";
       selectTo.value = "";
       currentMenuSwapDifference = 0;
@@ -1158,7 +1140,6 @@
       const toSelect = document.getElementById('swap-dish-to');
       const badge = document.getElementById('swap-diff-badge');
       const amountEl = document.getElementById('swap-diff-amount');
-
       const fromOption = fromSelect.selectedOptions[0];
       const toOption = toSelect.selectedOptions[0];
 
@@ -1167,10 +1148,8 @@
         badge.classList.add('hidden');
         return;
       }
-
       const priceFrom = parseFloat(fromOption.getAttribute('data-price')) || 0;
       const priceTo = parseFloat(toOption.getAttribute('data-price')) || 0;
-
       const diff = priceTo - priceFrom;
       currentMenuSwapDifference = diff;
 
@@ -1193,7 +1172,6 @@
       if (!currentSelectedDish || !currentSelectedDish.is_available) return;
 
       const isBao = checkIsBao(currentSelectedDish);
-
       if (DIRECT_ADD_CATEGORIES.includes(currentSelectedDish.category) && !isBao) {
         handleDirectAdd(dishId, event);
         return;
@@ -1209,16 +1187,15 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
       const isColacion = currentSelectedDish.is_colacion;
 
-      // 🌟 控制 BAO 专属口味模块
+      // 1. BAO 控制
       const boxBao = document.getElementById('box-bao-options');
       boxBao.classList.toggle('hidden', !isBao);
       if (isBao) {
         const isTriple = checkIsTripleBao(currentSelectedDish);
         document.getElementById('bao-single-box').classList.toggle('hidden', isTriple);
         document.getElementById('bao-triple-box').classList.toggle('hidden', !isTriple);
-
         if (!isTriple) {
-          selectSingleBaoFlavor('Cerdo'); // 默认选中 Cerdo 并渲染红框高亮
+          selectSingleBaoFlavor('Cerdo');
         } else {
           document.getElementById('bao-select-1').value = "Cerdo";
           document.getElementById('bao-select-2').value = "Pollo";
@@ -1226,37 +1203,45 @@
         }
       }
 
-      // 控制套餐换菜
+      // 2. 套餐换菜控制
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isMenu);
-      if (isMenu) {
-        populateMenuSwapSelectors(currentSelectedDish);
-      }
+      if (isMenu) populateMenuSwapSelectors(currentSelectedDish);
 
-      // 控制便当配餐
+      // 3. 便当配餐控制
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
 
-      // 控制常规中餐选项（BAO 自动隐藏辣度、少盐等炒菜选项）
+      // 4. 显示/隐藏各大面板
       document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink || isBao);
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
 
-      document.querySelectorAll('input[name="opt-aji"]').forEach(r => r.checked = false);
-      currentActiveAjiRadio = null;
-
       if (isSushi) {
+        // 判断是否为 California Roll（显示外皮选择）
+        const isCalifornia = currentSelectedDish.category === 'cat-sushi-california';
+        document.getElementById('sushi-california-wrap-box').classList.toggle('hidden', !isCalifornia);
+        if (isCalifornia) selectCaliforniaWrap('Sésamo');
+
+        // 判断是否支持“Sin arroz +$1.800”
+        const canSinArroz = SIN_ARROZ_SUSHI_CATS.includes(currentSelectedDish.category);
+        document.getElementById('sushi-sin-arroz-box').classList.toggle('hidden', !canSinArroz);
+        document.getElementById('sushi-sin-arroz').checked = false;
+
         document.getElementById('sushi-soya').checked = true;
         document.getElementById('sushi-teriyaki').checked = true;
         document.getElementById('sushi-wasabi').checked = false;
         document.getElementById('sushi-jengibre').checked = false;
-        document.querySelector('input[name="opt-palitos"][value="Con palitos"]').checked = true;
+        selectPalitosChoice('Con palitos');
         document.getElementById('sushi-no-queso').checked = false;
         document.getElementById('sushi-no-cebollin').checked = false;
         document.getElementById('sushi-no-sesamo').checked = false;
         document.getElementById('sushi-bien-dorado').checked = false;
       } else if (isDrink) {
-        document.querySelector('input[name="opt-drink-temp"][value="Fría / Helada"]').checked = true;
+        selectDrinkTemp('Fría / Helada');
       } else if (!isBao) {
+        // 重置中餐辣度为未选中（不亮）
+        selectedAjiValue = '';
+        renderAjiButtons();
         document.getElementById('pref-sal').checked = false;
         document.getElementById('pref-sillao').checked = false;
         document.getElementById('pref-cebollin').checked = false;
@@ -1280,10 +1265,8 @@
 
       let extraPrice = 0;
       let optionsList = [];
-
       const isBao = checkIsBao(currentSelectedDish);
 
-      // 🌟 提取 BAO 口味选项（纯西文）
       if (isBao) {
         const isTriple = checkIsTripleBao(currentSelectedDish);
         if (isTriple) {
@@ -1296,32 +1279,24 @@
         }
       }
 
-      // 套餐换菜计价
       if (currentSelectedDish.category === 'cat-menus') {
         const fromSelect = document.getElementById('swap-dish-from');
         const toSelect = document.getElementById('swap-dish-to');
         const swapNote = document.getElementById('menu-swap-note').value.trim();
-
         if (fromSelect.value && toSelect.value) {
           const fromOption = fromSelect.selectedOptions[0];
           const toOption = toSelect.selectedOptions[0];
           const fromName = fromOption.getAttribute('data-name') || fromOption.innerText.split(' ($')[0];
           const toName = toOption.getAttribute('data-name') || toOption.innerText.split(' ($')[0];
-
           extraPrice += currentMenuSwapDifference;
           const diffSign = currentMenuSwapDifference > 0 
             ? `+$${Number(currentMenuSwapDifference).toLocaleString('es-CL')}` 
             : (currentMenuSwapDifference < 0 ? `-$${Number(Math.abs(currentMenuSwapDifference)).toLocaleString('es-CL')}` : `$0`);
-
           optionsList.push(`Cambio: ${fromName} ➔ ${toName} (${diffSign})`);
         }
-
-        if (swapNote) {
-          optionsList.push(`Nota: ${swapNote}`);
-        }
+        if (swapNote) optionsList.push(`Nota: ${swapNote}`);
       }
 
-      // 便当
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -1334,6 +1309,13 @@
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
 
       if (isSushi) {
+        if (currentSelectedDish.category === 'cat-sushi-california') {
+          optionsList.push('Envuelto en: ' + selectedCaliforniaWrap);
+        }
+        if (SIN_ARROZ_SUSHI_CATS.includes(currentSelectedDish.category) && document.getElementById('sushi-sin-arroz').checked) {
+          optionsList.push('Sin arroz (+$1.800)');
+          extraPrice += 1800;
+        }
         let salsas = [];
         if (document.getElementById('sushi-soya').checked) salsas.push('Soya');
         if (document.getElementById('sushi-teriyaki').checked) salsas.push('Teriyaki');
@@ -1341,22 +1323,18 @@
         if (document.getElementById('sushi-jengibre').checked) salsas.push('Jengibre');
         if (salsas.length > 0) optionsList.push('Salsas: ' + salsas.join(', '));
 
-        const palitosChoice = document.querySelector('input[name="opt-palitos"]:checked').value;
-        optionsList.push(palitosChoice);
+        optionsList.push(selectedPalitosValue);
 
         if (document.getElementById('sushi-no-queso').checked) optionsList.push('Sin queso crema');
         if (document.getElementById('sushi-no-cebollin').checked) optionsList.push('Sin cebollín');
         if (document.getElementById('sushi-no-sesamo').checked) optionsList.push('Sin sésamo');
         if (document.getElementById('sushi-bien-dorado').checked) optionsList.push('Bien dorado');
       } else if (isDrink) {
-        const tempChoice = document.querySelector('input[name="opt-drink-temp"]:checked').value;
-        optionsList.push(tempChoice);
+        optionsList.push(selectedDrinkTempValue);
       } else if (!isBao) {
-        const ajiRadio = document.querySelector('input[name="opt-aji"]:checked');
-        if (ajiRadio) {
-          optionsList.push(ajiRadio.value);
+        if (selectedAjiValue) {
+          optionsList.push(selectedAjiValue);
         }
-
         if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
         if (document.getElementById('pref-sillao').checked) optionsList.push('Poco sillao');
         if (document.getElementById('pref-cebollin').checked) optionsList.push('Sin cebollín');
@@ -1382,7 +1360,6 @@
       const btnPick = document.getElementById('btn-pickup');
       const btnDel = document.getElementById('btn-delivery');
       const addrBox = document.getElementById('address-box');
-
       if (type === 'pickup') {
         btnPick.className = "p-2.5 rounded-xl border-2 theme-border-primary bg-white theme-text-primary shadow-sm text-center transition";
         btnDel.className = "p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 text-center transition";
@@ -1400,7 +1377,6 @@
       const btnAsap = document.getElementById('btn-time-asap');
       const btnSchedule = document.getElementById('btn-time-schedule');
       const box = document.getElementById('schedule-time-box');
-
       if (type === 'asap') {
         btnAsap.className = "p-2.5 rounded-xl border-2 theme-border-primary bg-white theme-text-primary shadow-sm text-center transition";
         btnSchedule.className = "p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 text-center transition";
@@ -1421,9 +1397,7 @@
 
     function refreshCheckoutTotal() {
       let subtotal = 0;
-      cart.forEach(item => {
-        subtotal += item.unitPrice * item.qty;
-      });
+      cart.forEach(item => { subtotal += item.unitPrice * item.qty; });
       const deliveryFee = (orderType === 'delivery') ? STORE_CONFIG.deliveryFee : 0;
       const grandTotal = subtotal + deliveryFee;
       document.getElementById('modal-checkout-total').innerText = grandTotal.toLocaleString('es-CL');
@@ -1440,11 +1414,7 @@
         const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
         const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-400 leading-tight mt-0.5">• ' + item.options.join('<br>• ') + '</div>' : '';
         previewHtml += '<div class="py-2 flex justify-between items-start">';
-        previewHtml += '  <div class="flex-1 pr-2">';
-        previewHtml += '    <div class="font-extrabold text-gray-900 text-xs">' + item.qty + 'x ' + item.name + '</div>';
-        previewHtml +=      optText;
-        previewHtml += '    <div class="theme-text-primary font-black mt-0.5 text-xs">$ ' + itemTotal + ' CLP</div>';
-        previewHtml += '  </div>';
+        previewHtml += '  <div class="flex-1 pr-2"><div class="font-extrabold text-gray-900 text-xs">' + item.qty + 'x ' + item.name + '</div>' + optText + '<div class="theme-text-primary font-black mt-0.5 text-xs">$ ' + itemTotal + ' CLP</div></div>';
         previewHtml += '  <button onclick="removeFromCart(' + index + ')" class="text-red-500 hover:text-red-700 text-[11px] px-2 py-1 font-bold rounded-lg bg-red-50">Quitar</button>';
         previewHtml += '</div>';
       });
@@ -1482,22 +1452,13 @@
       const cashGiven = parseFloat(document.getElementById('cust-cash').value) || 0;
       const notes = document.getElementById('cust-notes').value.trim();
 
-      if (!name || !phone) {
-        alert("Por favor completa tu nombre y teléfono.");
-        return;
-      }
-      if (orderType === 'delivery' && !address) {
-        alert("Por favor ingresa tu dirección para el envío.");
-        return;
-      }
+      if (!name || !phone) { alert("Por favor completa tu nombre y teléfono."); return; }
+      if (orderType === 'delivery' && !address) { alert("Por favor ingresa tu dirección para el envío."); return; }
 
       let scheduleTimeVal = "";
       if (timingType === 'schedule') {
         scheduleTimeVal = document.getElementById('cust-schedule-time').value;
-        if (!scheduleTimeVal) {
-          alert("Por favor indica la hora deseada para retirar o recibir tu pedido.");
-          return;
-        }
+        if (!scheduleTimeVal) { alert("Por favor indica la hora deseada para retirar o recibir tu pedido."); return; }
       }
 
       const orderCode = STORE_CONFIG.orderCodePrefix + '-' + Math.floor(1000000000 + Math.random() * 9000000000);
@@ -1532,14 +1493,11 @@
 
       const serviceType = orderType === 'pickup' ? 'Para llevar (Retiro en local)' : 'Delivery (Envío a domicilio)';
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
-
-      const timingLine = timingType === 'asap' 
-        ? '⚡ Lo antes posible (Inmediato)' 
-        : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
+      const timingLine = timingType === 'asap' ? '⚡ Lo antes posible (Inmediato)' : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
 
       const message = orderCode + '\n' +
         '📅 ' + dt.date + ' ⏰ ' + dt.time + '\n\n' +
-        'Tipo de servicio: ' + serviceType + '\n\n' +
+        'Tipo de servicio: ' + serviceType + '\n' +
         'Horario de entrega: ' + timingLine + '\n\n' +
         'Nombre: ' + name + '\n' +
         'Teléfono: ' + phone + addressLine + '\n\n' +
