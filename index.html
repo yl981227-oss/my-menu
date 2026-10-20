@@ -375,32 +375,44 @@
         </div>
       </div>
 
-      <!-- 🌟 B. 套餐换菜模块（按品类严格锁定 + 米饭按份数拆分，支持同时换多个菜或饭） -->
-      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/90 shadow-sm">
-        <div class="flex justify-between items-center mb-1">
-          <label class="block text-xs font-black text-amber-900 flex items-center gap-1"><span>🔄</span> Personaliza / Cambia platos del menú</label>
-          <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
-        </div>
-        <p class="text-[10px] text-amber-800/80 mb-2.5 leading-tight">
-          Toca cualquier plato o arroz incluido en este menú si deseas cambiarlo (Aperitivos por Aperitivos, Platos por Platos, Arroz por Arroz):
-        </p>
-
-        <!-- 动态生成的套餐内各菜品/米饭独立替换列表 -->
-        <div id="menu-swap-rows-container" class="space-y-2 text-xs"></div>
-
-        <!-- 差价汇总指示器 -->
-        <div id="swap-diff-badge" class="hidden mt-2.5 bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
-          <span class="font-bold text-gray-700">Diferencia total por cambios:</span>
-          <span id="swap-diff-amount" class="font-black text-rose-600">+$0 CLP</span>
+      <!-- 🌟 B. 极简递进式套餐换菜 + 一键 ×1/×2/×3 换白饭模块 -->
+      <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3.5 rounded-2xl border border-amber-200/90 shadow-sm space-y-3">
+        <!-- 1. 一键把炒饭换成白饭 (×1 / ×2 / ×3) -->
+        <div id="menu-rice-swap-box" class="hidden pb-3 border-b border-amber-200/80">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="block text-xs font-black text-amber-950">🍚 ¿Cambiar Chaufán por Arroz Blanco?</span>
+              <span class="text-[10px] text-amber-800/80">Elige cuántos cambias a blanco (Gratis)</span>
+            </div>
+            <div id="menu-rice-btns" class="flex items-center gap-1 shrink-0"></div>
+          </div>
         </div>
 
-        <div class="mt-2.5">
-          <label class="block text-[10px] font-bold text-amber-900/80 mb-1">Nota adicional sobre el cambio (opcional):</label>
-          <input id="menu-swap-note" type="text" placeholder="Ej: Detalle adicional..." class="w-full border border-amber-300 bg-white rounded-xl p-2 text-xs text-gray-800 outline-none focus:border-amber-600 placeholder-gray-400">
+        <!-- 2. 递进式换菜区（默认只显示 1 个选框，换完才问要不要继续换） -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-xs font-black text-amber-950 flex items-center gap-1">
+              <span>🔄</span> ¿Deseas cambiar algún plato del menú?
+            </label>
+            <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">Opcional</span>
+          </div>
+
+          <div id="progressive-swap-list" class="space-y-2.5 text-xs"></div>
+
+          <!-- 换完第1个菜后才弹出的“继续换下一个菜”按钮 -->
+          <button type="button" id="btn-add-more-swap" onclick="addAnotherSwapStep()" class="hidden mt-2.5 w-full py-2 px-3 rounded-xl border border-dashed border-amber-500 bg-amber-100/50 hover:bg-amber-100 text-amber-900 font-black text-xs flex items-center justify-center gap-1 active:scale-95 transition">
+            <span>➕ ¿Cambiar otro plato más?</span>
+          </button>
+
+          <!-- 差价汇总指示器 -->
+          <div id="swap-diff-badge" class="hidden mt-2.5 bg-white p-2.5 rounded-xl border border-amber-300 flex justify-between items-center text-xs shadow-sm">
+            <span class="font-bold text-gray-700">Diferencia por cambio:</span>
+            <span id="swap-diff-amount" class="font-black text-rose-600">+$0 CLP</span>
+          </div>
         </div>
       </div>
 
-      <!-- 🌟 C. Colaciones 便当配餐 4 选 1（炒饭、白饭均免费，薯条+$500，炒面+$800） -->
+      <!-- C. Colaciones 便当配餐 4 选 1 -->
       <div id="colacion-side-box" class="hidden mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
         <label class="block text-xs font-black text-gray-800 mb-2">🍱 Elige tu Acompañamiento *</label>
         <div class="space-y-1.5 text-xs">
@@ -423,7 +435,7 @@
         </div>
       </div>
 
-      <!-- 🌟 D. 中餐专属定制（含新增的 4 款 +$600 CLP 加料选项） -->
+      <!-- D. 中餐专属定制（含 4 款 +$600 CLP 加料选项） -->
       <div id="box-china-options" class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
@@ -440,7 +452,6 @@
           </div>
         </div>
 
-        <!-- 🌟 新增：中餐加料选项（Champiñón、Alga、Almendras、Ajo 各 $600 CLP） -->
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🍄 Agregar Extra al Plato</label>
@@ -843,49 +854,45 @@
 
     const SUSHI_COMBO_ITEMS_MAP = {
       9001: [
-        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
-        { id: 9045, name: "Chicken Tempura Roll", price: 6300 }
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600, type: "sushi" },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300, type: "sushi" }
       ],
       9002: [
-        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
-        { id: 9045, name: "Chicken Tempura Roll", price: 6300 },
-        { id: 9043, name: "Sake Tempura Roll", price: 6900 }
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600, type: "sushi" },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300, type: "sushi" },
+        { id: 9043, name: "Sake Tempura Roll", price: 6900, type: "sushi" }
       ],
       9003: [
-        { id: 9042, name: "Ebi Tempura Roll", price: 6600 },
-        { id: 9045, name: "Chicken Tempura Roll", price: 6300 },
-        { id: 9043, name: "Sake Tempura Roll", price: 6900 },
-        { id: 9046, name: "Tako Tempura Roll", price: 6600 }
+        { id: 9042, name: "Ebi Tempura Roll", price: 6600, type: "sushi" },
+        { id: 9045, name: "Chicken Tempura Roll", price: 6300, type: "sushi" },
+        { id: 9043, name: "Sake Tempura Roll", price: 6900, type: "sushi" },
+        { id: 9046, name: "Tako Tempura Roll", price: 6600, type: "sushi" }
       ],
       9004: [
-        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
-        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
-        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000 }
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000, type: "sushi" },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900, type: "sushi" },
+        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000, type: "sushi" }
       ],
       9005: [
-        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
-        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
-        { id: 9014, name: "1 California Ebi", price: 6000 },
-        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000 }
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000, type: "sushi" },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900, type: "sushi" },
+        { id: 9014, name: "1 California Ebi", price: 6000, type: "sushi" },
+        { id: 9086, name: "1 Gyosas Mixtas (5 u.)", price: 4000, type: "sushi" }
       ],
       9006: [
-        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000 },
-        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
-        { id: 9014, name: "1 California Ebi", price: 6000 },
-        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600 },
-        { id: 9089, name: "1 Gyosas Mixtas (8 u.)", price: 6300 }
+        { id: 9082, name: "1 Hosomaki (Camarón y palta)", price: 4000, type: "sushi" },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900, type: "sushi" },
+        { id: 9014, name: "1 California Ebi", price: 6000, type: "sushi" },
+        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600, type: "sushi" },
+        { id: 9089, name: "1 Gyosas Mixtas (8 u.)", price: 6300, type: "sushi" }
       ],
       9007: [
-        { id: 9082, name: "1° Hosomaki (Camarón y palta)", price: 4000 },
-        { id: 9081, name: "2° Hosomaki (Salmón y palta)", price: 4200 },
-        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900 },
-        { id: 9014, name: "1 California Ebi", price: 6000 },
-        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600 },
-        { id: "nigiri_salmon_2", name: "2 Nigiri Salmón", price: 3200 },
-        { id: "nigiri_camaron_2", name: "2 Nigiri Camarón", price: 2900 },
-        { id: "sashimi_salmon_4", name: "4 Sashimi Salmón", price: 4800 },
-        { id: "sashimi_pulpo_4", name: "4 Sashimi Pulpo", price: 4500 },
-        { id: "gyosas_10", name: "1 Gyosas Mixtas (10 u.)", price: 8000 }
+        { id: 9082, name: "1° Hosomaki", price: 4000, type: "sushi" },
+        { id: 9081, name: "2° Hosomaki", price: 4200, type: "sushi" },
+        { id: 9025, name: "1 Sake Roll (Envuelto en palta)", price: 6900, type: "sushi" },
+        { id: 9014, name: "1 California Ebi", price: 6000, type: "sushi" },
+        { id: 9042, name: "1 Ebi Tempura Roll", price: 6600, type: "sushi" },
+        { id: "gyosas_10", name: "1 Gyosas Mixtas (10 u.)", price: 8000, type: "sushi" }
       ]
     };
 
@@ -893,7 +900,6 @@
       'cat-sushi-california', 'cat-sushi-palta', 'cat-sushi-queso', 'cat-sushi-hot', 'cat-sushi-salmon'
     ];
 
-    // 主菜分类列表（严格排除 BAO、Aperitivos、Sopas、Arroz、Colaciones、Bebidas）
     const MAIN_CHINESE_DISH_CATS = [
       'cat-vacuno', 'cat-pollo', 'cat-cerdo', 'cat-chaumin',
       'cat-chapsui', 'cat-dragon', 'cat-mariscos', 'cat-parrilladas'
@@ -917,7 +923,6 @@
     let selectedSushiWasabi = false;
     let selectedSushiJengibre = false;
 
-    // 🌟 中餐加料（+$600 CLP c/u）状态字典
     let selectedChinaExtras = {
       'Champiñón': false,
       'Alga': false,
@@ -929,10 +934,15 @@
     let extraSoyaCount = 0;
     let extraTeriyakiCount = 0;
 
+    // 🌟 极简递进式换菜与 ×1/×2/×3 白饭状态变量
+    let currentMenuMaxRice = 0;
+    let selectedWhiteRiceSwapCount = 0;
+    let currentComboOriginalItems = []; // 当前套餐内可被替换的非米饭菜品
+    let progressiveSwaps = [];          // 递进式换菜槽位数组，默认只有 1 个 [{ fromIdx: '', toId: '', toName: '', toPrice: 0 }]
+
     const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
     const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
 
-    // 🌟 切换中餐 $600 加料按钮
     function toggleChinaExtra(item) {
       selectedChinaExtras[item] = !selectedChinaExtras[item];
       renderChinaExtrasButtons();
@@ -1516,7 +1526,7 @@
     }
 
     // =====================================================
-    // 🌟 智能套餐换菜引擎（按品类严格锁定 + 米饭按份数拆分）
+    // 🌟 极简递进式换菜引擎 + 一键 ×1/×2/×3 换白饭
     // =====================================================
     function normalizeTokens(str) {
       const stopWords = new Set(['de', 'con', 'en', 'al', 'el', 'la', 'los', 'las', 'un', 'una', 'y', 'o', 'u', 'unidades', 'porcion']);
@@ -1544,7 +1554,6 @@
         const overlap = targetTokens.filter(t => dTokens.includes(t)).length;
         if (overlap === 0) return;
 
-        // 精确度评分：重合词数占比越高分越高
         const score = (overlap * 2) / (targetTokens.length + dTokens.length);
         if (score > bestScore) {
           bestScore = score;
@@ -1566,196 +1575,281 @@
       return 'plato';
     }
 
-    function populateMenuSwapSelectors(currentDish) {
-      const container = document.getElementById('menu-swap-rows-container');
-      currentMenuSwapDifference = 0;
-      document.getElementById('swap-diff-badge').classList.add('hidden');
-      document.getElementById('menu-swap-note').value = "";
+    // 渲染一键换白饭按钮组 (No / ×1 / ×2 / ×3...)
+    function selectWhiteRiceSwapCount(count) {
+      selectedWhiteRiceSwapCount = count;
+      renderWhiteRiceButtons();
+    }
 
-      const isSushiPromo = currentDish.category === 'cat-sushi-promos';
+    function renderWhiteRiceButtons() {
+      const box = document.getElementById('menu-rice-swap-box');
+      const btnsContainer = document.getElementById('menu-rice-btns');
+      if (!box || !btnsContainer) return;
 
-      if (isSushiPromo) {
+      if (currentMenuMaxRice <= 0) {
+        box.classList.add('hidden');
+        return;
+      }
+
+      box.classList.remove('hidden');
+      let html = '';
+
+      for (let i = 0; i <= currentMenuMaxRice; i++) {
+        const isSelected = (selectedWhiteRiceSwapCount === i);
+        const label = (i === 0) ? 'No' : `×${i}`;
+        const btnStyle = isSelected
+          ? "px-2.5 py-1.5 rounded-xl border-2 border-red-600 bg-red-600 text-white font-black text-xs shadow-xs transition"
+          : "px-2.5 py-1.5 rounded-xl border border-amber-300 bg-white text-gray-700 font-bold text-xs hover:border-amber-500 transition";
+
+        html += `<button type="button" onclick="selectWhiteRiceSwapCount(${i})" class="${btnStyle}">${label}</button>`;
+      }
+
+      btnsContainer.innerHTML = html;
+    }
+
+    // 获取某个槽位类型对应的可替换目标 HTML（严格同类互换）
+    function getTargetOptionsHtmlForType(slotType) {
+      if (slotType === 'sushi') {
         const validSushiCatIds = [
           'cat-sushi-california', 'cat-sushi-palta', 'cat-sushi-queso',
           'cat-sushi-hot', 'cat-sushi-salmon', 'cat-sushi-vegetales',
           'cat-sushi-nuevos', 'cat-sushi-hosomaki', 'cat-sushi-handrolls', 'cat-sushi-piqueos'
         ];
         const singleSushiDishes = allDishes.filter(d => validSushiCatIds.includes(d.category) && d.is_available);
-        const presetItems = SUSHI_COMBO_ITEMS_MAP[currentDish.id] || [];
-
-        let sushiOptionsHtml = '<option value="">-- Mantener original (Sin cambio) --</option>';
+        let html = '<option value="">-- Elige por cuál roll cambiarlo --</option>';
         categoriesSushi.filter(c => validSushiCatIds.includes(c.id)).forEach(cat => {
           const catDishes = singleSushiDishes.filter(d => d.category === cat.id);
           if (catDishes.length > 0) {
-            sushiOptionsHtml += `<optgroup label="${cat.title}">`;
+            html += `<optgroup label="${cat.title}">`;
             catDishes.forEach(d => {
-              sushiOptionsHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+              html += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
             });
-            sushiOptionsHtml += `</optgroup>`;
+            html += `</optgroup>`;
           }
         });
-
-        let rowsHtml = '';
-        presetItems.forEach((item, idx) => {
-          rowsHtml += `
-            <div class="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs space-y-1">
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="font-black text-gray-800">🍣 ${item.name}</span>
-                <span class="text-gray-400 font-semibold">Base: $${Number(item.price).toLocaleString('es-CL')}</span>
-              </div>
-              <select class="menu-swap-row-select w-full bg-amber-50/50 border border-amber-300 rounded-lg p-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-600"
-                      data-from-name="${item.name}"
-                      data-from-price="${item.price}"
-                      onchange="calculateMenuSwapDifference()">
-                ${sushiOptionsHtml}
-              </select>
-            </div>
-          `;
-        });
-
-        container.innerHTML = rowsHtml;
-        return;
+        return html;
       }
 
-      // =====================================================
-      // 中餐套餐：严格分类池准备
-      // =====================================================
-      // 1. Aperitivos 池（严格排除 BAO）
-      const poolAperitivos = allDishes.filter(d =>
-        d.category === 'cat-aperitivos' && !checkIsBao(d) && d.is_available
-      );
+      if (slotType === 'aperitivo') {
+        const poolAperitivos = allDishes.filter(d => d.category === 'cat-aperitivos' && !checkIsBao(d) && d.is_available);
+        let html = '<option value="">-- Elige el nuevo Aperitivo --</option>';
+        poolAperitivos.forEach(d => {
+          html += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+        });
+        return html;
+      }
 
-      // 2. 主菜池（严格限定炒菜主菜，排除 BAO、排除 Aperitivos、排除 Sopas、排除 Arroz、排除 Colaciones）
+      // 默认主菜（plato）：严格只显示中餐主菜（不含 BAO、不含 Aperitivos、不含 Sopas、不含 Arroz）
       const poolPlatos = allDishes.filter(d =>
         MAIN_CHINESE_DISH_CATS.includes(d.category) && !d.is_colacion && !checkIsBao(d) && d.is_available
       );
-
-      // 3. 米饭池（仅限 cat-arroz）
-      const poolArroz = allDishes.filter(d =>
-        d.category === 'cat-arroz' && d.is_available
-      );
-
-      const allMatchableChinese = [...poolAperitivos, ...poolPlatos, ...poolArroz];
-
-      // 构建三类专属下拉选项 HTML
-      let aperitivoOptionsHtml = '<option value="">-- Mantener original (Sin cambio) --</option>';
-      poolAperitivos.forEach(d => {
-        aperitivoOptionsHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
-      });
-
-      let platoOptionsHtml = '<option value="">-- Mantener original (Sin cambio) --</option>';
+      let html = '<option value="">-- Elige el nuevo Plato --</option>';
       categoriesChina.filter(c => MAIN_CHINESE_DISH_CATS.includes(c.id)).forEach(cat => {
         const catDishes = poolPlatos.filter(d => d.category === cat.id);
         if (catDishes.length > 0) {
-          platoOptionsHtml += `<optgroup label="${cat.title}">`;
+          html += `<optgroup label="${cat.title}">`;
           catDishes.forEach(d => {
-            platoOptionsHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
+            html += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
           });
-          platoOptionsHtml += `</optgroup>`;
+          html += `</optgroup>`;
         }
       });
+      return html;
+    }
 
-      let arrozOptionsHtml = '<option value="">-- Mantener original (Sin cambio) --</option>';
-      poolArroz.forEach(d => {
-        arrozOptionsHtml += `<option value="${d.id}" data-price="${d.price}" data-name="${d.name}">${d.name} ($${Number(d.price).toLocaleString('es-CL')})</option>`;
-      });
+    function populateMenuSwapSelectors(currentDish) {
+      currentMenuSwapDifference = 0;
+      currentMenuMaxRice = 0;
+      selectedWhiteRiceSwapCount = 0;
+      currentComboOriginalItems = [];
+      progressiveSwaps = [{ fromIdx: '', toId: '', toName: '', toPrice: 0 }];
 
-      // 解析当前套餐描述，并将多份菜/多份米饭（如 3 arroz chaufán）拆分为独立行
-      const desc = currentDish.description || '';
-      const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
-      const expandedSlots = [];
+      document.getElementById('swap-diff-badge').classList.add('hidden');
 
-      rawParts.forEach(raw => {
-        // 提取开头的数量（如 "3 arroz chaufán" -> qty=3, cleanName="arroz chaufán"）
-        const qtyMatch = raw.match(/^(\d+)\s*(?:unidades|u|uds|x)?\s+(.+)$/i);
-        let count = 1;
-        let cleanName = raw;
+      const isSushiPromo = currentDish.category === 'cat-sushi-promos';
 
-        if (qtyMatch) {
-          count = parseInt(qtyMatch[1], 10) || 1;
-          cleanName = qtyMatch[2].trim();
+      if (isSushiPromo) {
+        currentComboOriginalItems = (SUSHI_COMBO_ITEMS_MAP[currentDish.id] || []).map(it => ({
+          name: it.name,
+          price: it.price,
+          type: 'sushi'
+        }));
+      } else {
+        const poolAperitivos = allDishes.filter(d => d.category === 'cat-aperitivos' && !checkIsBao(d) && d.is_available);
+        const poolPlatos = allDishes.filter(d => MAIN_CHINESE_DISH_CATS.includes(d.category) && !d.is_colacion && !checkIsBao(d) && d.is_available);
+        const poolArroz = allDishes.filter(d => d.category === 'cat-arroz' && d.is_available);
+        const allMatchable = [...poolAperitivos, ...poolPlatos, ...poolArroz];
+
+        const desc = currentDish.description || '';
+        const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
+
+        rawParts.forEach(raw => {
+          const qtyMatch = raw.match(/^(\d+)\s*(?:unidades|u|uds|x)?\s+(.+)$/i);
+          let count = 1;
+          let cleanName = raw;
+          if (qtyMatch) {
+            count = parseInt(qtyMatch[1], 10) || 1;
+            cleanName = qtyMatch[2].trim();
+          }
+          const baseCleanName = cleanName.replace(/\([^)]*\)/g, '').trim();
+          const matched = matchSingleDishFromPool(baseCleanName, allMatchable);
+          const slotType = classifyChineseComboItem(baseCleanName, matched);
+
+          if (slotType === 'arroz') {
+            currentMenuMaxRice += (count >= 1 && count <= 10) ? count : 1;
+          } else {
+            const basePrice = matched ? matched.price : 0;
+            const canonicalName = matched ? matched.name : (baseCleanName.charAt(0).toUpperCase() + baseCleanName.slice(1));
+            const safeCount = (count > 1 && count <= 6) ? count : 1;
+            for (let i = 1; i <= safeCount; i++) {
+              const prefix = safeCount > 1 ? `${i}° ` : '';
+              currentComboOriginalItems.push({
+                name: `${prefix}${canonicalName}`,
+                price: basePrice,
+                type: slotType
+              });
+            }
+          }
+        });
+      }
+
+      renderWhiteRiceButtons();
+      renderProgressiveSwapUI();
+    }
+
+    function onSwapFromChange(stepIndex, fromIdxVal) {
+      progressiveSwaps[stepIndex].fromIdx = fromIdxVal;
+      progressiveSwaps[stepIndex].toId = '';
+      progressiveSwaps[stepIndex].toName = '';
+      progressiveSwaps[stepIndex].toPrice = 0;
+
+      // 如果清空了第 1 步，自动收起后面的多余步骤
+      if (fromIdxVal === '' && progressiveSwaps.length > 1) {
+        progressiveSwaps.splice(stepIndex, 1);
+      }
+
+      renderProgressiveSwapUI();
+      calculateMenuSwapDifference();
+    }
+
+    function onSwapToChange(stepIndex, selectEl) {
+      const val = selectEl.value;
+      const opt = selectEl.selectedOptions[0];
+      progressiveSwaps[stepIndex].toId = val;
+      progressiveSwaps[stepIndex].toName = opt ? (opt.getAttribute('data-name') || '') : '';
+      progressiveSwaps[stepIndex].toPrice = opt ? (parseFloat(opt.getAttribute('data-price')) || 0) : 0;
+
+      renderProgressiveSwapUI();
+      calculateMenuSwapDifference();
+    }
+
+    function addAnotherSwapStep() {
+      if (progressiveSwaps.length < currentComboOriginalItems.length) {
+        progressiveSwaps.push({ fromIdx: '', toId: '', toName: '', toPrice: 0 });
+        renderProgressiveSwapUI();
+      }
+    }
+
+    function removeSwapStep(stepIndex) {
+      if (progressiveSwaps.length === 1) {
+        progressiveSwaps[0] = { fromIdx: '', toId: '', toName: '', toPrice: 0 };
+      } else {
+        progressiveSwaps.splice(stepIndex, 1);
+      }
+      renderProgressiveSwapUI();
+      calculateMenuSwapDifference();
+    }
+
+    function renderProgressiveSwapUI() {
+      const listEl = document.getElementById('progressive-swap-list');
+      const addMoreBtn = document.getElementById('btn-add-more-swap');
+      if (!listEl || !addMoreBtn) return;
+
+      // 记录已被其他步骤选中的原菜索引，防止重复换同一个菜
+      const usedFromIndices = new Set(
+        progressiveSwaps.map(s => s.fromIdx).filter(v => v !== '')
+      );
+
+      let html = '';
+
+      progressiveSwaps.forEach((step, sIdx) => {
+        // 1. 生成“要换掉哪个原菜”下拉框
+        let fromOptions = '<option value="">-- Sin cambio (Toca para elegir plato) --</option>';
+        currentComboOriginalItems.forEach((orig, oIdx) => {
+          const idxStr = String(oIdx);
+          if (step.fromIdx !== idxStr && usedFromIndices.has(idxStr)) return;
+          const selectedAttr = (step.fromIdx === idxStr) ? 'selected' : '';
+          const priceStr = orig.price > 0 ? ` ($${Number(orig.price).toLocaleString('es-CL')})` : '';
+          fromOptions += `<option value="${idxStr}" ${selectedAttr}>Cambiar: ${orig.name}${priceStr}</option>`;
+        });
+
+        // 2. 如果已选定原菜，紧接着展示“换成哪个同品类新菜”下拉框
+        let toSelectHtml = '';
+        if (step.fromIdx !== '') {
+          const origItem = currentComboOriginalItems[parseInt(step.fromIdx, 10)];
+          if (origItem) {
+            const rawTargetOptions = getTargetOptionsHtmlForType(origItem.type);
+            // 标记当前选中的目标菜
+            const tempDiv = document.createElement('select');
+            tempDiv.innerHTML = rawTargetOptions;
+            if (step.toId) {
+              const targetOpt = tempDiv.querySelector(`option[value="${step.toId}"]`);
+              if (targetOpt) targetOpt.setAttribute('selected', 'selected');
+            }
+
+            toSelectHtml = `
+              <div class="mt-2 pt-2 border-t border-amber-200/70">
+                <select onchange="onSwapToChange(${sIdx}, this)" class="w-full bg-red-50/50 border-2 border-red-400 rounded-xl p-2 text-xs font-black text-gray-900 outline-none focus:border-red-600 transition">
+                  ${tempDiv.innerHTML}
+                </select>
+              </div>
+            `;
+          }
         }
-        // 去除括号内小字如 (10u)
-        const baseCleanName = cleanName.replace(/\([^)]*\)/g, '').trim();
-        const matched = matchSingleDishFromPool(baseCleanName, allMatchableChinese);
-        const slotType = classifyChineseComboItem(baseCleanName, matched);
 
-        const basePrice = matched ? matched.price : 0;
-        const canonicalName = matched ? matched.name : (baseCleanName.charAt(0).toUpperCase() + baseCleanName.slice(1));
+        const headerLabel = progressiveSwaps.length > 1
+          ? `<div class="flex justify-between items-center mb-1"><span class="text-[10px] font-black text-amber-900">${sIdx + 1}° Cambio de plato</span><button type="button" onclick="removeSwapStep(${sIdx})" class="text-[10px] font-bold text-red-600 hover:underline">✕ Quitar</button></div>`
+          : '';
 
-        // 如果数量大于1（但排除像 "10 unidades" 这种单盘数量词），按份数拆分为 1°、2°、3°...
-        const safeCount = (count > 1 && count <= 10) ? count : 1;
-        for (let i = 1; i <= safeCount; i++) {
-          const labelPrefix = safeCount > 1 ? `${i}° ` : '';
-          expandedSlots.push({
-            slotLabel: `${labelPrefix}${canonicalName}`,
-            fromName: `${labelPrefix}${canonicalName}`,
-            price: basePrice,
-            type: slotType
-          });
-        }
-      });
-
-      let rowsHtml = '';
-      expandedSlots.forEach((slot) => {
-        let icon = '🍲';
-        let typeBadge = 'Plato';
-        let optionsHtml = platoOptionsHtml;
-
-        if (slot.type === 'aperitivo') {
-          icon = '🥟';
-          typeBadge = 'Aperitivo';
-          optionsHtml = aperitivoOptionsHtml;
-        } else if (slot.type === 'arroz') {
-          icon = '🍚';
-          typeBadge = 'Arroz';
-          optionsHtml = arrozOptionsHtml;
-        }
-
-        const priceText = slot.price > 0 ? `$${Number(slot.price).toLocaleString('es-CL')}` : '';
-
-        rowsHtml += `
-          <div class="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs space-y-1.5">
-            <div class="flex justify-between items-center text-[11px]">
-              <span class="font-black text-gray-800">${icon} ${slot.slotLabel}</span>
-              <span class="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md">${typeBadge} ${priceText}</span>
-            </div>
-            <select class="menu-swap-row-select w-full bg-amber-50/40 border border-amber-300 rounded-lg p-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-600 transition"
-                    data-from-name="${slot.fromName}"
-                    data-from-price="${slot.price}"
-                    data-slot-type="${slot.type}"
-                    onchange="calculateMenuSwapDifference()">
-              ${optionsHtml}
+        html += `
+          <div class="bg-white p-2.5 rounded-xl border border-amber-300 shadow-2xs">
+            ${headerLabel}
+            <select onchange="onSwapFromChange(${sIdx}, this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-600 transition">
+              ${fromOptions}
             </select>
+            ${toSelectHtml}
           </div>
         `;
       });
 
-      container.innerHTML = rowsHtml;
+      listEl.innerHTML = html;
+
+      // 判断是否显示“➕ ¿Cambiar otro plato más?”按钮（当前最后一步已完成换菜，且套餐还有剩余未换的菜）
+      const lastStep = progressiveSwaps[progressiveSwaps.length - 1];
+      const canAddMore = lastStep && lastStep.fromIdx !== '' && lastStep.toId !== '' && (progressiveSwaps.length < currentComboOriginalItems.length);
+      addMoreBtn.classList.toggle('hidden', !canAddMore);
     }
 
-    // 汇总计算所有行的换菜差价
     function calculateMenuSwapDifference() {
-      const selects = document.querySelectorAll('.menu-swap-row-select');
       const badge = document.getElementById('swap-diff-badge');
       const amountEl = document.getElementById('swap-diff-amount');
 
       let totalDiff = 0;
-      let anyChanged = false;
+      let anyCompleted = false;
 
-      selects.forEach(sel => {
-        if (sel.value) {
-          anyChanged = true;
-          const priceFrom = parseFloat(sel.getAttribute('data-from-price')) || 0;
-          const toOpt = sel.selectedOptions[0];
-          const priceTo = toOpt ? (parseFloat(toOpt.getAttribute('data-price')) || 0) : 0;
-          totalDiff += (priceTo - priceFrom);
+      progressiveSwaps.forEach(step => {
+        if (step.fromIdx !== '' && step.toId !== '') {
+          const origItem = currentComboOriginalItems[parseInt(step.fromIdx, 10)];
+          if (origItem) {
+            anyCompleted = true;
+            totalDiff += (step.toPrice - origItem.price);
+          }
         }
       });
 
       currentMenuSwapDifference = totalDiff;
 
-      if (!anyChanged) {
+      if (!anyCompleted) {
         badge.classList.add('hidden');
         return;
       }
@@ -1848,7 +1942,6 @@
       } else if (!isBao) {
         selectedAjiValue = '';
         renderAjiButtons();
-        // 重置 4 款中餐 $600 加料按钮
         selectedChinaExtras = { 'Champiñón': false, 'Alga': false, 'Almendras': false, 'Ajo': false };
         renderChinaExtrasButtons();
 
@@ -1889,33 +1982,28 @@
         }
       }
 
-      // 🌟 汇总套餐内所有被替换的菜品/米饭与差价
+      // 🌟 提取一键换白饭 (×1 / ×2 / ×3) 与递进式换菜记录
       if (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos') {
-        const selects = document.querySelectorAll('.menu-swap-row-select');
-        selects.forEach(sel => {
-          if (sel.value) {
-            const fromName = sel.getAttribute('data-from-name');
-            const priceFrom = parseFloat(sel.getAttribute('data-from-price')) || 0;
-            const toOpt = sel.selectedOptions[0];
-            const toName = toOpt.getAttribute('data-name') || toOpt.innerText.split(' ($')[0];
-            const priceTo = parseFloat(toOpt.getAttribute('data-price')) || 0;
-            const rowDiff = priceTo - priceFrom;
+        if (selectedWhiteRiceSwapCount > 0) {
+          optionsList.push(`Arroz: Cambiar ×${selectedWhiteRiceSwapCount} por Arroz Blanco`);
+        }
 
-            const diffSign = rowDiff > 0
-              ? `+$${Number(rowDiff).toLocaleString('es-CL')}`
-              : (rowDiff < 0 ? `-$${Number(Math.abs(rowDiff)).toLocaleString('es-CL')}` : `$0`);
-
-            optionsList.push(`Cambio: ${fromName} ➔ ${toName} (${diffSign})`);
+        progressiveSwaps.forEach(step => {
+          if (step.fromIdx !== '' && step.toId !== '') {
+            const origItem = currentComboOriginalItems[parseInt(step.fromIdx, 10)];
+            if (origItem) {
+              const rowDiff = step.toPrice - origItem.price;
+              const diffSign = rowDiff > 0
+                ? `+$${Number(rowDiff).toLocaleString('es-CL')}`
+                : (rowDiff < 0 ? `-$${Number(Math.abs(rowDiff)).toLocaleString('es-CL')}` : `$0`);
+              optionsList.push(`Cambio: ${origItem.name} ➔ ${step.toName} (${diffSign})`);
+            }
           }
         });
 
         extraPrice += currentMenuSwapDifference;
-
-        const swapNote = document.getElementById('menu-swap-note').value.trim();
-        if (swapNote) optionsList.push(`Nota: ${swapNote}`);
       }
 
-      // Colaciones 4 选 1 配餐
       if (currentSelectedDish.is_colacion) {
         const selectedSide = document.querySelector('input[name="side-choice"]:checked');
         if (selectedSide) {
@@ -1980,7 +2068,6 @@
           optionsList.push(selectedAjiValue);
         }
 
-        // 🌟 计入中餐 $600 加料（Champiñón, Alga, Almendras, Ajo）
         Object.keys(selectedChinaExtras).forEach(item => {
           if (selectedChinaExtras[item]) {
             extraPrice += 600;
@@ -2148,7 +2235,6 @@
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
       const timingLine = timingType === 'asap' ? '⚡ Lo antes posible (Inmediato)' : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
 
-      // 同步推送至 80mm 出单机后台
       try {
         await db.from('orders').insert([{
           order_code: orderCode,
