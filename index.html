@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     html, body {
       position: fixed;
@@ -49,6 +50,832 @@
   </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 flex flex-col notranslate" translate="no">
+
+<style id="dz-design">
+/* ============================================================
+   DRAGÓN DE ORO — 视觉系统 v2
+   墨黑 + 漆红 + 香槟金 · 衬线标题 + 无衬线正文
+   ============================================================ */
+:root{
+  --ink:#171310;
+  --ink-2:#463C33;
+  --muted:#8C7F72;
+  --line:#E8DFD2;
+  --paper:#FAF7F1;
+  --paper-2:#F3ECE1;
+  --red:#A81E24;
+  --red-deep:#6E1014;
+  --gold:#C39A52;
+  --gold-2:#E7CE9C;
+  --font-display:'Playfair Display',Georgia,'Times New Roman',serif;
+  --shadow-card:0 1px 2px rgba(23,19,16,.04), 0 10px 26px -20px rgba(23,19,16,.55);
+  --shadow-float:0 16px 44px -20px rgba(23,19,16,.6);
+}
+
+body{ background:var(--paper); color:var(--ink); }
+::selection{ background:rgba(168,30,36,.16); }
+
+#landing-view{ background:var(--paper) !important; }
+#menu-container{ background:var(--paper) !important; padding:14px 12px 0 !important; }
+#menu-container::-webkit-scrollbar,
+#sidebar-categories::-webkit-scrollbar,
+#landing-view::-webkit-scrollbar{ width:0; height:0; }
+
+/* ---------- 1. 店铺头部 ---------- */
+#store-header{
+  padding:15px 16px 13px !important;
+  box-shadow:inset 0 -1px 0 rgba(195,154,82,.34), 0 10px 26px -22px rgba(23,19,16,.9) !important;
+}
+#store-logo{
+  border-radius:15px !important;
+  background:rgba(255,255,255,.07) !important;
+  border:1px solid rgba(195,154,82,.5) !important;
+  box-shadow:0 0 0 4px rgba(195,154,82,.07), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  font-size:19px !important;
+}
+#store-title{
+  font-family:var(--font-display);
+  font-weight:700 !important;
+  font-size:19px !important;
+  letter-spacing:.055em !important;
+  line-height:1.15 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.45);
+}
+#store-slogan{
+  font-size:9px !important;
+  font-weight:600 !important;
+  letter-spacing:.17em !important;
+  text-transform:uppercase;
+  color:rgba(231,206,156,.82) !important;
+  margin-top:4px !important;
+}
+#store-promo-bar{
+  margin-top:11px !important;
+  margin-bottom:0 !important;
+  padding:7px 10px !important;
+  border-radius:9px !important;
+  background:rgba(195,154,82,.13) !important;
+  border:1px solid rgba(195,154,82,.3) !important;
+  color:#F1DFBA !important;
+  font-size:10.5px !important;
+  line-height:1.35 !important;
+  letter-spacing:.01em;
+}
+#badge-rating,#badge-preptime,#badge-delivery{
+  background:rgba(255,255,255,.07) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  border-radius:999px !important;
+  padding:3.5px 10px !important;
+  font-weight:600 !important;
+  font-size:10px !important;
+  color:rgba(255,255,255,.9) !important;
+}
+#store-header .flex.items-center.gap-1\.5.overflow-x-auto{ margin-top:10px; }
+
+#quick-search{
+  margin-top:11px !important;
+  padding:10px 12px 10px 34px !important;
+  border-radius:12px !important;
+  background:rgba(255,255,255,.09) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  font-size:12px !important;
+  color:#fff !important;
+  letter-spacing:.005em;
+}
+#quick-search::placeholder{ color:rgba(255,255,255,.5) !important; }
+#quick-search:focus{
+  background:rgba(255,255,255,.15) !important;
+  border-color:rgba(195,154,82,.62) !important;
+  box-shadow:0 0 0 3px rgba(195,154,82,.12);
+}
+#store-header .relative > span.absolute{
+  top:50% !important;
+  transform:translateY(-50%);
+  left:12px !important;
+  font-size:11px !important;
+  opacity:.75;
+  margin-top:0 !important;
+}
+
+/* ---------- 2. 主分类 Tab ---------- */
+nav{
+  background:var(--paper) !important;
+  border-bottom:1px solid var(--line) !important;
+  padding:10px 16px !important;
+  box-shadow:none !important;
+}
+nav > div{
+  background:var(--paper-2) !important;
+  border:1px solid var(--line) !important;
+  border-radius:14px !important;
+  padding:4px !important;
+  gap:4px !important;
+}
+#btn-tab-china,#btn-tab-sushi{
+  border-radius:10px !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+  padding:9px 8px !important;
+  color:var(--muted) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transition:all .25s ease;
+}
+#btn-tab-china.is-active,#btn-tab-sushi.is-active{
+  background:#fff !important;
+  color:var(--red) !important;
+  box-shadow:0 2px 8px rgba(23,19,16,.10) !important;
+}
+
+/* ---------- 3. 左侧分类栏 ---------- */
+#sidebar-categories{
+  width:88px !important;
+  background:var(--paper-2) !important;
+  border-right:1px solid var(--line) !important;
+  padding:4px 0 !important;
+}
+#sidebar-categories button{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  width:100%;
+  border:0 !important;
+  border-bottom:1px solid rgba(232,223,210,.75) !important;
+  padding:12px 6px !important;
+  gap:6px !important;
+  color:var(--muted) !important;
+  background:transparent !important;
+  position:relative;
+  border-radius:0 !important;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .2s ease, color .2s ease;
+}
+#sidebar-categories button > span:first-child{
+  font-size:17px !important;
+  line-height:1 !important;
+  filter:grayscale(.4);
+  transition:filter .2s ease, transform .2s ease;
+}
+#sidebar-categories button > span:last-child{
+  font-size:9.5px !important;
+  line-height:1.25 !important;
+  letter-spacing:.01em;
+  font-weight:600;
+}
+#sidebar-categories button.side-active{
+  background:#fff !important;
+  color:var(--red) !important;
+  font-weight:800 !important;
+}
+#sidebar-categories button.side-active > span:first-child{
+  filter:none;
+  transform:scale(1.06);
+}
+#sidebar-categories button.side-active::before{
+  content:'';
+  position:absolute; left:0; top:9px; bottom:9px; width:3px;
+  border-radius:0 3px 3px 0;
+  background:linear-gradient(180deg,var(--red),var(--gold));
+}
+
+/* ---------- 4. 分类标题 ---------- */
+.cat-head{
+  display:flex; align-items:center; gap:8px;
+  padding:0 2px 9px;
+}
+.cat-head .cat-ico{ font-size:13px; opacity:.9; }
+.cat-head h2{
+  margin:0;
+  font-family:var(--font-display);
+  font-size:13.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.09em !important;
+  text-transform:uppercase;
+  color:var(--ink) !important;
+}
+.cat-head .cat-count{
+  margin-left:auto;
+  font-size:9.5px; font-weight:700;
+  color:var(--gold);
+  background:rgba(195,154,82,.12);
+  border:1px solid rgba(195,154,82,.26);
+  border-radius:999px;
+  padding:2px 8px;
+  letter-spacing:.06em;
+}
+.dish-section{ margin-bottom:22px; }
+.dish-section:last-of-type{ margin-bottom:6px; }
+
+/* ---------- 5. 菜品卡 ---------- */
+.dish-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 12px 12px 14px;
+  box-shadow:var(--shadow-card);
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .26s ease, border-color .26s ease;
+}
+.dish-card:hover{
+  border-color:#DCD0C0;
+  box-shadow:0 12px 30px -20px rgba(23,19,16,.62);
+}
+.dish-card:active{ transform:scale(.993); }
+.dish-card.is-soldout{
+  opacity:.55;
+  cursor:not-allowed;
+  background:#fff;
+  border-style:dashed;
+}
+.dish-main{ flex:1; min-width:0; padding-right:8px; }
+.dish-name{
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.35;
+  color:var(--ink);
+  letter-spacing:.005em;
+}
+.dish-tag{
+  display:inline-block;
+  margin-left:6px;
+  vertical-align:1px;
+  font-size:8px; font-weight:800;
+  letter-spacing:.1em;
+  color:#fff;
+  background:var(--red);
+  border-radius:4px;
+  padding:2px 5px;
+}
+.dish-desc{
+  margin:3px 0 0;
+  font-size:10.5px;
+  line-height:1.5;
+  color:var(--muted);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.dish-price{
+  margin-top:9px;
+  display:flex;
+  align-items:baseline;
+  gap:2px;
+}
+.dish-price .cur{ font-size:10px; font-weight:700; color:var(--gold); }
+.dish-price .num{
+  font-size:15px; font-weight:800;
+  color:var(--red);
+  letter-spacing:-.015em;
+  font-variant-numeric:tabular-nums;
+}
+.dish-price .unit{
+  font-size:9px; font-weight:600;
+  color:#B4A695;
+  margin-left:3px;
+  letter-spacing:.07em;
+}
+
+/* 数量控件 */
+.dish-act{ flex:none; }
+.qty-add{
+  width:32px; height:32px;
+  border:0; border-radius:50%;
+  display:grid; place-items:center;
+  background:linear-gradient(160deg,#B8252C,#8A151A);
+  color:#fff;
+  font-size:17px; font-weight:700; line-height:1;
+  box-shadow:0 5px 14px -5px rgba(168,30,36,.8);
+  transition:transform .16s ease, box-shadow .2s;
+  cursor:pointer;
+}
+.qty-add:active{ transform:scale(.88); }
+.qty-stepper{
+  display:flex; align-items:center; gap:1px;
+  background:var(--paper-2);
+  border:1px solid #EADFCE;
+  border-radius:999px;
+  padding:2px;
+}
+.qty-stepper button{
+  width:25px; height:25px;
+  border:0; border-radius:50%;
+  display:grid; place-items:center;
+  font-size:14px; font-weight:700; line-height:1;
+  cursor:pointer;
+  transition:transform .15s, background .2s;
+}
+.qty-stepper button:active{ transform:scale(.88); }
+.qty-minus{ background:#fff; color:var(--ink-2); box-shadow:0 1px 3px rgba(23,19,16,.1); }
+.qty-plus{
+  background:linear-gradient(160deg,#B8252C,#8A151A);
+  color:#fff;
+  box-shadow:0 3px 9px -4px rgba(168,30,36,.85);
+}
+.qty-num{
+  min-width:20px; text-align:center;
+  font-size:12px; font-weight:800;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.qty-soldout{
+  width:32px; height:32px;
+  display:grid; place-items:center;
+  border-radius:50%;
+  background:#F1EBE2;
+  color:#B5A797;
+  font-size:12px; font-weight:700;
+}
+
+/* ---------- 6. 底部购物车 ---------- */
+.cart-dock{
+  pointer-events:auto;
+  max-width:448px;
+  margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:10px 10px 10px 16px;
+  background:rgba(23,19,16,.94);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  backdrop-filter:blur(16px) saturate(1.2);
+  border:1px solid rgba(195,154,82,.28);
+  border-radius:20px;
+  box-shadow:var(--shadow-float);
+}
+.cart-ico{
+  width:38px; height:38px;
+  border-radius:12px;
+  display:grid; place-items:center;
+  font-size:17px;
+  background:linear-gradient(160deg,#B8252C,#8A151A);
+  box-shadow:0 6px 16px -8px rgba(168,30,36,.9);
+}
+.cart-badge{
+  position:absolute; top:-6px; right:-6px;
+  min-width:19px; height:19px; padding:0 5px;
+  display:grid; place-items:center;
+  border-radius:999px;
+  background:linear-gradient(160deg,#E7CE9C,#C39A52);
+  color:#2A1E10;
+  font-size:10px; font-weight:800;
+  font-variant-numeric:tabular-nums;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+.cart-label{
+  font-size:9px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(231,206,156,.6);
+  margin-bottom:1px;
+}
+.cart-price{
+  font-size:17px; font-weight:800;
+  letter-spacing:-.02em;
+  color:#fff;
+  line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+.cart-price .unit{
+  font-size:9.5px; font-weight:600;
+  color:rgba(255,255,255,.45);
+  margin-left:3px;
+  letter-spacing:.08em;
+}
+.cart-cta{
+  display:flex; align-items:center; gap:6px;
+  padding:12px 18px;
+  border:0; border-radius:14px;
+  background:linear-gradient(160deg,#B8252C,#8A151A);
+  color:#fff;
+  font-size:12px; font-weight:800;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  box-shadow:0 10px 22px -12px rgba(168,30,36,1);
+  transition:transform .16s;
+  cursor:pointer;
+}
+.cart-cta:active{ transform:scale(.96); }
+
+/* ---------- 7. 弹窗 ---------- */
+#option-modal, #checkout-modal{
+  background:rgba(23,19,16,.5) !important;
+  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(4px);
+}
+#option-modal > div, #checkout-modal > div{
+  background:var(--paper) !important;
+  border-radius:26px 26px 0 0 !important;
+  padding:14px 18px calc(20px + env(safe-area-inset-bottom)) !important;
+  box-shadow:0 -24px 60px -30px rgba(0,0,0,.5) !important;
+}
+@media (min-width:640px){
+  #option-modal > div, #checkout-modal > div{
+    border-radius:26px !important;
+    padding:20px !important;
+  }
+}
+#option-modal > div > div:first-child,
+#checkout-modal > div > div:first-child{
+  width:38px !important; height:3px !important;
+  background:#DED2C0 !important;
+  border-radius:3px !important;
+  margin-bottom:14px !important;
+}
+#option-modal h3, #checkout-modal h3{
+  font-family:var(--font-display);
+  font-size:17px !important;
+  font-weight:700 !important;
+  letter-spacing:.01em;
+  line-height:1.3 !important;
+}
+#option-modal .border-b,
+#checkout-modal .border-b{
+  border-color:var(--line) !important;
+}
+
+/* 选项按钮（JS 动态写入 class） */
+.opt-btn{
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  padding:10px 8px;
+  border:1.5px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink-2);
+  font-family:inherit;
+  font-size:11px; font-weight:700;
+  line-height:1.3;
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.opt-btn:active{ transform:scale(.97); }
+.opt-btn.is-on{
+  border-color:var(--red);
+  background:linear-gradient(180deg,#FFF8F7,#FDF0EE);
+  color:var(--red);
+  font-weight:800;
+  box-shadow:0 0 0 3px rgba(168,30,36,.07);
+}
+
+/* 弹窗内的说明块 */
+#box-bao-options,#box-menu-notes,#colacion-side-box{
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:16px !important;
+  padding:14px !important;
+}
+#option-modal label,
+#checkout-modal label{
+  letter-spacing:.01em;
+}
+#option-modal label.block{
+  font-size:11.5px !important;
+  color:var(--ink) !important;
+}
+#box-china-options label.flex,
+#box-sushi-options label.flex,
+#colacion-side-box label.flex{
+  background:#fff !important;
+  border:1.5px solid var(--line) !important;
+  border-radius:11px !important;
+  padding:9px 11px !important;
+  transition:border-color .2s, background .2s;
+}
+#box-china-options label.flex:has(input:checked),
+#box-sushi-options label.flex:has(input:checked){
+  border-color:rgba(168,30,36,.5) !important;
+  background:#FFF9F8 !important;
+}
+#option-modal input[type="checkbox"],
+#option-modal input[type="radio"]{
+  accent-color:var(--red);
+}
+#option-modal select,
+#checkout-modal select,
+#checkout-modal input{
+  border-radius:12px !important;
+  border-color:var(--line) !important;
+  background:#fff !important;
+  font-family:inherit;
+}
+#checkout-modal input:focus,
+#checkout-modal select:focus,
+#option-modal select:focus{
+  border-color:var(--red) !important;
+  box-shadow:0 0 0 3px rgba(168,30,36,.08);
+  outline:none;
+}
+
+/* 结算方式选择（active 态用 theme-* 类作为钩子） */
+#checkout-modal button.theme-border-primary{
+  border:1.5px solid var(--red) !important;
+  background:linear-gradient(180deg,#FFF8F7,#FDF0EE) !important;
+  box-shadow:0 0 0 3px rgba(168,30,36,.06);
+  border-radius:13px !important;
+}
+#checkout-modal button{
+  border-radius:13px;
+}
+
+/* 弹窗内数量步进 */
+#option-modal .bg-gray-100{
+  background:var(--paper-2) !important;
+  border:1px solid #EADFCE !important;
+  border-radius:14px !important;
+  gap:8px !important;
+}
+
+/* 主按钮 */
+#btn-modal-add{
+  background:linear-gradient(160deg,#B8252C,#8A151A) !important;
+  border-radius:15px !important;
+  font-size:13px !important;
+  letter-spacing:.02em;
+  padding:15px !important;
+  box-shadow:0 14px 30px -14px rgba(168,30,36,.95) !important;
+}
+[onclick="sendOrderToWhatsApp()"]{
+  background:linear-gradient(160deg,#1FA855,#12803E) !important;
+  border-radius:15px !important;
+  font-size:13px !important;
+  letter-spacing:.02em;
+  padding:15px !important;
+  box-shadow:0 14px 30px -14px rgba(18,128,62,.9) !important;
+}
+
+/* ---------- 8. 通用：衬线小标题 ---------- */
+.min-w-0{ min-width:0; }
+.serif{
+  font-family:var(--font-display);
+  letter-spacing:.02em;
+}
+.section-cap{
+  font-size:9.5px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ---------- 9. 落地页 ---------- */
+#landing-hero{
+  padding:40px 20px 34px !important;
+  border-radius:0 0 30px 30px !important;
+  box-shadow:0 18px 44px -30px rgba(23,19,16,.8) !important;
+}
+#landing-hero::after{
+  content:'';
+  position:absolute; left:50%; bottom:0;
+  transform:translateX(-50%);
+  width:64px; height:1px;
+  background:linear-gradient(90deg,rgba(195,154,82,0),rgba(195,154,82,.75),rgba(195,154,82,0));
+}
+#landing-logo{
+  width:64px !important; height:64px !important;
+  border-radius:50% !important;
+  background:rgba(255,255,255,.06) !important;
+  border:1px solid rgba(195,154,82,.5) !important;
+  box-shadow:0 0 0 5px rgba(195,154,82,.08), inset 0 1px 0 rgba(255,255,255,.15) !important;
+  font-size:30px !important;
+  margin-bottom:16px !important;
+}
+#landing-title{
+  font-family:var(--font-display) !important;
+  font-size:29px !important;
+  font-weight:700 !important;
+  letter-spacing:.075em !important;
+  line-height:1.1 !important;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+#landing-slogan{
+  font-size:9.5px !important;
+  letter-spacing:.2em !important;
+  text-transform:uppercase;
+  color:rgba(231,206,156,.85) !important;
+  margin-top:8px !important;
+  font-weight:600 !important;
+}
+#landing-hero .rounded-full.bg-emerald-500\/30{
+  background:rgba(16,120,70,.28) !important;
+  border-color:rgba(110,220,160,.35) !important;
+}
+#landing-rating,#landing-preptime,#landing-delivery{
+  background:rgba(255,255,255,.07) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  border-radius:999px !important;
+  padding:5px 11px !important;
+  font-weight:600 !important;
+  font-size:10px !important;
+  letter-spacing:.02em;
+}
+#btn-landing-top-order{
+  background:linear-gradient(160deg,#B8252C,#8A151A) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  border-radius:15px !important;
+  box-shadow:0 16px 34px -16px rgba(168,30,36,1) !important;
+  font-size:13px !important;
+  letter-spacing:.02em;
+  padding:15px !important;
+  margin-top:22px !important;
+}
+
+.land-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+  box-shadow:var(--shadow-card);
+}
+.land-card-head{
+  display:flex; align-items:center; gap:9px;
+  margin-bottom:13px;
+}
+.land-card-head .ico{
+  width:26px; height:26px;
+  display:grid; place-items:center;
+  border-radius:9px;
+  background:rgba(195,154,82,.13);
+  font-size:12px;
+}
+.land-card-head h2{
+  margin:0;
+  font-size:10.5px !important;
+  font-weight:800 !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase;
+  color:var(--ink) !important;
+}
+
+.promo-item{
+  display:flex; align-items:flex-start; gap:10px;
+  padding:11px 12px;
+  border-radius:13px;
+  background:linear-gradient(180deg,#FDF9F1,#FAF4E8);
+  border:1px solid rgba(195,154,82,.24);
+}
+.promo-badge{
+  flex:none;
+  margin-top:1px;
+  font-size:8px; font-weight:800;
+  letter-spacing:.1em;
+  color:#fff;
+  background:linear-gradient(160deg,#B8252C,#8A151A);
+  border-radius:5px;
+  padding:3px 6px;
+}
+.promo-title{ font-size:11.5px; font-weight:800; color:var(--ink); line-height:1.3; }
+.promo-desc{ font-size:10.5px; color:var(--muted); margin-top:2px; line-height:1.5; }
+
+.gal-item{
+  position:relative;
+  height:132px;
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  background:#1B1714;
+  border:1px solid rgba(23,19,16,.1);
+  transition:transform .2s ease, box-shadow .25s;
+}
+.gal-item:active{ transform:scale(.97); }
+.gal-item img{
+  width:100%; height:100%; object-fit:cover;
+  opacity:.92;
+  transition:transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.gal-item:hover img{ transform:scale(1.06); }
+.gal-item .veil{
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(15,12,10,.92) 0%, rgba(15,12,10,.25) 48%, rgba(15,12,10,.05) 100%);
+}
+.gal-item .tag{
+  position:absolute; top:8px; left:8px;
+  font-size:8px; font-weight:800;
+  letter-spacing:.09em;
+  color:#F0DCB4;
+  background:rgba(15,12,10,.55);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(195,154,82,.35);
+  border-radius:6px;
+  padding:3px 6px;
+}
+.gal-item .cap{
+  position:absolute; left:10px; right:10px; bottom:9px;
+  color:#fff;
+}
+.gal-item .cap b{ display:block; font-size:11.5px; font-weight:800; line-height:1.25; }
+.gal-item .cap span{ display:block; font-size:9.5px; color:rgba(255,255,255,.72); margin-top:2px; font-weight:500; }
+
+.hour-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid rgba(232,223,210,.8);
+  font-size:11.5px;
+}
+.hour-row:last-child{ border-bottom:0; padding-bottom:0; }
+.hour-row .d{ color:var(--muted); font-weight:600; }
+.hour-row .h{
+  color:var(--ink); font-weight:800;
+  background:var(--paper-2);
+  border-radius:8px;
+  padding:4px 10px;
+  font-variant-numeric:tabular-nums;
+}
+
+.map-frame{
+  position:relative;
+  height:170px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:#EFE8DD;
+  margin-bottom:12px;
+}
+.map-frame iframe{ width:100%; height:100%; border:0; display:block; }
+.map-open{
+  position:absolute; right:9px; bottom:9px;
+  display:flex; align-items:center; gap:5px;
+  padding:7px 11px;
+  border-radius:10px;
+  background:rgba(23,19,16,.88);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  color:#fff;
+  font-size:9.5px; font-weight:800;
+  border:1px solid rgba(255,255,255,.14);
+}
+.btn-dark{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  background:#171310;
+  color:#fff;
+  font-size:11.5px; font-weight:800;
+  letter-spacing:.02em;
+  transition:transform .16s;
+}
+.btn-dark:active{ transform:scale(.985); }
+
+#landing-address-text{ font-size:12.5px; font-weight:800; color:var(--ink); line-height:1.4; }
+#landing-address-ref{ font-size:10.5px; color:var(--muted); margin-top:3px; line-height:1.5; }
+
+.land-bottom{
+  pointer-events:auto;
+  max-width:448px;
+  margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:10px 10px 10px 16px;
+  background:rgba(23,19,16,.94);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  backdrop-filter:blur(16px) saturate(1.2);
+  border:1px solid rgba(195,154,82,.28);
+  border-radius:20px;
+  box-shadow:var(--shadow-float);
+}
+.land-bottom .k{
+  font-size:9px; font-weight:800;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(231,206,156,.62);
+}
+.land-bottom .v{ font-size:12px; font-weight:800; color:#fff; margin-top:2px; }
+
+/* 轻提示 */
+#dz-toast{
+  position:fixed; z-index:120;
+  top:calc(14px + env(safe-area-inset-top));
+  left:50%;
+  transform:translate(-50%,-24px);
+  max-width:calc(100% - 40px);
+  padding:10px 18px;
+  border-radius:999px;
+  background:rgba(23,19,16,.94);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  color:#fff;
+  font-size:12px; font-weight:600;
+  text-align:center;
+  opacity:0; pointer-events:none;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.7);
+  transition:opacity .26s ease, transform .26s ease;
+}
+#dz-toast.show{ opacity:1; transform:translate(-50%,0); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
+/* ---------- 10. 兜底：背景图未加载时 ---------- */
+#store-header, #landing-hero{
+  background-color:#171310;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+</style>
 
   <!-- ======================================================== -->
   <!-- 🎨 店铺与前置主页配置中心 -->
@@ -113,10 +940,10 @@
 
     const THEMES = {
       red: {
-        primary: "#DC2626",
-        primaryDark: "#991B1B",
-        primaryLight: "#FEF2F2",
-        headerOverlay: "linear-gradient(to bottom, rgba(153, 27, 27, 0.78), rgba(17, 24, 39, 0.92))",
+        primary: "#A81E24",
+        primaryDark: "#6E1014",
+        primaryLight: "#FBF0EE",
+        headerOverlay: "radial-gradient(135% 110% at 86% -14%, rgba(168, 30, 36, 0.66) 0%, rgba(168, 30, 36, 0) 60%), linear-gradient(180deg, rgba(23, 19, 16, 0.58) 0%, rgba(23, 19, 16, 0.95) 100%)",
         btnGradient: "from-red-600 to-rose-600"
       },
       black_gold: {
@@ -146,178 +973,174 @@
   <!-- ======================================================== -->
   <!-- 🌟 视图 A：前置门店宣传主页 -->
   <!-- ======================================================== -->
-  <div id="landing-view" class="fixed inset-0 bg-[#F4F5F7] z-50 overflow-y-auto flex flex-col justify-between">
-    <div class="pb-28">
-      <div id="landing-hero" class="relative text-white pt-8 pb-7 px-5 rounded-b-[2.2rem] shadow-xl overflow-hidden bg-gray-900">
-        <div class="max-w-md mx-auto flex flex-col items-center text-center">
-          <div class="flex items-center gap-1.5 bg-emerald-500/30 backdrop-blur-md border border-emerald-400/40 px-3 py-1 rounded-full shadow-sm mb-3">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[11px] font-black text-emerald-100 tracking-wide uppercase">Abierto 12:00 a 23:00 hrs</span>
-          </div>
+  <div id="landing-view" class="fixed inset-0 z-50 overflow-y-auto">
+  <div class="pb-28">
 
-          <div id="landing-logo" class="w-16 h-16 rounded-3xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center text-4xl shadow-lg mb-2.5">
-            🐉
-          </div>
+    <!-- Hero -->
+    <div id="landing-hero" class="relative text-white overflow-hidden" style="background-image: linear-gradient(180deg, rgba(23,19,16,.58), rgba(23,19,16,.95)), url(&quot;bg.jpg&quot;);">
+      <div class="max-w-md mx-auto flex flex-col items-center text-center">
 
-          <h1 id="landing-title" class="text-2xl font-black tracking-tight text-white drop-shadow">
-            DRAGÓN DE ORO
-          </h1>
-          <p id="landing-slogan" class="text-xs text-white/90 font-medium mt-1">
-            Comida China Tradicional & Sushi
-          </p>
-
-          <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] font-bold">
-            <span id="landing-rating" class="bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/15">⭐ 4.9 (210+ reseñas)</span>
-            <span id="landing-preptime" class="bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/15">⏱️ 20-30 min</span>
-            <span id="landing-delivery" class="bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/15">🛵 Envío $1.800 CLP</span>
-          </div>
-
-          <button onclick="enterMenuPage()" id="btn-landing-top-order" class="mt-5 w-full max-w-xs bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-6 rounded-2xl shadow-[0_10px_25px_rgba(220,38,38,0.45)] border border-white/20 text-sm flex items-center justify-center gap-2 active:scale-95 transition">
-            <span>🥢 Ir al Menú / Hacer Pedido</span>
-            <span class="text-base">→</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="max-w-md mx-auto px-4 mt-4 space-y-4">
-        <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-base">🎁</span>
-            <h2 class="text-xs font-black text-gray-900 uppercase tracking-wider">Promociones Destacadas</h2>
-          </div>
-          <div id="landing-promos-list" class="space-y-2.5"></div>
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full mb-6" style="background:rgba(16,120,70,.24);border:1px solid rgba(110,220,160,.3);">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[9px] font-black text-emerald-50" style="letter-spacing:.18em;">ABIERTO · 12:00 – 23:00</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <span class="text-base">📸</span>
-              <h2 class="text-xs font-black text-gray-900 uppercase tracking-wider">Nuestras Especialidades</h2>
-            </div>
-            <button onclick="enterMenuPage()" class="text-[11px] font-black theme-text-primary">Ver carta completa →</button>
-          </div>
-          <div id="landing-dishes-gallery" class="grid grid-cols-2 gap-2.5"></div>
+        <div id="landing-logo" class="flex items-center justify-center">🐉</div>
+
+        <h1 id="landing-title">DRAGÓN DE ORO</h1>
+        <p id="landing-slogan">Comida China Tradicional &amp; Sushi</p>
+
+        <div class="flex flex-wrap items-center justify-center gap-1.5 mt-5">
+          <span id="landing-rating">⭐ 4.9 (210+ reseñas)</span>
+          <span id="landing-preptime">⏱️ 20-30 min</span>
+          <span id="landing-delivery">🛵 Envío $1.800 CLP</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-base">⏰</span>
-            <h2 class="text-xs font-black text-gray-900 uppercase tracking-wider">Horario de Atención</h2>
-          </div>
-          <div id="landing-hours-list" class="space-y-2 text-xs"></div>
-        </div>
-
-        <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="text-base">📍</span>
-              <h2 class="text-xs font-black text-gray-900 uppercase tracking-wider">Ubicación del Local</h2>
-            </div>
-            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Huechuraba</span>
-          </div>
-
-          <p id="landing-address-text" class="text-xs font-extrabold text-gray-900 leading-snug"></p>
-          <p id="landing-address-ref" class="text-[11px] text-gray-500 mt-0.5 mb-3"></p>
-
-          <div class="relative w-full h-44 rounded-2xl overflow-hidden border border-gray-200 bg-gray-100 mb-3 shadow-inner">
-            <iframe id="landing-map-iframe" class="w-full h-full border-0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-            <a id="landing-map-overlay-link" href="#" target="_blank" rel="noopener noreferrer" class="absolute bottom-2 right-2 bg-gray-900/85 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1 hover:bg-black transition">
-              <span>🗺️ Ampliar Mapa</span>
-            </a>
-          </div>
-
-          <a id="landing-map-btn" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gray-900 hover:bg-black text-white font-extrabold py-3 px-4 rounded-2xl shadow-md text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-            <span>📍 Cómo llegar • Abrir en Google Maps</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="fixed bottom-3 left-3 right-3 z-50 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
-      <div class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md p-2.5 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/15 flex items-center justify-between gap-3">
-        <div class="pl-2">
-          <div class="text-[10px] text-amber-300 font-black uppercase tracking-wider">Camino de la Viña 1461</div>
-          <div class="text-xs font-extrabold text-white">Pide directo sin comisiones</div>
-        </div>
-        <button onclick="enterMenuPage()" id="btn-landing-bottom-order" class="bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3 px-6 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition shrink-0">
-          <span>🥢 Ir a Pedir</span>
-          <span>→</span>
+        <button onclick="enterMenuPage()" id="btn-landing-top-order" class="w-full max-w-xs text-white flex items-center justify-center gap-2 active:scale-95 transition">
+          <span>🥢 Ir al Menú / Hacer Pedido</span>
+          <span class="text-sm">→</span>
         </button>
       </div>
     </div>
+
+    <!-- 内容 -->
+    <div class="max-w-md mx-auto px-4 mt-5 space-y-3.5">
+
+      <div class="land-card">
+        <div class="land-card-head">
+          <span class="ico">🎁</span>
+          <h2>Promociones Destacadas</h2>
+        </div>
+        <div id="landing-promos-list" class="space-y-2.5"></div>
+      </div>
+
+      <div class="land-card">
+        <div class="land-card-head">
+          <span class="ico">📸</span>
+          <h2>Nuestras Especialidades</h2>
+          <button onclick="enterMenuPage()" class="ml-auto text-[10px] font-black" style="color:var(--red);letter-spacing:.02em;">Ver carta →</button>
+        </div>
+        <div id="landing-dishes-gallery" class="grid grid-cols-2 gap-2.5"></div>
+      </div>
+
+      <div class="land-card">
+        <div class="land-card-head">
+          <span class="ico">⏰</span>
+          <h2>Horario de Atención</h2>
+        </div>
+        <div id="landing-hours-list"></div>
+      </div>
+
+      <div class="land-card">
+        <div class="land-card-head">
+          <span class="ico">📍</span>
+          <h2>Ubicación del Local</h2>
+          <span class="ml-auto text-[9px] font-black px-2 py-0.5 rounded-full" style="color:#0F7A4A;background:#EDF8F1;border:1px solid #CDEBDA;">Huechuraba</span>
+        </div>
+
+        <p id="landing-address-text">Camino de la Viña 1461, Huechuraba, Santiago, Chile</p>
+        <p id="landing-address-ref">Retiro en local y Delivery a domicilio</p>
+
+        <div class="map-frame mt-3">
+          <iframe id="landing-map-iframe" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <a id="landing-map-overlay-link" class="map-open" target="_blank" rel="noopener noreferrer">
+            <span>🗺️</span> Ampliar mapa
+          </a>
+        </div>
+
+        <a id="landing-map-btn" class="btn-dark" target="_blank" rel="noopener noreferrer">
+          <span>📍</span><span>Cómo llegar · Google Maps</span>
+        </a>
+      </div>
+
+      <p class="text-center text-[9px] pt-3 pb-1" style="color:var(--muted);letter-spacing:.2em;">DRAGÓN DE ORO · SANTIAGO DE CHILE</p>
+    </div>
   </div>
+
+  <div class="fixed bottom-3 left-3 right-3 z-50 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+    <div class="land-bottom">
+      <div class="pl-1">
+        <div class="k">Camino de la Viña 1461</div>
+        <div class="v">Pide directo, sin comisiones</div>
+      </div>
+      <button onclick="enterMenuPage()" id="btn-landing-bottom-order" class="cart-cta">
+        <span>🥢 Ir a pedir</span><span>→</span>
+      </button>
+    </div>
+  </div>
+</div>
 
   <!-- ======================================================== -->
   <!-- 🍱 视图 B：在线点餐主界面 -->
   <!-- ======================================================== -->
-  <header id="store-header" class="text-white px-3.5 pt-3 pb-2 shadow-lg shrink-0 z-20 transition-all">
-    <div class="flex justify-between items-center mb-1.5">
-      <div class="flex items-center gap-2.5">
-        <div id="store-logo" class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">🐉</div>
-        <div>
-          <h1 id="store-title" class="text-base font-black tracking-tight leading-none text-white drop-shadow">DRAGÓN DE ORO</h1>
-          <p id="store-slogan" class="text-[10px] text-white/90 font-medium mt-1 leading-tight line-clamp-1 drop-shadow-sm">Comida China Tradicional & Sushi</p>
-        </div>
+  <header id="store-header" class="text-white shrink-0 z-20 relative" style="background-image: linear-gradient(180deg, rgba(23,19,16,.58), rgba(23,19,16,.95)), url(&quot;bg.jpg&quot;);">
+  <div class="flex justify-between items-center">
+    <div class="flex items-center gap-2.5">
+      <div id="store-logo" class="w-10 h-10 flex items-center justify-center shrink-0">🐉</div>
+      <div>
+        <h1 id="store-title">DRAGÓN DE ORO</h1>
+        <p id="store-slogan">Comida China Tradicional &amp; Sushi</p>
       </div>
-
-      <button onclick="openLandingPage()" class="flex items-center gap-1 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 px-2.5 py-1.5 rounded-xl shadow-sm active:scale-95 transition">
-        <span class="text-xs">📍</span>
-        <span class="text-[10px] font-black text-white tracking-wide">Info / Mapa</span>
-      </button>
     </div>
 
-    <div id="store-promo-bar" class="mb-1.5 bg-black/35 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-xl text-[10px] font-bold text-amber-200 flex items-center gap-1.5">
-      <span class="shrink-0">📢</span><span id="store-promo-text" class="truncate leading-tight"></span>
-    </div>
-    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px] font-semibold text-white/95">
-      <span id="badge-rating" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">⭐ 4.9 (210+)</span>
-      <span id="badge-preptime" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">⏱️ 20-30 min</span>
-      <span id="badge-delivery" class="bg-black/35 backdrop-blur-md px-2 py-0.5 rounded-xl border border-white/15 flex items-center gap-1 whitespace-nowrap">🛵 Envío $1.800 CLP</span>
-    </div>
-    <div class="mt-1.5 relative">
-      <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? (ej. California, Tempura, Carne...)" class="w-full bg-black/35 placeholder-white/70 text-white text-xs rounded-xl py-2 pl-8 pr-3 outline-none border border-white/20 focus:bg-black/55 focus:border-white/50 transition backdrop-blur-sm">
-      <span class="absolute left-2.5 top-2 text-xs text-white/80">🔍</span>
-    </div>
-  </header>
-
-  <!-- 2. 主分类切换 -->
-  <nav class="bg-white px-3 py-1.5 border-b border-gray-150 shrink-0 z-20 shadow-sm">
-    <div class="bg-gray-100 p-1 rounded-2xl flex gap-1 border border-gray-200/60">
-      <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 py-1.5 rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200">
-        <span class="text-sm">🥢</span> Comida China
-      </button>
-      <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200">
-        <span class="text-sm">🍣</span> Sushi
-      </button>
-    </div>
-  </nav>
-
-  <!-- 3. 双栏菜单区 -->
-  <div class="flex flex-1 overflow-hidden relative">
-    <aside id="sidebar-categories" class="w-24 bg-[#F1F3F5] border-r border-gray-200/80 overflow-y-auto no-scrollbar shrink-0 flex flex-col py-1.5"></aside>
-    <main id="menu-container" class="flex-1 overflow-y-auto px-2.5 pt-2 space-y-5 bg-[#F8F9FA]">
-      <div class="text-center py-24 text-gray-400 text-xs">Cargando delicias...</div>
-    </main>
+    <button onclick="openLandingPage()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl active:scale-95 transition shrink-0" style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);">
+      <span class="text-[10px]">📍</span>
+      <span class="text-[9.5px] font-bold" style="letter-spacing:.06em;">Info</span>
+    </button>
   </div>
 
-  <!-- 4. 底部悬浮购物车 -->
-  <div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
-    <footer class="pointer-events-auto max-w-md mx-auto bg-gray-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] border border-white/10 flex items-center justify-between transition-transform active:scale-[0.99]">
-      <div class="flex items-center gap-3 pl-1">
-        <div class="relative">
-          <div id="cart-icon-box" class="w-10 h-10 rounded-xl theme-bg-primary flex items-center justify-center text-lg shadow-md">🛒</div>
-          <span id="cart-total-count" class="absolute -top-1.5 -right-1.5 bg-amber-400 text-gray-950 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md">0</span>
-        </div>
-        <div>
-          <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Subtotal</div>
-          <div class="text-base font-black tracking-tight text-white leading-tight">$ <span id="cart-total-price">0</span> <span class="text-[10px] font-normal text-gray-400">CLP</span></div>
-        </div>
-      </div>
-      <button id="btn-checkout-dock" onclick="openCheckoutModal()" class="text-white font-extrabold py-2.5 px-5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition">
-        <span>Ver pedido</span><span>→</span>
-      </button>
-    </footer>
+  <div id="store-promo-bar" class="flex items-center gap-1.5">
+    <span class="shrink-0">📢</span><span id="store-promo-text" class="truncate"></span>
   </div>
+
+  <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+    <span id="badge-rating"></span>
+    <span id="badge-preptime"></span>
+    <span id="badge-delivery"></span>
+  </div>
+
+  <div class="relative">
+    <input id="quick-search" oninput="filterMenuItems()" type="text" placeholder="¿Qué se te antoja hoy? Busca un plato..." class="w-full outline-none">
+    <span class="absolute">🔍</span>
+  </div>
+</header>
+
+<!-- 主分类切换 -->
+<nav class="shrink-0 z-20">
+  <div class="flex">
+    <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 flex items-center justify-center gap-1.5 is-active">
+      <span class="text-sm">🥢</span> Comida China
+    </button>
+    <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 flex items-center justify-center gap-1.5">
+      <span class="text-sm">🍣</span> Sushi
+    </button>
+  </div>
+</nav>
+
+<!-- 双栏菜单区 -->
+<div class="flex flex-1 overflow-hidden relative">
+  <aside id="sidebar-categories" class="overflow-y-auto no-scrollbar shrink-0 flex flex-col"></aside>
+  <main id="menu-container" class="flex-1 overflow-y-auto"></main>
+</div>
+
+<!-- 底部悬浮购物车 -->
+<div class="fixed bottom-3 left-3 right-3 z-30 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+  <footer class="cart-dock">
+    <div class="flex items-center gap-3 pl-1">
+      <div class="relative">
+        <div id="cart-icon-box" class="cart-ico">🛒</div>
+        <span id="cart-total-count" class="cart-badge">0</span>
+      </div>
+      <div>
+        <div class="cart-label">Subtotal</div>
+        <div class="cart-price">$ <span id="cart-total-price">0</span><span class="unit">CLP</span></div>
+      </div>
+    </div>
+    <button id="btn-checkout-dock" onclick="openCheckoutModal()" class="cart-cta">
+      <span>Ver pedido</span><span>→</span>
+    </button>
+  </footer>
+</div>
 
   <!-- 5. 菜品定制弹窗 (增加 overflow-x-hidden 严防横向溢出) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -695,6 +1518,8 @@
     </div>
   </div>
 
+  <div id="dz-toast"></div>
+
   <script>
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
@@ -910,6 +1735,16 @@
 
     let currentMenuMode = 'china';
     let allDishes = [];
+
+    let dzToastTimer;
+    function dzToast(msg) {
+      const el = document.getElementById('dz-toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(dzToastTimer);
+      dzToastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
     let cart = [];
     let currentSelectedDish = null;
     let modalQty = 1;
@@ -942,8 +1777,8 @@
     let currentComboOriginalItems = [];
     let progressiveSwaps = [];
 
-    const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
-    const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
+    const BTN_ACTIVE_STYLE = "opt-btn is-on";
+    const BTN_INACTIVE_STYLE = "opt-btn";
 
     function toggleChinaExtra(item) {
       selectedChinaExtras[item] = !selectedChinaExtras[item];
@@ -985,11 +1820,11 @@
       let promosHtml = '';
       (STORE_CONFIG.promotions || []).forEach(p => {
         promosHtml += `
-          <div class="bg-amber-50/90 border border-amber-200/80 rounded-2xl p-3 flex items-start gap-2.5">
-            <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 mt-0.5">${p.badge}</span>
+          <div class="promo-item">
+            <span class="promo-badge">${p.badge}</span>
             <div>
-              <div class="text-xs font-black text-gray-900 leading-tight">${p.title}</div>
-              <div class="text-[11px] text-gray-600 mt-0.5 leading-snug">${p.desc}</div>
+              <div class="promo-title">${p.title}</div>
+              <div class="promo-desc">${p.desc}</div>
             </div>
           </div>
         `;
@@ -1000,14 +1835,11 @@
       let galleryHtml = '';
       (STORE_CONFIG.promoDishes || []).forEach(d => {
         galleryHtml += `
-          <div onclick="enterMenuPage()" class="group relative rounded-2xl overflow-hidden border border-gray-200 bg-gray-900 h-36 cursor-pointer shadow-xs active:scale-95 transition">
-            <img src="${d.img}" alt="${d.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 opacity-90">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
-            <span class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-300 text-[9px] font-black px-2 py-0.5 rounded-lg border border-white/15">${d.tag}</span>
-            <div class="absolute bottom-2 left-2.5 right-2.5 text-white">
-              <div class="text-xs font-black leading-tight">${d.name}</div>
-              <div class="text-[10px] text-white/80 font-semibold mt-0.5">${d.price}</div>
-            </div>
+          <div onclick="enterMenuPage()" class="gal-item">
+            <img src="${d.img}" alt="${d.name}">
+            <div class="veil"></div>
+            <span class="tag">${d.tag}</span>
+            <div class="cap"><b>${d.name}</b><span>${d.price}</span></div>
           </div>
         `;
       });
@@ -1017,9 +1849,9 @@
       let hoursHtml = '';
       (STORE_CONFIG.businessHours || []).forEach(h => {
         hoursHtml += `
-          <div class="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-0">
-            <span class="font-bold text-gray-600">${h.days}</span>
-            <span class="font-black text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg">${h.hours}</span>
+          <div class="hour-row">
+            <span class="d">${h.days}</span>
+            <span class="h">${h.hours}</span>
           </div>
         `;
       });
@@ -1305,22 +2137,15 @@
       document.getElementById('label-delivery-fee').innerText = "+$" + Number(STORE_CONFIG.deliveryFee).toLocaleString('es-CL') + " CLP";
 
       const btnCheckout = document.getElementById('btn-checkout-dock');
-      btnCheckout.className = "bg-gradient-to-r " + t.btnGradient + " text-white font-extrabold py-2.5 px-5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 active:scale-95 transition";
-      const btnModalAdd = document.getElementById('btn-modal-add');
-      btnModalAdd.className = "w-full bg-gradient-to-r " + t.btnGradient + " text-white font-black py-3.5 rounded-2xl shadow-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition";
+      if (btnCheckout) btnCheckout.classList.add('cart-cta');
     }
 
     function switchMainMenu(mode) {
       currentMenuMode = mode;
       const btnChina = document.getElementById('btn-tab-china');
       const btnSushi = document.getElementById('btn-tab-sushi');
-      if (mode === 'china') {
-        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
-      } else {
-        btnSushi.className = "flex-1 py-1.5 rounded-xl text-xs font-black bg-white theme-text-primary shadow-sm flex items-center justify-center gap-1.5 transition-all duration-200";
-        btnChina.className = "flex-1 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 transition-all duration-200";
-      }
+      btnChina.classList.toggle('is-active', mode === 'china');
+      btnSushi.classList.toggle('is-active', mode === 'sushi');
       renderCurrentMenu();
     }
 
@@ -1351,11 +2176,9 @@
       const sidebar = document.getElementById('sidebar-categories');
       let html = '';
       cats.forEach((cat, idx) => {
-        const isFirst = idx === 0;
-        const activeClass = isFirst ? 'bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm' : 'text-gray-500 font-semibold hover:bg-gray-200/60';
-        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 ' + activeClass + '">';
-        html += '  <span class="text-base leading-none">' + cat.icon + '</span>';
-        html += '  <span class="leading-tight break-words text-[9.5px]">' + cat.short + '</span>';
+        html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="' + (idx === 0 ? 'side-active' : '') + '">';
+        html += '  <span>' + cat.icon + '</span>';
+        html += '  <span>' + cat.short + '</span>';
         html += '</button>';
       });
       html += '<div class="h-36 w-full shrink-0 pointer-events-none"></div>';
@@ -1379,7 +2202,7 @@
       const dish = allDishes.find(d => d.id === dishId);
       if (!dish) return '';
       if (!dish.is_available) {
-        return '<button class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 font-black text-base flex items-center justify-center shrink-0">✕</button>';
+        return '<div class="qty-soldout">✕</div>';
       }
       const qty = getDishCartQty(dishId);
       const isBao = checkIsBao(dish);
@@ -1387,13 +2210,13 @@
       const addCall = isDirectAdd ? `handleDirectAdd(${dish.id}, event)` : `openOptionModal(${dish.id}, event)`;
 
       if (qty === 0) {
-        return `<button onclick="${addCall}" class="w-8 h-8 rounded-full theme-bg-primary text-white font-black text-base flex items-center justify-center shrink-0 shadow-md active:scale-90 transition">+</button>`;
+        return `<button onclick="${addCall}" class="qty-add" aria-label="Agregar al pedido">+</button>`;
       }
       return `
-        <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-full border border-gray-200 shadow-sm" onclick="event.stopPropagation()">
-          <button onclick="handleDishMinus(${dish.id}, event)" class="w-7 h-7 rounded-full bg-white text-gray-800 hover:text-red-600 font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">-</button>
-          <span class="text-xs font-black text-gray-900 px-1 min-w-[16px] text-center">${qty}</span>
-          <button onclick="${addCall}" class="w-7 h-7 rounded-full theme-bg-primary text-white font-black flex items-center justify-center shadow-sm text-sm active:scale-90 transition">+</button>
+        <div class="qty-stepper" onclick="event.stopPropagation()">
+          <button onclick="handleDishMinus(${dish.id}, event)" class="qty-minus" aria-label="Quitar uno">−</button>
+          <span class="qty-num">${qty}</span>
+          <button onclick="${addCall}" class="qty-plus" aria-label="Agregar uno">+</button>
         </div>
       `;
     }
@@ -1406,10 +2229,10 @@
         if (items.length === 0) return;
 
         html += '<section id="' + cat.id + '" class="scroll-mt-3 dish-section" data-cat-id="' + cat.id + '">';
-        html += '<div class="flex items-center gap-2 mb-2 px-1">';
-        html += '  <span class="text-sm">' + cat.icon + '</span>';
-        html += '  <h2 class="text-xs font-black text-gray-800 uppercase tracking-wider">' + cat.title + '</h2>';
-        html += '  <span class="text-[10px] font-bold text-gray-400 ml-auto bg-gray-200/60 px-2 py-0.5 rounded-full">' + items.length + '</span>';
+        html += '<div class="cat-head">';
+        html += '  <span class="cat-ico">' + cat.icon + '</span>';
+        html += '  <h2>' + cat.title + '</h2>';
+        html += '  <span class="cat-count">' + items.length + '</span>';
         html += '</div><div class="space-y-2">';
 
         items.forEach(dish => {
@@ -1418,26 +2241,23 @@
           const isDirectAdd = DIRECT_ADD_CATEGORIES.includes(dish.category) && !isBao;
           const cardClickAction = isDirectAdd ? 'handleDirectAdd(' + dish.id + ', event)' : 'openOptionModal(' + dish.id + ', event)';
           const clickAttr = isSoldOut ? '' : 'onclick="' + cardClickAction + '"';
-          const cardStyle = isSoldOut 
-            ? 'bg-white/60 p-3 rounded-2xl border border-gray-200/50 flex justify-between items-center opacity-60 cursor-not-allowed' 
-            : 'bg-white p-3 rounded-2xl border border-gray-150 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md flex justify-between items-center active:scale-[0.99] transition cursor-pointer';
-          const badge = isSoldOut ? '<span class="bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded-md font-black tracking-wider">AGOTADO</span>' : '';
+          const badge = isSoldOut ? '<span class="dish-tag">AGOTADO</span>' : '';
           const descText = dish.description || '';
           const priceStr = Number(dish.price).toLocaleString('es-CL');
 
-          html += '<div ' + clickAttr + ' class="' + cardStyle + ' dish-card" data-dishname="' + dish.name.toLowerCase() + '" data-dishdesc="' + descText.toLowerCase() + '">';
-          html += '  <div class="flex-1 pr-3">';
-          html += '    <div class="flex items-center gap-1.5"><h3 class="font-extrabold text-xs text-gray-900 leading-snug">' + dish.name + '</h3>' + badge + '</div>';
-          if (descText) html += '<p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">' + descText + '</p>';
-          html += '    <div class="mt-1.5 flex items-baseline gap-1"><span class="text-[10px] font-bold theme-text-primary">$</span><span class="text-sm font-black theme-text-primary tracking-tight">' + priceStr + '</span><span class="text-[9px] font-semibold text-gray-400">CLP</span></div>';
+          html += '<div ' + clickAttr + ' class="dish-card' + (isSoldOut ? ' is-soldout' : '') + '" data-dishname="' + dish.name.toLowerCase() + '" data-dishdesc="' + descText.toLowerCase() + '">';
+          html += '  <div class="dish-main">';
+          html += '    <h3 class="dish-name">' + dish.name + badge + '</h3>';
+          if (descText) html += '    <p class="dish-desc">' + descText + '</p>';
+          html += '    <div class="dish-price"><span class="cur">$</span><span class="num">' + priceStr + '</span><span class="unit">CLP</span></div>';
           html += '  </div>';
-          html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="shrink-0">' + renderDishActionBtn(dish.id) + '</div>';
+          html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="dish-act">' + renderDishActionBtn(dish.id) + '</div>';
           html += '</div>';
         });
         html += '</div></section>';
       });
 
-      if (!html) html = '<div class="text-center py-20 text-gray-400 text-xs">No hay platos disponibles por el momento.</div>';
+      if (!html) html = '<div class="text-center py-20" style="color:var(--muted);font-size:12px">No hay platos disponibles por el momento.</div>';
       html += '<div class="h-44 w-full shrink-0 pointer-events-none"></div>';
       container.innerHTML = html;
     }
@@ -1507,12 +2327,10 @@
     function highlightSidebarCategory(catId, shouldScrollSidebar = true) {
       const sidebar = document.getElementById('sidebar-categories');
       if (!sidebar) return;
-      sidebar.querySelectorAll('button').forEach(btn => {
-        btn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 text-gray-500 font-semibold hover:bg-gray-200/60";
-      });
+      sidebar.querySelectorAll('button').forEach(btn => btn.classList.remove('side-active'));
       const activeBtn = document.getElementById('side-btn-' + catId);
       if (activeBtn) {
-        activeBtn.className = "w-full text-left px-1.5 py-3 text-[11px] transition flex flex-col items-center text-center gap-1 border-b border-gray-200/50 bg-white theme-text-primary font-black border-l-4 theme-border-primary shadow-sm";
+        activeBtn.classList.add('side-active');
         if (shouldScrollSidebar) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
@@ -2132,17 +2950,17 @@
 
     function openCheckoutModal() {
       if (cart.length === 0) {
-        alert("El carrito está vacío. Agrega platos antes de continuar.");
+        dzToast("Tu carrito está vacío · Agrega platos para continuar");
         return;
       }
       const container = document.getElementById('cart-items-preview');
       let previewHtml = '';
       cart.forEach((item, index) => {
         const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
-        const optText = item.options.length > 0 ? '<div class="text-[10px] text-gray-400 leading-tight mt-0.5">• ' + item.options.join('<br>• ') + '</div>' : '';
-        previewHtml += '<div class="py-2 flex justify-between items-start">';
-        previewHtml += '  <div class="flex-1 pr-2"><div class="font-extrabold text-gray-900 text-xs">' + item.qty + 'x ' + item.name + '</div>' + optText + '<div class="theme-text-primary font-black mt-0.5 text-xs">$ ' + itemTotal + ' CLP</div></div>';
-        previewHtml += '  <button onclick="removeFromCart(' + index + ')" class="text-red-500 hover:text-red-700 text-[11px] px-2 py-1 font-bold rounded-lg bg-red-50">Quitar</button>';
+        const optText = item.options.length > 0 ? '<div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:3px">• ' + item.options.join('<br>• ') + '</div>' : '';
+        previewHtml += '<div class="py-2.5 flex justify-between items-start gap-2">';
+        previewHtml += '  <div class="flex-1 min-w-0"><div style="font-size:12px;font-weight:800;color:var(--ink);line-height:1.35">' + item.qty + ' × ' + item.name + '</div>' + optText + '<div style="font-size:11.5px;font-weight:800;color:var(--red);margin-top:4px">$ ' + itemTotal + '</div></div>';
+        previewHtml += '  <button onclick="removeFromCart(' + index + ')" style="font-size:10px;font-weight:800;color:var(--red);background:#FDF0EE;border:1px solid rgba(168,30,36,.18);border-radius:9px;padding:5px 9px;flex:none">Quitar</button>';
         previewHtml += '</div>';
       });
       container.innerHTML = previewHtml;
