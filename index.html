@@ -1932,7 +1932,7 @@
       return { date: dd + '/' + mm + '/' + yyyy, time: hh + ':' + min };
     }
 
-    function sendOrderToWhatsApp() {
+    async function sendOrderToWhatsApp() {
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
       const address = document.getElementById('cust-address').value.trim();
@@ -1983,6 +1983,27 @@
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
       const timingLine = timingType === 'asap' ? '⚡ Lo antes posible (Inmediato)' : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
 
+      // 🌟 核心联动：在跳转 WhatsApp 前，自动将订单推送至店长端 80mm 出单机后台
+      try {
+        await db.from('orders').insert([{
+          order_code: orderCode,
+          service_type: serviceType,
+          timing_info: timingLine,
+          customer_name: name,
+          customer_phone: phone,
+          customer_address: orderType === 'delivery' ? address : '',
+          items: cart,
+          subtotal: subtotal,
+          delivery_fee: deliveryFee,
+          total: total,
+          payment_detail: payDetail,
+          notes: notes || 'Sin comentarios',
+          status: 'pending'
+        }]);
+      } catch (err) {
+        console.error("Error guardando pedido:", err);
+      }
+
       const message = orderCode + '\n' +
         '📅 ' + dt.date + ' ⏰ ' + dt.time + '\n\n' +
         'Tipo de servicio: ' + serviceType + '\n' +
@@ -2003,7 +2024,6 @@
 
       window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
-
     applyStoreConfig();
     initLandingPage();
     autoDetectAndSetBanner();
