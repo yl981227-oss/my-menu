@@ -319,9 +319,9 @@
     </footer>
   </div>
 
-  <!-- 5. 菜品定制弹窗 -->
+  <!-- 5. 菜品定制弹窗 (增加 overflow-x-hidden 严防横向溢出) -->
   <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
 
       <div class="flex justify-between items-start border-b pb-3 mb-3.5">
@@ -375,16 +375,19 @@
         </div>
       </div>
 
-      <!-- 🌟 B. 极简递进式套餐换菜 + 一键 ×1/×2/×3 换白饭模块 -->
+      <!-- 🌟 B. 极简竖向弹窗换白饭 (×1/×2/×3...) + 递进式换菜模块 -->
       <div id="box-menu-notes" class="hidden mb-4 bg-amber-50/90 p-3.5 rounded-2xl border border-amber-200/90 shadow-sm space-y-3">
-        <!-- 1. 一键把炒饭换成白饭 (×1 / ×2 / ×3) -->
+        <!-- 1. 点击弹出竖向选择框：把对应数量的炒饭换成白饭 -->
         <div id="menu-rice-swap-box" class="hidden pb-3 border-b border-amber-200/80">
-          <div class="flex items-center justify-between gap-2">
-            <div>
-              <span class="block text-xs font-black text-amber-950">🍚 ¿Cambiar Chaufán por Arroz Blanco?</span>
-              <span class="text-[10px] text-amber-800/80">Elige cuántos cambias a blanco (Gratis)</span>
-            </div>
-            <div id="menu-rice-btns" class="flex items-center gap-1 shrink-0"></div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-xs font-black text-amber-950 flex items-center gap-1">
+              <span>🍚</span> ¿Cambiar Chaufán por Arroz Blanco?
+            </label>
+            <span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">Gratis</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-amber-300 shadow-2xs">
+            <select id="menu-rice-select" onchange="selectWhiteRiceSwapCount(parseInt(this.value, 10))" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-600 transition">
+            </select>
           </div>
         </div>
 
@@ -934,11 +937,10 @@
     let extraSoyaCount = 0;
     let extraTeriyakiCount = 0;
 
-    // 🌟 极简递进式换菜与 ×1/×2/×3 白饭状态变量
     let currentMenuMaxRice = 0;
     let selectedWhiteRiceSwapCount = 0;
-    let currentComboOriginalItems = []; // 当前套餐内可被替换的非米饭菜品
-    let progressiveSwaps = [];          // 递进式换菜槽位数组，默认只有 1 个 [{ fromIdx: '', toId: '', toName: '', toPrice: 0 }]
+    let currentComboOriginalItems = [];
+    let progressiveSwaps = [];
 
     const BTN_ACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-red-600 bg-red-50 text-red-600 font-black shadow-sm transition";
     const BTN_INACTIVE_STYLE = "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:border-gray-300 transition";
@@ -1526,7 +1528,7 @@
     }
 
     // =====================================================
-    // 🌟 极简递进式换菜引擎 + 一键 ×1/×2/×3 换白饭
+    // 🌟 极简竖向弹窗换白饭 + 递进式换菜引擎
     // =====================================================
     function normalizeTokens(str) {
       const stopWords = new Set(['de', 'con', 'en', 'al', 'el', 'la', 'los', 'las', 'un', 'una', 'y', 'o', 'u', 'unidades', 'porcion']);
@@ -1575,16 +1577,15 @@
       return 'plato';
     }
 
-    // 渲染一键换白饭按钮组 (No / ×1 / ×2 / ×3...)
+    // 🌟 渲染竖向弹窗换白饭下拉菜单 (No / ×1 / ×2 / ×3...)
     function selectWhiteRiceSwapCount(count) {
-      selectedWhiteRiceSwapCount = count;
-      renderWhiteRiceButtons();
+      selectedWhiteRiceSwapCount = count || 0;
     }
 
     function renderWhiteRiceButtons() {
       const box = document.getElementById('menu-rice-swap-box');
-      const btnsContainer = document.getElementById('menu-rice-btns');
-      if (!box || !btnsContainer) return;
+      const selectEl = document.getElementById('menu-rice-select');
+      if (!box || !selectEl) return;
 
       if (currentMenuMaxRice <= 0) {
         box.classList.add('hidden');
@@ -1592,22 +1593,16 @@
       }
 
       box.classList.remove('hidden');
-      let html = '';
+      let html = `<option value="0" ${selectedWhiteRiceSwapCount === 0 ? 'selected' : ''}>-- No cambiar (Todo Arroz Chaufán) --</option>`;
 
-      for (let i = 0; i <= currentMenuMaxRice; i++) {
-        const isSelected = (selectedWhiteRiceSwapCount === i);
-        const label = (i === 0) ? 'No' : `×${i}`;
-        const btnStyle = isSelected
-          ? "px-2.5 py-1.5 rounded-xl border-2 border-red-600 bg-red-600 text-white font-black text-xs shadow-xs transition"
-          : "px-2.5 py-1.5 rounded-xl border border-amber-300 bg-white text-gray-700 font-bold text-xs hover:border-amber-500 transition";
-
-        html += `<button type="button" onclick="selectWhiteRiceSwapCount(${i})" class="${btnStyle}">${label}</button>`;
+      for (let i = 1; i <= currentMenuMaxRice; i++) {
+        const sel = (selectedWhiteRiceSwapCount === i) ? 'selected' : '';
+        html += `<option value="${i}" ${sel}>🍚 Cambiar ×${i} por Arroz Blanco (Gratis)</option>`;
       }
 
-      btnsContainer.innerHTML = html;
+      selectEl.innerHTML = html;
     }
 
-    // 获取某个槽位类型对应的可替换目标 HTML（严格同类互换）
     function getTargetOptionsHtmlForType(slotType) {
       if (slotType === 'sushi') {
         const validSushiCatIds = [
@@ -1639,7 +1634,6 @@
         return html;
       }
 
-      // 默认主菜（plato）：严格只显示中餐主菜（不含 BAO、不含 Aperitivos、不含 Sopas、不含 Arroz）
       const poolPlatos = allDishes.filter(d =>
         MAIN_CHINESE_DISH_CATS.includes(d.category) && !d.is_colacion && !checkIsBao(d) && d.is_available
       );
@@ -1696,7 +1690,7 @@
           const slotType = classifyChineseComboItem(baseCleanName, matched);
 
           if (slotType === 'arroz') {
-            currentMenuMaxRice += (count >= 1 && count <= 10) ? count : 1;
+            currentMenuMaxRice += (count >= 1 && count <= 12) ? count : 1;
           } else {
             const basePrice = matched ? matched.price : 0;
             const canonicalName = matched ? matched.name : (baseCleanName.charAt(0).toUpperCase() + baseCleanName.slice(1));
@@ -1723,7 +1717,6 @@
       progressiveSwaps[stepIndex].toName = '';
       progressiveSwaps[stepIndex].toPrice = 0;
 
-      // 如果清空了第 1 步，自动收起后面的多余步骤
       if (fromIdxVal === '' && progressiveSwaps.length > 1) {
         progressiveSwaps.splice(stepIndex, 1);
       }
@@ -1765,7 +1758,6 @@
       const addMoreBtn = document.getElementById('btn-add-more-swap');
       if (!listEl || !addMoreBtn) return;
 
-      // 记录已被其他步骤选中的原菜索引，防止重复换同一个菜
       const usedFromIndices = new Set(
         progressiveSwaps.map(s => s.fromIdx).filter(v => v !== '')
       );
@@ -1773,7 +1765,6 @@
       let html = '';
 
       progressiveSwaps.forEach((step, sIdx) => {
-        // 1. 生成“要换掉哪个原菜”下拉框
         let fromOptions = '<option value="">-- Sin cambio (Toca para elegir plato) --</option>';
         currentComboOriginalItems.forEach((orig, oIdx) => {
           const idxStr = String(oIdx);
@@ -1783,13 +1774,11 @@
           fromOptions += `<option value="${idxStr}" ${selectedAttr}>Cambiar: ${orig.name}${priceStr}</option>`;
         });
 
-        // 2. 如果已选定原菜，紧接着展示“换成哪个同品类新菜”下拉框
         let toSelectHtml = '';
         if (step.fromIdx !== '') {
           const origItem = currentComboOriginalItems[parseInt(step.fromIdx, 10)];
           if (origItem) {
             const rawTargetOptions = getTargetOptionsHtmlForType(origItem.type);
-            // 标记当前选中的目标菜
             const tempDiv = document.createElement('select');
             tempDiv.innerHTML = rawTargetOptions;
             if (step.toId) {
@@ -1812,7 +1801,7 @@
           : '';
 
         html += `
-          <div class="bg-white p-2.5 rounded-xl border border-amber-300 shadow-2xs">
+          <div class="bg-white p-2 rounded-xl border border-amber-300 shadow-2xs">
             ${headerLabel}
             <select onchange="onSwapFromChange(${sIdx}, this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-600 transition">
               ${fromOptions}
@@ -1824,7 +1813,6 @@
 
       listEl.innerHTML = html;
 
-      // 判断是否显示“➕ ¿Cambiar otro plato más?”按钮（当前最后一步已完成换菜，且套餐还有剩余未换的菜）
       const lastStep = progressiveSwaps[progressiveSwaps.length - 1];
       const canAddMore = lastStep && lastStep.fromIdx !== '' && lastStep.toId !== '' && (progressiveSwaps.length < currentComboOriginalItems.length);
       addMoreBtn.classList.toggle('hidden', !canAddMore);
@@ -1982,7 +1970,6 @@
         }
       }
 
-      // 🌟 提取一键换白饭 (×1 / ×2 / ×3) 与递进式换菜记录
       if (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos') {
         if (selectedWhiteRiceSwapCount > 0) {
           optionsList.push(`Arroz: Cambiar ×${selectedWhiteRiceSwapCount} por Arroz Blanco`);
