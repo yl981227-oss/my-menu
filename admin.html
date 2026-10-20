@@ -3,324 +3,660 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="google" content="notranslate">
-  <title>Panel de Control - Administración</title>
+  <title>DRAGÓN DE ORO - Panel de Control & Impresora 80mm</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    /* 80mm 系统打印备用样式 */
+    @media print {
+      body * { visibility: hidden; }
+      #print-area-80mm, #print-area-80mm * { visibility: visible; }
+      #print-area-80mm {
+        position: absolute; left: 0; top: 0;
+        width: 72mm; padding: 2mm;
+        font-family: 'Courier New', monospace;
+        font-size: 12px; color: #000;
+      }
+      @page { size: 80mm auto; margin: 0; }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
+
+  <!-- 顶部导航栏 -->
+  <header class="bg-slate-950 border-b border-slate-800 px-4 py-3 sticky top-0 z-30">
+    <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🐉</span>
+        <div>
+          <h1 class="text-sm font-black text-white tracking-wide">DRAGÓN DE ORO • POS 80MM</h1>
+          <div class="flex items-center gap-1.5 text-[11px] text-emerald-400 font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="realtime-status">Escuchando pedidos en vivo...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 视图切换：实时接单 vs 菜品管理 -->
+      <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+        <button id="tab-orders" onclick="switchAdminTab('orders')" class="px-3 py-1.5 rounded-lg bg-red-600 text-white shadow">
+          🖨️ Pedidos (<span id="pending-count">0</span>)
+        </button>
+        <button id="tab-dishes" onclick="switchAdminTab('dishes')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white">
+          🍱 Menú / Stock
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto p-3.5 space-y-4">
+
+    <!-- ========================================== -->
+    <!-- 面板 1：实时接单 & 80mm 蓝牙打印控制台 -->
+    <!-- ========================================== -->
+    <div id="view-orders" class="space-y-4">
+
+      <!-- 蓝牙打印机控制中心 -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
+          <div>
+            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Configuración Impresora Térmica 80mm</h2>
+            <p id="printer-status-text" class="text-[11px] text-slate-400 mt-0.5">Estado: No conectada (Selecciona modo abajo)</p>
+          </div>
+          <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
+            <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
+            <span>Auto-Imprimir</span>
+          </label>
+        </div>
+
+        <!-- 打印通道模式选择 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <button onclick="setPrintMethod('ble')" id="btn-mode-ble" class="p-2.5 rounded-xl border-2 border-red-500 bg-red-500/10 text-white font-bold text-left transition">
+            <div class="font-black">1. Bluetooth Directo (BLE)</div>
+            <div class="text-[10px] text-slate-300 mt-0.5">Emparejar directo desde Chrome</div>
+          </button>
+          <button onclick="setPrintMethod('rawbt')" id="btn-mode-rawbt" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
+            <div class="font-black">2. App RawBT (SPP/WiFi/LAN)</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Para Bluetooth clásico o Red</div>
+          </button>
+          <button onclick="setPrintMethod('system')" id="btn-mode-system" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
+            <div class="font-black">3. Impresión Sistema Android</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Ventana nativa de Android</div>
+          </button>
+        </div>
+
+        <!-- 操作按钮栏 -->
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button onclick="connectBluetoothPrinter()" id="btn-connect-ble" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+            <span>🔵 Conectar Impresora Bluetooth</span>
+          </button>
+
+          <button onclick="printTestTicket()" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+            <span>🧪 Imprimir Ticket Prueba (80mm)</span>
+          </button>
+
+          <button onclick="enableAudioAndWakeLock()" id="btn-wakelock" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 shadow transition">
+            <span>🔔 Activar Sonido y Pantalla Activa</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 实时订单列表 -->
+      <div class="flex items-center justify-between px-1">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-300">📋 Lista de Pedidos Recientes</h3>
+        <button onclick="fetchOrders()" class="text-xs font-bold text-blue-400 hover:text-blue-300">🔄 Actualizar ahora</button>
+      </div>
+
+      <div id="orders-list" class="space-y-3">
+        <div class="text-center py-16 text-slate-500 text-xs">Cargando pedidos...</div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 面板 2：菜品上下架与价格管理 (保留原有功能) -->
+    <!-- ========================================== -->
+    <div id="view-dishes" class="hidden space-y-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-3.5">
+        <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato para cambiar precio o agotar..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
+      </div>
+      <div id="admin-dishes-list" class="space-y-2"></div>
+    </div>
+
+  </main>
+
+  <!-- 隐藏的 80mm 系统打印预览区 -->
+  <div id="print-area-80mm" class="hidden"></div>
+
   <script>
-    // 云端配置与密钥
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const ADMIN_PIN = "8888";
-    let allDishes = [];
-    let currentFilterType = 'all'; // all, china, sushi, bebidas, soldout
+    let ordersData = [];
+    let knownOrderIds = new Set();
+    let isFirstLoad = true;
+    let printMethod = 'ble'; // 'ble' | 'rawbt' | 'system'
 
-    // 分类字典映射
-    const categoryNames = {
-      'cat-menus': '🍱 Menús',
-      'cat-colaciones': '🍛 Colaciones',
-      'cat-aperitivos': '🥟 Aperitivos',
-      'cat-vacuno': '🥩 Vacuno',
-      'cat-pollo': '🍗 Pollo',
-      'cat-cerdo': '🐷 Cerdo',
-      'cat-chaumin': '🍜 Chaumín',
-      'cat-arroz': '🍚 Arroz',
-      'cat-sopas': '🍲 Sopas',
-      'cat-chapsui': '🥗 Chapsui',
-      'cat-dragon': '🌱 Diente Dragón',
-      'cat-mariscos': '🍤 Mariscos',
-      'cat-parrilladas': '🥘 Parrilladas',
-      'cat-sushi-promos': '🍱 Promos Sushi',
-      'cat-sushi-hot': '🔥 Hot Rolls',
-      'cat-sushi-california': '🥑 California',
-      'cat-sushi-envueltos': '🍣 Envueltos',
-      'cat-sushi-handrolls': '🌯 Hand Rolls',
-      'cat-sushi-gohan': '🍚 Gohan',
-      'cat-bebidas': '🥤 Bebidas'
-    };
+    // Web Bluetooth 变量
+    let bluetoothDevice = null;
+    let printCharacteristic = null;
 
-    function checkPin() {
-      const pin = document.getElementById('pin-input').value.trim();
-      if (pin === ADMIN_PIN) {
-        sessionStorage.setItem('isAdminAuth', 'true');
-        showPanel();
-      } else {
-        document.getElementById('pin-error').classList.remove('hidden');
+    // 切换顶部面板
+    function switchAdminTab(tab) {
+      document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
+      document.getElementById('view-dishes').classList.toggle('hidden', tab !== 'dishes');
+      document.getElementById('tab-orders').className = tab === 'orders' ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      document.getElementById('tab-dishes').className = tab === 'dishes' ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      if (tab === 'dishes') loadAdminDishes();
+    }
+
+    // 切换打印连接方式
+    function setPrintMethod(method) {
+      printMethod = method;
+      ['ble', 'rawbt', 'system'].forEach(m => {
+        const btn = document.getElementById('btn-mode-' + m);
+        if (m === method) {
+          btn.className = "p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition";
+        } else {
+          btn.className = "p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition";
+        }
+      });
+      document.getElementById('btn-connect-ble').style.display = (method === 'ble') ? 'flex' : 'none';
+      const statusEl = document.getElementById('printer-status-text');
+      if (method === 'rawbt') {
+        statusEl.innerText = "Modo activo: App RawBT (Impresión directa por Bluetooth SPP / WiFi / Red)";
+      } else if (method === 'system') {
+        statusEl.innerText = "Modo activo: Impresión del Sistema Android (80mm)";
       }
     }
 
-    function showPanel() {
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('admin-panel').classList.remove('hidden');
-      fetchDishes();
+    // 开启声音提醒与屏幕常亮
+    async function enableAudioAndWakeLock() {
+      playBeepAlert();
+      try {
+        if ('wakeLock' in navigator) {
+          await navigator.wakeLock.request('screen');
+        }
+        const btn = document.getElementById('btn-wakelock');
+        btn.innerText = "✅ Sonido y Pantalla Activa OK";
+        btn.className = "bg-slate-700 text-emerald-400 font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1";
+      } catch (e) {
+        alert("Sonido activado. Mantén la pantalla encendida para recibir pedidos.");
+      }
     }
 
-    function logout() {
-      sessionStorage.removeItem('isAdminAuth');
-      window.location.reload();
+    // 接单响铃音效（使用 Web Audio 合成响亮双音铃声）
+    function playBeepAlert() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.35, 0.7].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
+          osc.frequency.setValueAtTime(1174, ctx.currentTime + delay + 0.15);
+          gain.gain.setValueAtTime(0.9, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + delay + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.32);
+        });
+      } catch (e) { console.log(e); }
     }
 
-    // 从 Supabase 拉取全部菜品
-    async function fetchDishes() {
-      const container = document.getElementById('dish-list');
-      container.innerHTML = '<div class="text-center py-16 text-gray-400 text-xs">Cargando platos desde la nube...</div>';
-
-      const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
-      if (error) {
-        container.innerHTML = '<div class="text-center py-16 text-red-500 text-xs">Error de conexión: ' + error.message + '</div>';
+    // =====================================================
+    // 🔵 Web Bluetooth API 蓝牙直连 80mm 打印机核心引擎
+    // =====================================================
+    async function connectBluetoothPrinter() {
+      if (!navigator.bluetooth) {
+        alert("Tu navegador no soporta Web Bluetooth directo. Usa Chrome en Android o selecciona el Modo 2 (App RawBT).");
         return;
       }
-      allDishes = data || [];
-      updateDashboardCounts();
-      applyFilters();
+      try {
+        const commonServices = [
+          '000018f0-0000-1000-8000-00805f9b34fb',
+          'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+          '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+          '0000ff00-0000-1000-8000-00805f9b34fb',
+          '0000ffe0-0000-1000-8000-00805f9b34fb'
+        ];
+
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: commonServices
+        });
+
+        document.getElementById('printer-status-text').innerText = "Conectando a " + (bluetoothDevice.name || "Impresora") + "...";
+        const server = await bluetoothDevice.gatt.connect();
+        const services = await server.getPrimaryServices();
+
+        let foundChar = null;
+        for (const service of services) {
+          const chars = await service.getCharacteristics();
+          for (const c of chars) {
+            if (c.properties.write || c.properties.writeWithoutResponse) {
+              foundChar = c;
+              break;
+            }
+          }
+          if (foundChar) break;
+        }
+
+        if (!foundChar) {
+          throw new Error("No se encontró canal de escritura BLE. Te recomendamos usar el Modo 2 (RawBT).");
+        }
+
+        printCharacteristic = foundChar;
+        document.getElementById('printer-status-text').innerHTML = `<span class="text-emerald-400 font-bold">✅ Conectada: ${bluetoothDevice.name || 'Impresora 80mm'}</span>`;
+        document.getElementById('btn-connect-ble').innerText = "✅ Impresora Bluetooth Conectada";
+
+        bluetoothDevice.addEventListener('gattserverdisconnected', () => {
+          printCharacteristic = null;
+          document.getElementById('printer-status-text').innerHTML = `<span class="text-rose-400 font-bold">⚠️ Impresora desconectada. Reconecta por favor.</span>`;
+          document.getElementById('btn-connect-ble').innerText = "🔵 Reconectar Impresora Bluetooth";
+        });
+
+      } catch (err) {
+        alert("Aviso de conexión Bluetooth: " + err.message + "\n\n💡 Tip: Si tu impresora 80mm usa Bluetooth clásico (SPP), selecciona el botón '2. App RawBT' arriba.");
+      }
     }
 
-    // 统计面板数量
-    function updateDashboardCounts() {
-      const total = allDishes.length;
-      const available = allDishes.filter(d => d.is_available).length;
-      const soldOut = total - available;
-
-      document.getElementById('count-total').innerText = total;
-      document.getElementById('count-available').innerText = available;
-      document.getElementById('count-soldout').innerText = soldOut;
+    // 清理西语重音符号以确保所有 80mm 热敏打印机绝不乱码
+    function cleanSpanishText(str) {
+      return (str || '')
+        .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
+        .replace(/Á/g, 'A').replace(/É/g, 'E').replace(/Í/g, 'I').replace(/Ó/g, 'O').replace(/Ú/g, 'U')
+        .replace(/ñ/g, 'n').replace(/Ñ/g, 'N').replace(/ü/g, 'u').replace(/Ü/g, 'U')
+        .replace(/[^\x20-\x7E\n]/g, '');
     }
 
-    // 设置类型过滤器
-    function setFilter(type) {
-      currentFilterType = type;
-      
-      const tabIds = ['tab-all', 'tab-china', 'tab-sushi', 'tab-bebidas', 'tab-soldout'];
-      tabIds.forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0";
+    // 左右两端对齐辅助函数 (80mm 纸标准 48 字符宽)
+    function formatLineLR(left, right, width = 48) {
+      const l = cleanSpanishText(left);
+      const r = cleanSpanishText(right);
+      const spaces = Math.max(1, width - l.length - r.length);
+      return l + ' '.repeat(spaces) + r + '\n';
+    }
+
+    // =====================================================
+    // 🧾 生成 80mm 纯西语 ESC/POS 字节流（无中文，48列宽）
+    // =====================================================
+    function buildEscPosBytes(order) {
+      const ESC = 0x1B;
+      const GS = 0x1D;
+      const bytes = [];
+
+      const pushBytes = (arr) => arr.forEach(b => bytes.push(b));
+      const pushText = (txt) => {
+        const clean = cleanSpanishText(txt);
+        for (let i = 0; i < clean.length; i++) {
+          bytes.push(clean.charCodeAt(i));
+        }
+      };
+
+      // 初始化打印机
+      pushBytes([ESC, 0x40]);
+
+      // 居中 + 倍高倍宽 + 加粗：店名
+      pushBytes([ESC, 0x61, 0x01]); // Center
+      pushBytes([ESC, 0x45, 0x01]); // Bold ON
+      pushBytes([GS, 0x21, 0x11]);  // 2x height & width
+      pushText("DRAGON DE ORO\n");
+
+      // 恢复标准字体，居中打印地址
+      pushBytes([GS, 0x21, 0x00]);
+      pushBytes([ESC, 0x45, 0x00]);
+      pushText("Comida China Tradicional & Sushi\n");
+      pushText("Camino de la Vina 1461, Huechuraba\n");
+      pushText("================================================\n");
+
+      // 左对齐：订单号与时间
+      pushBytes([ESC, 0x61, 0x00]); // Left
+      pushBytes([ESC, 0x45, 0x01]); // Bold ON
+      pushText(`PEDIDO: ${order.order_code}\n`);
+      pushBytes([ESC, 0x45, 0x00]);
+      const dt = new Date(order.created_at || Date.now()).toLocaleString('es-CL');
+      pushText(`FECHA:  ${dt}\n`);
+      pushText("------------------------------------------------\n");
+
+      // 履约方式与预约时间（倍高加粗醒目提示）
+      pushBytes([ESC, 0x45, 0x01]);
+      pushBytes([GS, 0x21, 0x01]); // Double height
+      pushText(`SERVICIO: ${(order.service_type || '').toUpperCase()}\n`);
+      pushText(`HORARIO:  ${cleanSpanishText(order.timing_info || 'Lo antes posible')}\n`);
+      pushBytes([GS, 0x21, 0x00]);
+      pushBytes([ESC, 0x45, 0x00]);
+      pushText("------------------------------------------------\n");
+
+      // 客户信息
+      pushBytes([ESC, 0x45, 0x01]);
+      pushText(`CLIENTE:  ${order.customer_name}\n`);
+      pushText(`TELEFONO: ${order.customer_phone}\n`);
+      if (order.customer_address) {
+        pushText(`DIRECCION: ${order.customer_address}\n`);
+      }
+      pushBytes([ESC, 0x45, 0x00]);
+      pushText("================================================\n");
+      pushBytes([ESC, 0x45, 0x01]);
+      pushText(formatLineLR("CANT  DESCRIPCION", "TOTAL", 48));
+      pushBytes([ESC, 0x45, 0x00]);
+      pushText("------------------------------------------------\n");
+
+      // 菜品明细列表（纯西语，无中文）
+      const items = Array.isArray(order.items) ? order.items : [];
+      items.forEach(item => {
+        const lineTotal = "$" + Number(item.unitPrice * item.qty).toLocaleString('es-CL');
+        const titleLeft = `${item.qty}x   ${item.name}`;
+
+        // 菜名加粗倍高，方便后厨看单
+        pushBytes([ESC, 0x45, 0x01]);
+        pushText(formatLineLR(titleLeft, lineTotal, 48));
+        pushBytes([ESC, 0x45, 0x00]);
+
+        // 菜品客制化选项（换菜、辣度、酱料等）
+        if (item.options && item.options.length > 0) {
+          item.options.forEach(opt => {
+            pushText(`      * ${cleanSpanishText(opt)}\n`);
+          });
         }
       });
 
-      const activeBtn = document.getElementById('tab-' + type);
-      if (activeBtn) {
-        if (type === 'soldout') {
-          activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-red-600 text-white shadow-sm shrink-0";
-        } else {
-          activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-gray-900 text-white shadow-sm shrink-0";
+      pushText("================================================\n");
+      pushText(formatLineLR("Subtotal:", "$" + Number(order.subtotal).toLocaleString('es-CL'), 48));
+      pushText(formatLineLR("Costo de Entrega:", "$" + Number(order.delivery_fee).toLocaleString('es-CL'), 48));
+
+      // 总金额倍高加粗
+      pushBytes([ESC, 0x45, 0x01]);
+      pushBytes([GS, 0x21, 0x01]);
+      pushText(formatLineLR("TOTAL A PAGAR:", "$" + Number(order.total).toLocaleString('es-CL') + " CLP", 48));
+      pushBytes([GS, 0x21, 0x00]);
+      pushBytes([ESC, 0x45, 0x00]);
+
+      pushText("------------------------------------------------\n");
+      pushBytes([ESC, 0x45, 0x01]);
+      pushText(`PAGO: ${order.payment_detail}\n`);
+      if (order.notes && order.notes !== 'Sin comentarios') {
+        pushText(`NOTAS: ${order.notes}\n`);
+      }
+      pushBytes([ESC, 0x45, 0x00]);
+      pushText("================================================\n");
+
+      // 底部致谢 + 走纸 4 行 + 自动切刀
+      pushBytes([ESC, 0x61, 0x01]);
+      pushText("Gracias por su preferencia!\n\n\n\n");
+      pushBytes([GS, 0x56, 0x42, 0x00]); // 80mm 标准自动切刀指令
+
+      return new Uint8Array(bytes);
+    }
+
+    // 执行打印（支持 BLE / RawBT / 系统打印）
+    async function printOrderTicket(order) {
+      const escposBytes = buildEscPosBytes(order);
+
+      // 模式 1：Web Bluetooth 直连打印
+      if (printMethod === 'ble') {
+        if (!printCharacteristic) {
+          alert("Primero toca el botón azul '🔵 Conectar Impresora Bluetooth' o cambia al Modo 2 (RawBT).");
+          return;
         }
+        try {
+          const chunkSize = 100; // 分包发送防蓝牙缓冲区溢出
+          for (let i = 0; i < escposBytes.length; i += chunkSize) {
+            const chunk = escposBytes.slice(i, i + chunkSize);
+            if (printCharacteristic.properties.writeWithoutResponse) {
+              await printCharacteristic.writeValueWithoutResponse(chunk);
+            } else {
+              await printCharacteristic.writeValue(chunk);
+            }
+            await new Promise(r => setTimeout(r, 25));
+          }
+          markOrderPrinted(order.id);
+        } catch (err) {
+          alert("Error al enviar por Bluetooth: " + err.message);
+        }
+        return;
       }
 
-      applyFilters();
+      // 模式 2：RawBT 极速桥接打印 (支持所有经典蓝牙 SPP / WiFi / 网线打印机)
+      if (printMethod === 'rawbt') {
+        let binary = '';
+        for (let i = 0; i < escposBytes.byteLength; i++) {
+          binary += String.fromCharCode(escposBytes[i]);
+        }
+        const base64Data = window.btoa(binary);
+        window.location.href = 'rawbt:base64,' + base64Data;
+        markOrderPrinted(order.id);
+        return;
+      }
+
+      // 模式 3：安卓系统打印窗口
+      if (printMethod === 'system') {
+        const printArea = document.getElementById('print-area-80mm');
+        const items = Array.isArray(order.items) ? order.items : [];
+        let itemsHtml = '';
+        items.forEach(it => {
+          const opts = (it.options || []).map(o => `<div style="padding-left:10px;font-size:11px;">* ${o}</div>`).join('');
+          itemsHtml += `
+            <div style="margin-bottom:4px;">
+              <div style="display:flex;justify-content:space-between;font-weight:bold;">
+                <span>${it.qty}x ${it.name}</span>
+                <span>$${Number(it.unitPrice * it.qty).toLocaleString('es-CL')}</span>
+              </div>
+              ${opts}
+            </div>
+          `;
+        });
+
+        printArea.innerHTML = `
+          <div style="text-align:center;font-weight:bold;font-size:16px;">DRAGON DE ORO</div>
+          <div style="text-align:center;font-size:11px;">Camino de la Viña 1461, Huechuraba</div>
+          <hr style="border-top:1px dashed #000;margin:6px 0;">
+          <div><b>PEDIDO:</b> ${order.order_code}</div>
+          <div><b>SERVICIO:</b> ${order.service_type}</div>
+          <div><b>HORARIO:</b> ${order.timing_info}</div>
+          <hr style="border-top:1px dashed #000;margin:6px 0;">
+          <div><b>CLIENTE:</b> ${order.customer_name}</div>
+          <div><b>TEL:</b> ${order.customer_phone}</div>
+          ${order.customer_address ? `<div><b>DIR:</b> ${order.customer_address}</div>` : ''}
+          <hr style="border-top:1px dashed #000;margin:6px 0;">
+          ${itemsHtml}
+          <hr style="border-top:1px dashed #000;margin:6px 0;">
+          <div style="display:flex;justify-content:space-between;"><span>Subtotal:</span><span>$${Number(order.subtotal).toLocaleString('es-CL')}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Entrega:</span><span>$${Number(order.delivery_fee).toLocaleString('es-CL')}</span></div>
+          <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:15px;margin-top:4px;"><span>TOTAL:</span><span>$${Number(order.total).toLocaleString('es-CL')} CLP</span></div>
+          <hr style="border-top:1px dashed #000;margin:6px 0;">
+          <div><b>PAGO:</b> ${order.payment_detail}</div>
+          <div><b>NOTAS:</b> ${order.notes || 'Sin comentarios'}</div>
+        `;
+        window.print();
+        markOrderPrinted(order.id);
+      }
     }
 
-    // 执行过滤并渲染
-    function applyFilters() {
-      const q = document.getElementById('search-input').value.toLowerCase().trim();
-      
-      let filtered = allDishes.filter(item => {
-        // 1. 文本搜索
-        const matchText = item.name.toLowerCase().includes(q) || 
-                          String(item.id).includes(q) ||
-                          item.category.toLowerCase().includes(q);
-        if (!matchText) return false;
+    // 打印测试小票（无需真实下单即可测试 80mm 打印机）
+    function printTestTicket() {
+      const sampleOrder = {
+        id: 0,
+        order_code: "TEST-80MM",
+        created_at: new Date().toISOString(),
+        service_type: "Delivery (Envio a domicilio)",
+        timing_info: "Lo antes posible (Inmediato)",
+        customer_name: "Cliente de Prueba",
+        customer_phone: "56912345678",
+        customer_address: "Camino de la Vina 1461, Huechuraba",
+        items: [
+          { qty: 1, name: "Menu 2 personas B", unitPrice: 26800, options: ["Cambio: Wantan frito -> Carne Mongoliana", "Con aji"] },
+          { qty: 1, name: "California Ebi", unitPrice: 6500, options: ["Envuelto en: Sesamo", "Salsa incluida: Salsa Soya", "Con Wasabi (+$500)"] }
+        ],
+        subtotal: 33300,
+        delivery_fee: 1800,
+        total: 35100,
+        payment_detail: "Efectivo $35.100 (monto recibido $40.000, vuelto $4.900)",
+        notes: "Ticket de prueba 80mm OK"
+      };
+      printOrderTicket(sampleOrder);
+    }
 
-        // 2. 标签分类筛选
-        if (currentFilterType === 'all') return true;
-        if (currentFilterType === 'soldout') return !item.is_available;
-        if (currentFilterType === 'bebidas') return item.category === 'cat-bebidas';
-        if (currentFilterType === 'sushi') return item.category.startsWith('cat-sushi-');
-        if (currentFilterType === 'china') return !item.category.startsWith('cat-sushi-') && item.category !== 'cat-bebidas';
+    async function markOrderPrinted(orderId) {
+      if (!orderId) return;
+      await db.from('orders').update({ status: 'printed' }).eq('id', orderId);
+      fetchOrders();
+    }
 
-        return true;
+    // 拉取订单并监控新单
+    async function fetchOrders() {
+      const { data, error } = await db.from('orders').select('*').order('id', { ascending: false }).limit(40);
+      if (error) return;
+
+      ordersData = data || [];
+      let newOrderArrived = null;
+
+      ordersData.forEach(o => {
+        if (!knownOrderIds.has(o.id)) {
+          knownOrderIds.add(o.id);
+          if (!isFirstLoad && o.status === 'pending') {
+            newOrderArrived = o;
+          }
+        }
       });
 
-      renderList(filtered);
+      isFirstLoad = false;
+      renderOrdersList();
+
+      if (newOrderArrived) {
+        playBeepAlert();
+        if (document.getElementById('auto-print-toggle').checked) {
+          printOrderTicket(newOrderArrived);
+        }
+      }
     }
 
-    // 渲染卡片列表
-    function renderList(list) {
-      const container = document.getElementById('dish-list');
-      if (list.length === 0) {
-        container.innerHTML = '<div class="text-center py-16 text-gray-400 text-xs">No se encontraron platos que coincidan con el filtro.</div>';
+    function renderOrdersList() {
+      const container = document.getElementById('orders-list');
+      const pendingCount = ordersData.filter(o => o.status === 'pending').length;
+      document.getElementById('pending-count').innerText = pendingCount;
+
+      if (ordersData.length === 0) {
+        container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">Aún no hay pedidos registrados.</div>';
         return;
       }
 
       let html = '';
-      list.forEach(item => {
-        const catBadge = categoryNames[item.category] || item.category;
-        const cardBg = item.is_available ? 'bg-white border-gray-200' : 'bg-red-50/50 border-red-300';
-        const statusBtnClass = item.is_available 
-          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-300' 
-          : 'bg-red-600 text-white shadow-md font-black animate-pulse';
-        const statusBtnText = item.is_available ? '✅ En Venta' : '⛔ AGOTADO';
+      ordersData.forEach(o => {
+        const isPending = o.status === 'pending';
+        const statusBadge = isPending
+          ? '<span class="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full animate-pulse">🔔 NUEVO</span>'
+          : '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">🖨️ IMPRESO</span>';
 
-        html += '<div class="' + cardBg + ' p-3 rounded-xl border shadow-sm flex flex-col gap-2 transition">';
-        html += '  <div class="flex justify-between items-start gap-2">';
-        html += '    <div class="flex-1">';
-        html += '      <div class="flex items-center gap-1.5">';
-        html += '        <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-bold">' + catBadge + '</span>';
-        html += '        <span class="text-[10px] text-gray-400 font-mono">#' + item.id + '</span>';
-        html += '      </div>';
-        html += '      <h3 class="text-xs font-black text-gray-900 mt-1 leading-snug">' + item.name + '</h3>';
-        if (item.description) {
-          html += '    <p class="text-[10px] text-gray-400 line-clamp-1 mt-0.5">' + item.description + '</p>';
-        }
-        html += '    </div>';
-        html += '    <button onclick="toggleAvailability(' + item.id + ', ' + item.is_available + ')" class="px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition ' + statusBtnClass + '">';
-        html +=        statusBtnText;
-        html += '    </button>';
-        html += '  </div>';
+        const dt = new Date(o.created_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+        const items = Array.isArray(o.items) ? o.items : [];
+        let itemsHtml = '';
+        items.forEach(it => {
+          const opts = (it.options && it.options.length > 0)
+            ? `<div class="text-[11px] text-amber-300 font-semibold mt-0.5">• ${it.options.join(' | ')}</div>`
+            : '';
+          itemsHtml += `
+            <div class="py-1.5 border-b border-slate-700/60 last:border-0 flex justify-between items-start">
+              <div>
+                <span class="font-black text-white text-xs">${it.qty}x ${it.name}</span>
+                ${opts}
+              </div>
+              <span class="text-xs font-bold text-slate-300">$${Number(it.unitPrice * it.qty).toLocaleString('es-CL')}</span>
+            </div>
+          `;
+        });
 
-        // 改价模块
-        html += '  <div class="flex items-center gap-2 border-t pt-2 mt-0.5">';
-        html += '    <span class="text-xs font-black text-gray-500">$</span>';
-        html += '    <input id="price-' + item.id + '" type="number" value="' + item.price + '" class="w-24 border rounded-lg px-2.5 py-1 text-xs font-black text-gray-800 bg-gray-50 outline-none focus:border-red-600">';
-        html += '    <span class="text-[10px] text-gray-400 font-bold">CLP</span>';
-        html += '    <button onclick="updatePrice(' + item.id + ')" class="ml-auto bg-gray-900 hover:bg-black active:scale-95 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm transition">';
-        html += '      Guardar precio';
-        html += '    </button>';
-        html += '  </div>';
-        html += '</div>';
+        html += `
+          <div class="bg-slate-800 border ${isPending ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.25)]' : 'border-slate-700'} rounded-2xl p-4 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+              <div class="flex items-center gap-2">
+                ${statusBadge}
+                <span class="font-black text-sm text-white">${o.order_code}</span>
+                <span class="text-xs text-slate-400">⏰ ${dt}</span>
+              </div>
+              <span class="text-base font-black text-emerald-400">$${Number(o.total).toLocaleString('es-CL')} CLP</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs bg-slate-900/70 p-2.5 rounded-xl border border-slate-700/80">
+              <div><span class="text-slate-400">Servicio:</span> <span class="font-black text-amber-300">${o.service_type}</span></div>
+              <div><span class="text-slate-400">Horario:</span> <span class="font-black text-white">${o.timing_info}</span></div>
+              <div><span class="text-slate-400">Cliente:</span> <span class="font-bold text-white">${o.customer_name} (${o.customer_phone})</span></div>
+              ${o.customer_address ? `<div><span class="text-slate-400">Dirección:</span> <span class="font-bold text-rose-300">${o.customer_address}</span></div>` : ''}
+            </div>
+
+            <div class="bg-slate-900/40 rounded-xl p-2.5 border border-slate-700/50">
+              ${itemsHtml}
+            </div>
+
+            <div class="text-[11px] text-slate-300 flex flex-wrap justify-between gap-2 pt-1">
+              <div><b>Pago:</b> ${o.payment_detail}</div>
+              ${o.notes ? `<div class="text-amber-300"><b>Nota:</b> ${o.notes}</div>` : ''}
+            </div>
+
+            <div class="flex gap-2 pt-1">
+              <button onclick='printOrderTicket(${JSON.stringify(o).replace(/'/g, "&#39;")})' class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+                <span>🖨️ Imprimir Ticket 80mm</span>
+              </button>
+              <a href="https://wa.me/${(o.customer_phone || '').replace(/\D/g, '')}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1">
+                <span>💬 WhatsApp Cliente</span>
+              </a>
+            </div>
+          </div>
+        `;
       });
 
       container.innerHTML = html;
     }
 
-    // 价格更新
-    async function updatePrice(id) {
-      const inputEl = document.getElementById('price-' + id);
-      const newPrice = parseInt(inputEl.value);
-      if (isNaN(newPrice) || newPrice <= 0) {
-        alert("Por favor ingresa un precio válido mayor a 0");
-        return;
-      }
-
-      const { error } = await db.from('dishes').update({ price: newPrice }).eq('id', id);
-      if (error) {
-        alert("Error al actualizar precio: " + error.message);
-      } else {
-        showToast("¡Precio de #" + id + " actualizado a $" + newPrice.toLocaleString('es-CL') + " CLP!");
-        const item = allDishes.find(d => d.id === id);
-        if (item) item.price = newPrice;
-      }
+    // =====================================================
+    // 🍱 菜品上下架与价格管理模块
+    // =====================================================
+    let adminDishes = [];
+    async function loadAdminDishes() {
+      const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
+      adminDishes = data || [];
+      renderAdminDishes();
     }
 
-    // 上下架（售罄）状态切换
-    async function toggleAvailability(id, currentStatus) {
-      const newStatus = !currentStatus;
-      const { error } = await db.from('dishes').update({ is_available: newStatus }).eq('id', id);
-      if (error) {
-        alert("Error al cambiar estado: " + error.message);
-      } else {
-        const item = allDishes.find(d => d.id === id);
-        if (item) item.is_available = newStatus;
+    function renderAdminDishes() {
+      const q = (document.getElementById('admin-search-dish').value || '').toLowerCase().trim();
+      const list = document.getElementById('admin-dishes-list');
+      const filtered = adminDishes.filter(d => (d.name || '').toLowerCase().includes(q));
 
-        showToast(newStatus ? "Plato marcado como EN VENTA" : "Plato marcado como AGOTADO");
-        updateDashboardCounts();
-        applyFilters();
-      }
+      let html = '';
+      filtered.forEach(d => {
+        html += `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+            <div class="flex-1">
+              <div class="font-bold text-white">${d.name}</div>
+              <div class="text-emerald-400 font-black mt-0.5">$${Number(d.price).toLocaleString('es-CL')} CLP</div>
+            </div>
+            <button onclick="toggleDishStock(${d.id}, ${!d.is_available})" class="px-3 py-2 rounded-xl font-black ${d.is_available ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+              ${d.is_available ? '✅ Disponible' : '🚫 Agotado'}
+            </button>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
     }
 
-    function showToast(msg) {
-      const t = document.getElementById('status-toast');
-      t.innerText = msg;
-      t.classList.remove('hidden');
-      setTimeout(() => t.classList.add('hidden'), 2500);
+    async function toggleDishStock(id, newState) {
+      await db.from('dishes').update({ is_available: newState }).eq('id', id);
+      loadAdminDishes();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('isAdminAuth') === 'true') {
-        showPanel();
-      }
-    });
+    // 启动实时监听 + 5秒轮询双保险（防止安卓锁屏断连）
+    db.channel('orders-channel')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
+        fetchOrders();
+      })
+      .subscribe();
+
+    fetchOrders();
+    setInterval(fetchOrders, 5000);
   </script>
-</head>
-<body class="bg-gray-100 text-gray-800 min-h-screen notranslate" translate="no">
-
-  <!-- 1. 登录验证遮罩层 -->
-  <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
-      <div class="text-4xl mb-3">🔒</div>
-      <h2 class="text-base font-black text-gray-900 mb-1">Panel de Control</h2>
-      <p class="text-xs text-gray-500 mb-4">Ingresa la clave de administración</p>
-      <input id="pin-input" onkeydown="if(event.key==='Enter') checkPin()" type="password" maxlength="6" placeholder="Clave PIN" class="w-full text-center text-2xl tracking-widest border rounded-xl p-3 mb-4 focus:ring-2 focus:ring-red-600 outline-none">
-      <button onclick="checkPin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow text-sm">Ingresar</button>
-      <p id="pin-error" class="text-xs text-red-500 mt-2 hidden font-bold">Clave incorrecta</p>
-    </div>
-  </div>
-
-  <!-- 2. 后台主管理面板 -->
-  <div id="admin-panel" class="hidden max-w-2xl mx-auto pb-12">
-    <!-- 顶部状态栏 -->
-    <header class="bg-white border-b sticky top-0 z-20 px-4 py-3 shadow-sm flex justify-between items-center">
-      <div>
-        <h1 class="text-base font-black text-gray-900 flex items-center gap-1.5">
-          <span>⚙️</span> Control de Menú
-        </h1>
-        <p class="text-[10px] text-gray-400">Modifica precios y agota platos en tiempo real</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="fetchDishes()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1">
-          <span>🔄</span> Refrescar
-        </button>
-        <button onclick="logout()" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1.5 rounded-lg font-bold">
-          Salir
-        </button>
-      </div>
-    </header>
-
-    <!-- 顶部数据看板块 -->
-    <div class="p-3 bg-white border-b grid grid-cols-3 gap-2 text-center text-xs">
-      <div class="bg-gray-50 p-2 rounded-xl border border-gray-100">
-        <div class="text-[10px] text-gray-400 font-bold">TOTAL PLATOS</div>
-        <div id="count-total" class="text-base font-black text-gray-800">0</div>
-      </div>
-      <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100">
-        <div class="text-[10px] text-emerald-600 font-bold">EN VENTA</div>
-        <div id="count-available" class="text-base font-black text-emerald-700">0</div>
-      </div>
-      <div class="bg-red-50 p-2 rounded-xl border border-red-100">
-        <div class="text-[10px] text-red-600 font-bold">AGOTADOS</div>
-        <div id="count-soldout" class="text-base font-black text-red-600">0</div>
-      </div>
-    </div>
-
-    <!-- 搜索与多维度分类切换栏 -->
-    <div class="p-3 space-y-2.5 sticky top-[57px] bg-white border-b z-10 shadow-sm">
-      <!-- 搜索输入框 -->
-      <div class="flex gap-2">
-        <input id="search-input" oninput="applyFilters()" type="text" placeholder="Buscar por nombre, código o categoría..." class="flex-1 border rounded-xl px-3 py-2 text-xs bg-gray-50 outline-none focus:border-red-600 focus:bg-white">
-      </div>
-
-      <!-- 分类快捷标签栏 (横向滚动) -->
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-        <button id="tab-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap bg-gray-900 text-white shadow-sm shrink-0">
-          📋 Todos
-        </button>
-        <button id="tab-china" onclick="setFilter('china')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
-          🥢 Comida China
-        </button>
-        <button id="tab-sushi" onclick="setFilter('sushi')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
-          🍣 Sushi
-        </button>
-        <button id="tab-bebidas" onclick="setFilter('bebidas')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
-          🥤 Bebidas
-        </button>
-        <button id="tab-soldout" onclick="setFilter('soldout')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200 transition shrink-0">
-          ⛔ Solo Agotados
-        </button>
-      </div>
-
-      <!-- 状态保存浮动提示 -->
-      <div id="status-toast" class="hidden text-center text-xs py-2 px-3 rounded-xl bg-green-100 text-green-700 font-bold shadow-sm transition"></div>
-    </div>
-
-    <!-- 菜品卡片列表区域 -->
-    <main id="dish-list" class="p-3 space-y-2.5">
-      <div class="text-center py-16 text-gray-400 text-xs">Cargando platos desde la nube...</div>
-    </main>
-  </div>
-
 </body>
 </html>
