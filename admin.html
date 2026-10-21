@@ -87,6 +87,18 @@
 
   </main>
 
+  <!-- 🌟 全局防拦截打印引导遮罩 -->
+  <div id="rawbt-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border-2 border-red-500 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+      <div class="text-4xl">🖨️</div>
+      <h3 class="text-base font-black text-white">Nuevo Pedido Detectado</h3>
+      <p class="text-xs text-slate-300">Toca el botón de abajo para enviar el ticket a la impresora:</p>
+      <a id="rawbt-link-btn" href="#" target="_blank" onclick="closeRawbtModal()" class="block w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg text-sm active:scale-95 transition">
+        🖨️ Imprimir Inmediatamente
+      </a>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
@@ -261,7 +273,7 @@
       return new Uint8Array(bytes);
     }
 
-    // 🌟 统一使用 rawbt:base64 链接跳转，100% 稳定唤醒打印机并自动切纸
+    // 🌟 核心优化：利用“弹窗防拦截机制”，通过用户点击按钮彻底绕过 Chrome 限制
     function printOrderTicket(order) {
       const escposBytes = buildEscPosBytes(order);
       let binary = '';
@@ -269,8 +281,21 @@
         binary += String.fromCharCode(escposBytes[i]);
       }
       const base64Data = window.btoa(binary);
-      window.location.href = 'rawbt:base64,' + base64Data;
+      const rawbtUrl = 'rawbt:base64,' + base64Data;
+
+      if (document.getElementById('auto-print-toggle').checked) {
+        // 弹出醒目防拦截弹窗，用户只需点一下即可 100% 唤醒打印机
+        document.getElementById('rawbt-link-btn').href = rawbtUrl;
+        document.getElementById('rawbt-modal').classList.remove('hidden');
+      } else {
+        window.location.href = rawbtUrl;
+      }
+
       if (order.id) markOrderPrinted(order.id);
+    }
+
+    function closeRawbtModal() {
+      document.getElementById('rawbt-modal').classList.add('hidden');
     }
 
     function printTestTicket() {
@@ -332,9 +357,7 @@
 
       if (newOrderArrived) {
         playBeepAlert();
-        if (document.getElementById('auto-print-toggle').checked) {
-          printOrderTicket(newOrderArrived);
-        }
+        printOrderTicket(newOrderArrived);
       }
     }
 
