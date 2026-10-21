@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
-    /* 80mm 系统打印备用样式 */
     @media print {
       body * { visibility: hidden; }
       #print-area-80mm, #print-area-80mm * { visibility: visible; }
@@ -38,7 +37,6 @@
         </div>
       </div>
 
-      <!-- 视图切换：实时接单 vs 菜品管理 -->
       <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-bold">
         <button id="tab-orders" onclick="switchAdminTab('orders')" class="px-3 py-1.5 rounded-lg bg-red-600 text-white shadow">
           🖨️ Pedidos (<span id="pending-count">0</span>)
@@ -52,17 +50,14 @@
 
   <main class="max-w-3xl mx-auto p-3.5 space-y-4">
 
-    <!-- ========================================== -->
-    <!-- 面板 1：实时接单 & 80mm 蓝牙打印控制台 -->
-    <!-- ========================================== -->
+    <!-- 面板 1：实时接单 & 80mm 打印控制台 -->
     <div id="view-orders" class="space-y-4">
 
-      <!-- 蓝牙打印机控制中心 -->
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg space-y-3">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Configuración Impresora Térmica 80mm</h2>
-            <p id="printer-status-text" class="text-[11px] text-slate-400 mt-0.5">Estado: No conectada (Selecciona modo abajo)</p>
+            <p id="printer-status-text" class="text-[11px] text-slate-400 mt-0.5">Modo activo: App RawBT (USB / Red LAN)</p>
           </div>
           <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
@@ -70,30 +65,29 @@
           </label>
         </div>
 
-        <!-- 打印通道模式选择 -->
+        <!-- 默认选中模式 2 (RawBT USB/LAN) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-          <button onclick="setPrintMethod('ble')" id="btn-mode-ble" class="p-2.5 rounded-xl border-2 border-red-500 bg-red-500/10 text-white font-bold text-left transition">
-            <div class="font-black">1. Bluetooth Directo (BLE)</div>
-            <div class="text-[10px] text-slate-300 mt-0.5">Emparejar directo desde Chrome</div>
+          <button onclick="setPrintMethod('rawbt')" id="btn-mode-rawbt" class="p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition">
+            <div class="font-black">1. App RawBT (USB / Red LAN)</div>
+            <div class="text-[10px] text-slate-300 mt-0.5">Recomendado para SP-POS892UEd</div>
           </button>
-          <button onclick="setPrintMethod('rawbt')" id="btn-mode-rawbt" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
-            <div class="font-black">2. App RawBT (SPP/WiFi/LAN)</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Para Bluetooth clásico o Red</div>
+          <button onclick="setPrintMethod('ble')" id="btn-mode-ble" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
+            <div class="font-black">2. Bluetooth Directo (BLE)</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Solo impresoras con Bluetooth</div>
           </button>
           <button onclick="setPrintMethod('system')" id="btn-mode-system" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
-            <div class="font-black">3. Impresión Sistema Android</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Ventana nativa de Android</div>
+            <div class="font-black">3. Impresión Sistema</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Ventana nativa del navegador</div>
           </button>
         </div>
 
-        <!-- 操作按钮栏 -->
         <div class="flex flex-wrap gap-2 pt-1">
-          <button onclick="connectBluetoothPrinter()" id="btn-connect-ble" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+          <button onclick="connectBluetoothPrinter()" id="btn-connect-ble" class="hidden flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl text-xs items-center justify-center gap-1.5 shadow transition">
             <span>🔵 Conectar Impresora Bluetooth</span>
           </button>
 
-          <button onclick="printTestTicket()" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
-            <span>🧪 Imprimir Ticket Prueba (80mm)</span>
+          <button onclick="printTestTicket()" class="flex-1 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+            <span>🧪 Imprimir Ticket Prueba ($ Corregido)</span>
           </button>
 
           <button onclick="enableAudioAndWakeLock()" id="btn-wakelock" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 shadow transition">
@@ -113,9 +107,7 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 面板 2：菜品上下架与价格管理 (保留原有功能) -->
-    <!-- ========================================== -->
+    <!-- 面板 2：菜品上下架与价格管理 -->
     <div id="view-dishes" class="hidden space-y-4">
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-3.5">
         <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato para cambiar precio o agotar..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
@@ -125,7 +117,6 @@
 
   </main>
 
-  <!-- 隐藏的 80mm 系统打印预览区 -->
   <div id="print-area-80mm" class="hidden"></div>
 
   <script>
@@ -137,13 +128,11 @@
     let ordersData = [];
     let knownOrderIds = new Set();
     let isFirstLoad = true;
-    let printMethod = 'ble'; // 'ble' | 'rawbt' | 'system'
+    let printMethod = 'rawbt'; // 默认直接使用 RawBT (USB / LAN)
 
-    // Web Bluetooth 变量
     let bluetoothDevice = null;
     let printCharacteristic = null;
 
-    // 切换顶部面板
     function switchAdminTab(tab) {
       document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
       document.getElementById('view-dishes').classList.toggle('hidden', tab !== 'dishes');
@@ -152,10 +141,9 @@
       if (tab === 'dishes') loadAdminDishes();
     }
 
-    // 切换打印连接方式
     function setPrintMethod(method) {
       printMethod = method;
-      ['ble', 'rawbt', 'system'].forEach(m => {
+      ['rawbt', 'ble', 'system'].forEach(m => {
         const btn = document.getElementById('btn-mode-' + m);
         if (m === method) {
           btn.className = "p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition";
@@ -166,13 +154,12 @@
       document.getElementById('btn-connect-ble').style.display = (method === 'ble') ? 'flex' : 'none';
       const statusEl = document.getElementById('printer-status-text');
       if (method === 'rawbt') {
-        statusEl.innerText = "Modo activo: App RawBT (Impresión directa por Bluetooth SPP / WiFi / Red)";
+        statusEl.innerText = "Modo activo: App RawBT (Impresión directa por USB / Red LAN)";
       } else if (method === 'system') {
-        statusEl.innerText = "Modo activo: Impresión del Sistema Android (80mm)";
+        statusEl.innerText = "Modo activo: Impresión del Sistema (80mm)";
       }
     }
 
-    // 开启声音提醒与屏幕常亮
     async function enableAudioAndWakeLock() {
       playBeepAlert();
       try {
@@ -187,7 +174,6 @@
       }
     }
 
-    // 接单响铃音效（使用 Web Audio 合成响亮双音铃声）
     function playBeepAlert() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -207,73 +193,48 @@
       } catch (e) { console.log(e); }
     }
 
-    // =====================================================
-    // 🔵 Web Bluetooth API 蓝牙直连 80mm 打印机核心引擎
-    // =====================================================
     async function connectBluetoothPrinter() {
       if (!navigator.bluetooth) {
-        alert("Tu navegador no soporta Web Bluetooth directo. Usa Chrome en Android o selecciona el Modo 2 (App RawBT).");
+        alert("Usa el Modo 1 (App RawBT) para conexión USB o Red LAN.");
         return;
       }
       try {
         const commonServices = [
           '000018f0-0000-1000-8000-00805f9b34fb',
           'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
-          '49535343-fe7d-4ae5-8fa9-9fafd205e455',
-          '0000ff00-0000-1000-8000-00805f9b34fb',
-          '0000ffe0-0000-1000-8000-00805f9b34fb'
+          '49535343-fe7d-4ae5-8fa9-9fafd205e455'
         ];
-
         bluetoothDevice = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: commonServices
         });
-
-        document.getElementById('printer-status-text').innerText = "Conectando a " + (bluetoothDevice.name || "Impresora") + "...";
         const server = await bluetoothDevice.gatt.connect();
         const services = await server.getPrimaryServices();
-
-        let foundChar = null;
         for (const service of services) {
           const chars = await service.getCharacteristics();
           for (const c of chars) {
             if (c.properties.write || c.properties.writeWithoutResponse) {
-              foundChar = c;
+              printCharacteristic = c;
               break;
             }
           }
-          if (foundChar) break;
+          if (printCharacteristic) break;
         }
-
-        if (!foundChar) {
-          throw new Error("No se encontró canal de escritura BLE. Te recomendamos usar el Modo 2 (RawBT).");
-        }
-
-        printCharacteristic = foundChar;
-        document.getElementById('printer-status-text').innerHTML = `<span class="text-emerald-400 font-bold">✅ Conectada: ${bluetoothDevice.name || 'Impresora 80mm'}</span>`;
-        document.getElementById('btn-connect-ble').innerText = "✅ Impresora Bluetooth Conectada";
-
-        bluetoothDevice.addEventListener('gattserverdisconnected', () => {
-          printCharacteristic = null;
-          document.getElementById('printer-status-text').innerHTML = `<span class="text-rose-400 font-bold">⚠️ Impresora desconectada. Reconecta por favor.</span>`;
-          document.getElementById('btn-connect-ble').innerText = "🔵 Reconectar Impresora Bluetooth";
-        });
-
       } catch (err) {
-        alert("Aviso de conexión Bluetooth: " + err.message + "\n\n💡 Tip: Si tu impresora 80mm usa Bluetooth clásico (SPP), selecciona el botón '2. App RawBT' arriba.");
+        alert("Aviso: " + err.message);
       }
     }
 
-    // 清理西语重音符号以确保所有 80mm 热敏打印机绝不乱码
     function cleanSpanishText(str) {
       return (str || '')
+        .replace(/➔/g, '->')
+        .replace(/×/g, 'x')
         .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
         .replace(/Á/g, 'A').replace(/É/g, 'E').replace(/Í/g, 'I').replace(/Ó/g, 'O').replace(/Ú/g, 'U')
         .replace(/ñ/g, 'n').replace(/Ñ/g, 'N').replace(/ü/g, 'u').replace(/Ü/g, 'U')
         .replace(/[^\x20-\x7E\n]/g, '');
     }
 
-    // 左右两端对齐辅助函数 (80mm 纸标准 48 字符宽)
     function formatLineLR(left, right, width = 48) {
       const l = cleanSpanishText(left);
       const r = cleanSpanishText(right);
@@ -282,11 +243,12 @@
     }
 
     // =====================================================
-    // 🧾 生成 80mm 纯西语 ESC/POS 字节流（无中文，48列宽）
+    // 🧾 生成 80mm 纯西语 ESC/POS 字节流（已修复 $ 符号 & 菜名倍高）
     // =====================================================
     function buildEscPosBytes(order) {
       const ESC = 0x1B;
-      const GS = 0x1D;
+      const FS  = 0x1C;
+      const GS  = 0x1D;
       const bytes = [];
 
       const pushBytes = (arr) => arr.forEach(b => bytes.push(b));
@@ -297,8 +259,13 @@
         }
       };
 
-      // 初始化打印机
+      // 1. 初始化打印机
       pushBytes([ESC, 0x40]);
+
+      // 🌟 2. 核心修复：退出中文字符模式并强制切换为美国/国际字符集，解决 $ 被印成 ¥ 的问题！
+      pushBytes([FS, 0x2E]);        // FS . 取消中文模式
+      pushBytes([ESC, 0x52, 0x00]); // ESC R 0 国际字符集设为 USA (0x24 严格输出为 $)
+      pushBytes([ESC, 0x74, 0x00]); // ESC t 0 代码页设为 PC437
 
       // 居中 + 倍高倍宽 + 加粗：店名
       pushBytes([ESC, 0x61, 0x01]); // Center
@@ -345,26 +312,28 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
-      // 菜品明细列表（纯西语，无中文）
+      // 🌟 菜品明细列表（菜名与换菜备注采用倍高字体，方便后厨远距离看单）
       const items = Array.isArray(order.items) ? order.items : [];
       items.forEach(item => {
         const lineTotal = "$" + Number(item.unitPrice * item.qty).toLocaleString('es-CL');
-        const titleLeft = `${item.qty}x   ${item.name}`;
+        const titleLeft = `${item.qty}x ${item.name}`;
 
-        // 菜名加粗倍高，方便后厨看单
+        // 菜名加粗 + 倍高 (GS ! 0x01)
         pushBytes([ESC, 0x45, 0x01]);
+        pushBytes([GS, 0x21, 0x01]);
         pushText(formatLineLR(titleLeft, lineTotal, 48));
-        pushBytes([ESC, 0x45, 0x00]);
 
-        // 菜品客制化选项（换菜、辣度、酱料等）
+        // 菜品客制化选项（换菜、换白饭、加料、辣度等）保持倍高清晰显示
+        pushBytes([ESC, 0x45, 0x00]);
         if (item.options && item.options.length > 0) {
           item.options.forEach(opt => {
-            pushText(`      * ${cleanSpanishText(opt)}\n`);
+            pushText(`   * ${cleanSpanishText(opt)}\n`);
           });
         }
+        pushBytes([GS, 0x21, 0x00]); // 恢复标准高度
+        pushText("------------------------------------------------\n");
       });
 
-      pushText("================================================\n");
       pushText(formatLineLR("Subtotal:", "$" + Number(order.subtotal).toLocaleString('es-CL'), 48));
       pushText(formatLineLR("Costo de Entrega:", "$" + Number(order.delivery_fee).toLocaleString('es-CL'), 48));
 
@@ -384,43 +353,18 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("================================================\n");
 
-      // 底部致谢 + 走纸 4 行 + 自动切刀
+      // 底部致谢 + 走纸 5 行推过切刀位置 + 执行切刀
       pushBytes([ESC, 0x61, 0x01]);
-      pushText("Gracias por su preferencia!\n\n\n\n");
-      pushBytes([GS, 0x56, 0x42, 0x00]); // 80mm 标准自动切刀指令
+      pushText("Gracias por su preferencia!\n");
+      pushBytes([ESC, 0x64, 0x05]);      // ESC d 5 (走纸 5 行，确保文字完全越过切刀刀片)
+      pushBytes([GS, 0x56, 0x42, 0x00]); // 标准切纸指令
 
       return new Uint8Array(bytes);
     }
 
-    // 执行打印（支持 BLE / RawBT / 系统打印）
     async function printOrderTicket(order) {
       const escposBytes = buildEscPosBytes(order);
 
-      // 模式 1：Web Bluetooth 直连打印
-      if (printMethod === 'ble') {
-        if (!printCharacteristic) {
-          alert("Primero toca el botón azul '🔵 Conectar Impresora Bluetooth' o cambia al Modo 2 (RawBT).");
-          return;
-        }
-        try {
-          const chunkSize = 100; // 分包发送防蓝牙缓冲区溢出
-          for (let i = 0; i < escposBytes.length; i += chunkSize) {
-            const chunk = escposBytes.slice(i, i + chunkSize);
-            if (printCharacteristic.properties.writeWithoutResponse) {
-              await printCharacteristic.writeValueWithoutResponse(chunk);
-            } else {
-              await printCharacteristic.writeValue(chunk);
-            }
-            await new Promise(r => setTimeout(r, 25));
-          }
-          markOrderPrinted(order.id);
-        } catch (err) {
-          alert("Error al enviar por Bluetooth: " + err.message);
-        }
-        return;
-      }
-
-      // 模式 2：RawBT 极速桥接打印 (支持所有经典蓝牙 SPP / WiFi / 网线打印机)
       if (printMethod === 'rawbt') {
         let binary = '';
         for (let i = 0; i < escposBytes.byteLength; i++) {
@@ -432,51 +376,35 @@
         return;
       }
 
-      // 模式 3：安卓系统打印窗口
-      if (printMethod === 'system') {
-        const printArea = document.getElementById('print-area-80mm');
-        const items = Array.isArray(order.items) ? order.items : [];
-        let itemsHtml = '';
-        items.forEach(it => {
-          const opts = (it.options || []).map(o => `<div style="padding-left:10px;font-size:11px;">* ${o}</div>`).join('');
-          itemsHtml += `
-            <div style="margin-bottom:4px;">
-              <div style="display:flex;justify-content:space-between;font-weight:bold;">
-                <span>${it.qty}x ${it.name}</span>
-                <span>$${Number(it.unitPrice * it.qty).toLocaleString('es-CL')}</span>
-              </div>
-              ${opts}
-            </div>
-          `;
-        });
+      if (printMethod === 'ble') {
+        if (!printCharacteristic) {
+          alert("Primero conecta la impresora o selecciona el Modo 1 (App RawBT).");
+          return;
+        }
+        try {
+          const chunkSize = 100;
+          for (let i = 0; i < escposBytes.length; i += chunkSize) {
+            const chunk = escposBytes.slice(i, i + chunkSize);
+            if (printCharacteristic.properties.writeWithoutResponse) {
+              await printCharacteristic.writeValueWithoutResponse(chunk);
+            } else {
+              await printCharacteristic.writeValue(chunk);
+            }
+            await new Promise(r => setTimeout(r, 25));
+          }
+          markOrderPrinted(order.id);
+        } catch (err) {
+          alert("Error Bluetooth: " + err.message);
+        }
+        return;
+      }
 
-        printArea.innerHTML = `
-          <div style="text-align:center;font-weight:bold;font-size:16px;">DRAGON DE ORO</div>
-          <div style="text-align:center;font-size:11px;">Camino de la Viña 1461, Huechuraba</div>
-          <hr style="border-top:1px dashed #000;margin:6px 0;">
-          <div><b>PEDIDO:</b> ${order.order_code}</div>
-          <div><b>SERVICIO:</b> ${order.service_type}</div>
-          <div><b>HORARIO:</b> ${order.timing_info}</div>
-          <hr style="border-top:1px dashed #000;margin:6px 0;">
-          <div><b>CLIENTE:</b> ${order.customer_name}</div>
-          <div><b>TEL:</b> ${order.customer_phone}</div>
-          ${order.customer_address ? `<div><b>DIR:</b> ${order.customer_address}</div>` : ''}
-          <hr style="border-top:1px dashed #000;margin:6px 0;">
-          ${itemsHtml}
-          <hr style="border-top:1px dashed #000;margin:6px 0;">
-          <div style="display:flex;justify-content:space-between;"><span>Subtotal:</span><span>$${Number(order.subtotal).toLocaleString('es-CL')}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span>Entrega:</span><span>$${Number(order.delivery_fee).toLocaleString('es-CL')}</span></div>
-          <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:15px;margin-top:4px;"><span>TOTAL:</span><span>$${Number(order.total).toLocaleString('es-CL')} CLP</span></div>
-          <hr style="border-top:1px dashed #000;margin:6px 0;">
-          <div><b>PAGO:</b> ${order.payment_detail}</div>
-          <div><b>NOTAS:</b> ${order.notes || 'Sin comentarios'}</div>
-        `;
+      if (printMethod === 'system') {
         window.print();
         markOrderPrinted(order.id);
       }
     }
 
-    // 打印测试小票（无需真实下单即可测试 80mm 打印机）
     function printTestTicket() {
       const sampleOrder = {
         id: 0,
@@ -488,7 +416,7 @@
         customer_phone: "56912345678",
         customer_address: "Camino de la Vina 1461, Huechuraba",
         items: [
-          { qty: 1, name: "Menu 2 personas B", unitPrice: 26800, options: ["Cambio: Wantan frito -> Carne Mongoliana", "Con aji"] },
+          { qty: 1, name: "Menu 2 personas B", unitPrice: 26800, options: ["Arroz: Cambiar x1 por Arroz Blanco", "Cambio: Wantan frito -> Carne Mongoliana", "Con aji"] },
           { qty: 1, name: "California Ebi", unitPrice: 6500, options: ["Envuelto en: Sesamo", "Salsa incluida: Salsa Soya", "Con Wasabi (+$500)"] }
         ],
         subtotal: 33300,
@@ -506,7 +434,6 @@
       fetchOrders();
     }
 
-    // 拉取订单并监控新单
     async function fetchOrders() {
       const { data, error } = await db.from('orders').select('*').order('id', { ascending: false }).limit(40);
       if (error) return;
@@ -552,7 +479,7 @@
           : '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">🖨️ IMPRESO</span>';
 
         const dt = new Date(o.created_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-        const items = Array.isArray(o.items) ? o.items : [];
+        const items = Array.isArray(o.items) ? orderItemsSafe(o.items) : [];
         let itemsHtml = '';
         items.forEach(it => {
           const opts = (it.options && it.options.length > 0)
@@ -611,9 +538,8 @@
       container.innerHTML = html;
     }
 
-    // =====================================================
-    // 🍱 菜品上下架与价格管理模块
-    // =====================================================
+    function orderItemsSafe(items) { return items || []; }
+
     let adminDishes = [];
     async function loadAdminDishes() {
       const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
@@ -648,7 +574,6 @@
       loadAdminDishes();
     }
 
-    // 启动实时监听 + 5秒轮询双保险（防止安卓锁屏断连）
     db.channel('orders-channel')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
         fetchOrders();
