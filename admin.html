@@ -3,22 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DRAGÓN DE ORO - Panel de Control & Impresora 80mm</title>
+  <title>DRAGÓN DE ORO - Panel POS 80mm</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
-    @media print {
-      body * { visibility: hidden; }
-      #print-area-80mm, #print-area-80mm * { visibility: visible; }
-      #print-area-80mm {
-        position: absolute; left: 0; top: 0;
-        width: 72mm; padding: 2mm;
-        font-family: 'Courier New', monospace;
-        font-size: 12px; color: #000;
-      }
-      @page { size: 80mm auto; margin: 0; }
-    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
@@ -32,7 +21,7 @@
           <h1 class="text-sm font-black text-white tracking-wide">DRAGÓN DE ORO • POS 80MM</h1>
           <div class="flex items-center gap-1.5 text-[11px] text-emerald-400 font-bold">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span id="realtime-status">Escuchando pedidos en vivo...</span>
+            <span id="realtime-status">Conectando con base de datos...</span>
           </div>
         </div>
       </div>
@@ -56,8 +45,8 @@
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg space-y-3">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
           <div>
-            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Configuración Impresora Térmica 80mm</h2>
-            <p id="printer-status-text" class="text-[11px] text-slate-400 mt-0.5">Modo activo: App RawBT (USB / Red LAN)</p>
+            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Impresora Térmica 80mm (SP-POS892UEd)</h2>
+            <p id="printer-status-text" class="text-[11px] text-rose-400 font-bold mt-0.5">⚠️ Paso 1: Toca el botón azul abajo para conectar por USB</p>
           </div>
           <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
@@ -65,32 +54,29 @@
           </label>
         </div>
 
-        <!-- 默认选中模式 2 (RawBT USB/LAN) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-          <button onclick="setPrintMethod('rawbt')" id="btn-mode-rawbt" class="p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition">
-            <div class="font-black">1. App RawBT (USB / Red LAN)</div>
-            <div class="text-[10px] text-slate-300 mt-0.5">Recomendado para SP-POS892UEd</div>
+        <!-- 两种打印模式切换：1. Chrome 原生 USB 直连（最稳，支持后台自动出单） 2. RawBT 备用 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <button onclick="setPrintMethod('webusb')" id="btn-mode-webusb" class="p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition">
+            <div class="font-black">🔌 1. USB Directo en Chrome (Recomendado)</div>
+            <div class="text-[10px] text-slate-300 mt-0.5">Impresión completa + Auto-impresión sin ventanas</div>
           </button>
-          <button onclick="setPrintMethod('ble')" id="btn-mode-ble" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
-            <div class="font-black">2. Bluetooth Directo (BLE)</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Solo impresoras con Bluetooth</div>
-          </button>
-          <button onclick="setPrintMethod('system')" id="btn-mode-system" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
-            <div class="font-black">3. Impresión Sistema</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Ventana nativa del navegador</div>
+          <button onclick="setPrintMethod('rawbt')" id="btn-mode-rawbt" class="p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition">
+            <div class="font-black">📡 2. App RawBT (Servicio / Red LAN)</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Usar solo si conectas por cable de red WiFi/LAN</div>
           </button>
         </div>
 
+        <!-- 核心操作按钮 -->
         <div class="flex flex-wrap gap-2 pt-1">
-          <button onclick="connectBluetoothPrinter()" id="btn-connect-ble" class="hidden flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl text-xs items-center justify-center gap-1.5 shadow transition">
-            <span>🔵 Conectar Impresora Bluetooth</span>
+          <button onclick="connectUsbPrinter()" id="btn-connect-usb" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition">
+            <span>🔌 Conectar Impresora USB (SPRT)</span>
           </button>
 
-          <button onclick="printTestTicket()" class="flex-1 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
-            <span>🧪 Imprimir Ticket Prueba ($ Corregido)</span>
+          <button onclick="printTestTicket()" class="flex-1 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition">
+            <span>🧪 Imprimir Ticket Prueba Completo</span>
           </button>
 
-          <button onclick="enableAudioAndWakeLock()" id="btn-wakelock" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 shadow transition">
+          <button onclick="enableAudioAndWakeLock()" id="btn-wakelock" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1 shadow transition">
             <span>🔔 Activar Sonido y Pantalla Activa</span>
           </button>
         </div>
@@ -98,7 +84,7 @@
 
       <!-- 实时订单列表 -->
       <div class="flex items-center justify-between px-1">
-        <h3 class="text-xs font-black uppercase tracking-wider text-slate-300">📋 Lista de Pedidos Recientes</h3>
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-300">📋 Lista de Pedidos en Vivo</h3>
         <button onclick="fetchOrders()" class="text-xs font-bold text-blue-400 hover:text-blue-300">🔄 Actualizar ahora</button>
       </div>
 
@@ -117,8 +103,6 @@
 
   </main>
 
-  <div id="print-area-80mm" class="hidden"></div>
-
   <script>
     const SUPABASE_URL = "https://ecjxlhhhywxsqtwbujxr.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
@@ -128,10 +112,12 @@
     let ordersData = [];
     let knownOrderIds = new Set();
     let isFirstLoad = true;
-    let printMethod = 'rawbt'; // 默认直接使用 RawBT (USB / LAN)
+    let printMethod = 'webusb'; // 'webusb' | 'rawbt'
 
-    let bluetoothDevice = null;
-    let printCharacteristic = null;
+    // WebUSB 硬件连接变量
+    let usbDevice = null;
+    let usbInterfaceNumber = 0;
+    let usbEndpointOut = 1;
 
     function switchAdminTab(tab) {
       document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
@@ -143,7 +129,7 @@
 
     function setPrintMethod(method) {
       printMethod = method;
-      ['rawbt', 'ble', 'system'].forEach(m => {
+      ['webusb', 'rawbt'].forEach(m => {
         const btn = document.getElementById('btn-mode-' + m);
         if (m === method) {
           btn.className = "p-2.5 rounded-xl border-2 border-red-500 bg-red-500/15 text-white font-bold text-left transition";
@@ -151,12 +137,19 @@
           btn.className = "p-2.5 rounded-xl border border-slate-600 bg-slate-900/60 text-slate-300 font-bold text-left transition";
         }
       });
-      document.getElementById('btn-connect-ble').style.display = (method === 'ble') ? 'flex' : 'none';
+      document.getElementById('btn-connect-usb').style.display = (method === 'webusb') ? 'flex' : 'none';
       const statusEl = document.getElementById('printer-status-text');
       if (method === 'rawbt') {
-        statusEl.innerText = "Modo activo: App RawBT (Impresión directa por USB / Red LAN)";
-      } else if (method === 'system') {
-        statusEl.innerText = "Modo activo: Impresión del Sistema (80mm)";
+        statusEl.className = "text-[11px] text-amber-300 font-bold mt-0.5";
+        statusEl.innerText = "Modo RawBT activo (Asegúrate de desmarcar 'Start printing automatically' en RawBT si corta el ticket)";
+      } else {
+        if (usbDevice && usbDevice.opened) {
+          statusEl.className = "text-[11px] text-emerald-400 font-bold mt-0.5";
+          statusEl.innerText = "✅ Impresora USB Conectada y Lista para Auto-Imprimir";
+        } else {
+          statusEl.className = "text-[11px] text-rose-400 font-bold mt-0.5";
+          statusEl.innerText = "⚠️ Paso 1: Toca el botón azul abajo para conectar por USB";
+        }
       }
     }
 
@@ -168,9 +161,9 @@
         }
         const btn = document.getElementById('btn-wakelock');
         btn.innerText = "✅ Sonido y Pantalla Activa OK";
-        btn.className = "bg-slate-700 text-emerald-400 font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1";
+        btn.className = "w-full sm:w-auto bg-slate-700 text-emerald-400 font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1";
       } catch (e) {
-        alert("Sonido activado. Mantén la pantalla encendida para recibir pedidos.");
+        alert("Sonido activado.");
       }
     }
 
@@ -193,35 +186,71 @@
       } catch (e) { console.log(e); }
     }
 
-    async function connectBluetoothPrinter() {
-      if (!navigator.bluetooth) {
-        alert("Usa el Modo 1 (App RawBT) para conexión USB o Red LAN.");
+    // =====================================================
+    // 🔌 Chrome 原生 WebUSB 直连驱动 (解决打一半停住 & 支持后台自动打单)
+    // =====================================================
+    async function connectUsbPrinter() {
+      if (!navigator.usb) {
+        alert("Tu navegador no soporta WebUSB. Usa Google Chrome en Android.");
         return;
       }
       try {
-        const commonServices = [
-          '000018f0-0000-1000-8000-00805f9b34fb',
-          'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
-          '49535343-fe7d-4ae5-8fa9-9fafd205e455'
-        ];
-        bluetoothDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: commonServices
-        });
-        const server = await bluetoothDevice.gatt.connect();
-        const services = await server.getPrimaryServices();
-        for (const service of services) {
-          const chars = await service.getCharacteristics();
-          for (const c of chars) {
-            if (c.properties.write || c.properties.writeWithoutResponse) {
-              printCharacteristic = c;
+        usbDevice = await navigator.usb.requestDevice({ filters: [] });
+        await openUsbDevice(usbDevice);
+      } catch (err) {
+        alert("No se pudo conectar por USB: " + err.message + "\n\n💡 IMPORTANTE: Si tienes la App RawBT abierta, entra a RawBT y apaga el botón 'Run as a print service' arriba a la derecha para que suelte el cable USB.");
+      }
+    }
+
+    async function openUsbDevice(device) {
+      await device.open();
+      if (device.configuration === null) {
+        await device.selectConfiguration(1);
+      }
+
+      // 自动寻找打印机的 Bulk OUT 写入端点
+      let foundInterface = null;
+      let foundEndpoint = null;
+
+      for (const iface of device.configuration.interfaces) {
+        for (const alt of iface.alternates) {
+          for (const ep of alt.endpoints) {
+            if (ep.direction === 'out' && ep.type === 'bulk') {
+              foundInterface = iface.interfaceNumber;
+              foundEndpoint = ep.endpointNumber;
               break;
             }
           }
-          if (printCharacteristic) break;
+          if (foundEndpoint !== null) break;
         }
-      } catch (err) {
-        alert("Aviso: " + err.message);
+        if (foundEndpoint !== null) break;
+      }
+
+      usbInterfaceNumber = foundInterface !== null ? foundInterface : 0;
+      usbEndpointOut = foundEndpoint !== null ? foundEndpoint : 1;
+
+      await device.claimInterface(usbInterfaceNumber);
+
+      const statusEl = document.getElementById('printer-status-text');
+      statusEl.className = "text-[11px] text-emerald-400 font-bold mt-0.5";
+      statusEl.innerText = `✅ Conectada por USB: ${device.productName || 'SPRT Printer'} (Auto-Impresión Activa)`;
+
+      const btn = document.getElementById('btn-connect-usb');
+      btn.innerText = "✅ Impresora USB Conectada";
+      btn.className = "flex-1 bg-emerald-700 text-white font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow";
+    }
+
+    // 页面加载时自动重连已授权过的 USB 打印机
+    async function autoReconnectUsb() {
+      if (!navigator.usb) return;
+      try {
+        const devices = await navigator.usb.getDevices();
+        if (devices.length > 0) {
+          usbDevice = devices[0];
+          await openUsbDevice(usbDevice);
+        }
+      } catch (e) {
+        console.log("Auto-reconnect USB:", e);
       }
     }
 
@@ -243,7 +272,7 @@
     }
 
     // =====================================================
-    // 🧾 生成 80mm 纯西语 ESC/POS 字节流（已修复 $ 符号 & 菜名倍高）
+    // 🧾 生成 80mm 纯西语 ESC/POS 字节流（$ 符号已修复 + 完整走纸切刀）
     // =====================================================
     function buildEscPosBytes(order) {
       const ESC = 0x1B;
@@ -259,46 +288,43 @@
         }
       };
 
-      // 1. 初始化打印机
+      // 1. 初始化并强制设置国际字符集 USA（确保 $ 不会变成 ¥）
       pushBytes([ESC, 0x40]);
+      pushBytes([FS, 0x2E]);
+      pushBytes([ESC, 0x52, 0x00]);
+      pushBytes([ESC, 0x74, 0x00]);
 
-      // 🌟 2. 核心修复：退出中文字符模式并强制切换为美国/国际字符集，解决 $ 被印成 ¥ 的问题！
-      pushBytes([FS, 0x2E]);        // FS . 取消中文模式
-      pushBytes([ESC, 0x52, 0x00]); // ESC R 0 国际字符集设为 USA (0x24 严格输出为 $)
-      pushBytes([ESC, 0x74, 0x00]); // ESC t 0 代码页设为 PC437
-
-      // 居中 + 倍高倍宽 + 加粗：店名
-      pushBytes([ESC, 0x61, 0x01]); // Center
-      pushBytes([ESC, 0x45, 0x01]); // Bold ON
-      pushBytes([GS, 0x21, 0x11]);  // 2x height & width
+      // 2. 店名标题
+      pushBytes([ESC, 0x61, 0x01]);
+      pushBytes([ESC, 0x45, 0x01]);
+      pushBytes([GS, 0x21, 0x11]);
       pushText("DRAGON DE ORO\n");
 
-      // 恢复标准字体，居中打印地址
       pushBytes([GS, 0x21, 0x00]);
       pushBytes([ESC, 0x45, 0x00]);
       pushText("Comida China Tradicional & Sushi\n");
       pushText("Camino de la Vina 1461, Huechuraba\n");
       pushText("================================================\n");
 
-      // 左对齐：订单号与时间
-      pushBytes([ESC, 0x61, 0x00]); // Left
-      pushBytes([ESC, 0x45, 0x01]); // Bold ON
+      // 3. 订单号与时间
+      pushBytes([ESC, 0x61, 0x00]);
+      pushBytes([ESC, 0x45, 0x01]);
       pushText(`PEDIDO: ${order.order_code}\n`);
       pushBytes([ESC, 0x45, 0x00]);
       const dt = new Date(order.created_at || Date.now()).toLocaleString('es-CL');
       pushText(`FECHA:  ${dt}\n`);
       pushText("------------------------------------------------\n");
 
-      // 履约方式与预约时间（倍高加粗醒目提示）
+      // 4. 配送方式与预约时间（倍高突出）
       pushBytes([ESC, 0x45, 0x01]);
-      pushBytes([GS, 0x21, 0x01]); // Double height
+      pushBytes([GS, 0x21, 0x01]);
       pushText(`SERVICIO: ${(order.service_type || '').toUpperCase()}\n`);
       pushText(`HORARIO:  ${cleanSpanishText(order.timing_info || 'Lo antes posible')}\n`);
       pushBytes([GS, 0x21, 0x00]);
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
-      // 客户信息
+      // 5. 客人信息
       pushBytes([ESC, 0x45, 0x01]);
       pushText(`CLIENTE:  ${order.customer_name}\n`);
       pushText(`TELEFONO: ${order.customer_phone}\n`);
@@ -312,32 +338,30 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
-      // 🌟 菜品明细列表（菜名与换菜备注采用倍高字体，方便后厨远距离看单）
+      // 6. 菜品明细列表
       const items = Array.isArray(order.items) ? order.items : [];
       items.forEach(item => {
         const lineTotal = "$" + Number(item.unitPrice * item.qty).toLocaleString('es-CL');
         const titleLeft = `${item.qty}x ${item.name}`;
 
-        // 菜名加粗 + 倍高 (GS ! 0x01)
         pushBytes([ESC, 0x45, 0x01]);
         pushBytes([GS, 0x21, 0x01]);
         pushText(formatLineLR(titleLeft, lineTotal, 48));
-
-        // 菜品客制化选项（换菜、换白饭、加料、辣度等）保持倍高清晰显示
         pushBytes([ESC, 0x45, 0x00]);
+
         if (item.options && item.options.length > 0) {
           item.options.forEach(opt => {
             pushText(`   * ${cleanSpanishText(opt)}\n`);
           });
         }
-        pushBytes([GS, 0x21, 0x00]); // 恢复标准高度
+        pushBytes([GS, 0x21, 0x00]);
         pushText("------------------------------------------------\n");
       });
 
+      // 7. 金额汇总
       pushText(formatLineLR("Subtotal:", "$" + Number(order.subtotal).toLocaleString('es-CL'), 48));
       pushText(formatLineLR("Costo de Entrega:", "$" + Number(order.delivery_fee).toLocaleString('es-CL'), 48));
 
-      // 总金额倍高加粗
       pushBytes([ESC, 0x45, 0x01]);
       pushBytes([GS, 0x21, 0x01]);
       pushText(formatLineLR("TOTAL A PAGAR:", "$" + Number(order.total).toLocaleString('es-CL') + " CLP", 48));
@@ -353,55 +377,67 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("================================================\n");
 
-      // 底部致谢 + 走纸 5 行推过切刀位置 + 执行切刀
+      // 8. 底部致谢 + 充足走纸 6 行 + 自动切刀
       pushBytes([ESC, 0x61, 0x01]);
-      pushText("Gracias por su preferencia!\n");
-      pushBytes([ESC, 0x64, 0x05]);      // ESC d 5 (走纸 5 行，确保文字完全越过切刀刀片)
-      pushBytes([GS, 0x56, 0x42, 0x00]); // 标准切纸指令
+      pushText("Gracias por su preferencia!\n\n\n\n\n\n");
+      pushBytes([GS, 0x56, 0x42, 0x00]);
 
       return new Uint8Array(bytes);
     }
 
+    // 执行打印
     async function printOrderTicket(order) {
       const escposBytes = buildEscPosBytes(order);
 
+      // 模式 1：Chrome WebUSB 原生直连（不弹窗、不截断、支持后台全自动打单）
+      if (printMethod === 'webusb') {
+        if (!usbDevice || !usbDevice.opened) {
+          try {
+            await autoReconnectUsb();
+          } catch (e) {}
+        }
+        if (!usbDevice || !usbDevice.opened) {
+          alert("⚠️ Primero toca el botón azul '🔌 Conectar Impresora USB (SPRT)' para autorizar el cable USB.");
+          return;
+        }
+        try {
+          // 分块稳定写入 USB 端口，确保长小票 100% 完整输出并切纸
+          const chunkSize = 256;
+          for (let i = 0; i < escposBytes.length; i += chunkSize) {
+            const chunk = escposBytes.slice(i, i + chunkSize);
+            await usbDevice.transferOut(usbEndpointOut, chunk);
+          }
+          if (order.id) markOrderPrinted(order.id);
+        } catch (err) {
+          alert("Error de escritura USB: " + err.message + "\nIntenta reconectar el cable USB.");
+        }
+        return;
+      }
+
+      // 模式 2：RawBT 后台 WebSocket 优先，失败则回退 URI
       if (printMethod === 'rawbt') {
         let binary = '';
         for (let i = 0; i < escposBytes.byteLength; i++) {
           binary += String.fromCharCode(escposBytes[i]);
         }
         const base64Data = window.btoa(binary);
-        window.location.href = 'rawbt:base64,' + base64Data;
-        markOrderPrinted(order.id);
-        return;
-      }
 
-      if (printMethod === 'ble') {
-        if (!printCharacteristic) {
-          alert("Primero conecta la impresora o selecciona el Modo 1 (App RawBT).");
-          return;
-        }
+        // 优先尝试 RawBT 本地后台 WebSocket 服务 (端口 40213)，避免弹窗早关截断
         try {
-          const chunkSize = 100;
-          for (let i = 0; i < escposBytes.length; i += chunkSize) {
-            const chunk = escposBytes.slice(i, i + chunkSize);
-            if (printCharacteristic.properties.writeWithoutResponse) {
-              await printCharacteristic.writeValueWithoutResponse(chunk);
-            } else {
-              await printCharacteristic.writeValue(chunk);
-            }
-            await new Promise(r => setTimeout(r, 25));
-          }
-          markOrderPrinted(order.id);
-        } catch (err) {
-          alert("Error Bluetooth: " + err.message);
+          const ws = new WebSocket('ws://127.0.0.1:40213/');
+          ws.onopen = () => {
+            ws.send(escposBytes);
+            setTimeout(() => ws.close(), 1500);
+            if (order.id) markOrderPrinted(order.id);
+          };
+          ws.onerror = () => {
+            window.location.href = 'rawbt:base64,' + base64Data;
+            if (order.id) markOrderPrinted(order.id);
+          };
+        } catch (e) {
+          window.location.href = 'rawbt:base64,' + base64Data;
+          if (order.id) markOrderPrinted(order.id);
         }
-        return;
-      }
-
-      if (printMethod === 'system') {
-        window.print();
-        markOrderPrinted(order.id);
       }
     }
 
@@ -423,7 +459,7 @@
         delivery_fee: 1800,
         total: 35100,
         payment_detail: "Efectivo $35.100 (monto recibido $40.000, vuelto $4.900)",
-        notes: "Ticket de prueba 80mm OK"
+        notes: "Ticket de prueba 80mm COMPLETO OK"
       };
       printOrderTicket(sampleOrder);
     }
@@ -434,9 +470,26 @@
       fetchOrders();
     }
 
+    // 拉取订单并清楚显示数据库状态
     async function fetchOrders() {
+      const statusEl = document.getElementById('realtime-status');
       const { data, error } = await db.from('orders').select('*').order('id', { ascending: false }).limit(40);
-      if (error) return;
+
+      if (error) {
+        statusEl.className = "text-rose-400 font-bold";
+        statusEl.innerText = "⚠️ Error tabla 'orders': " + error.message;
+        document.getElementById('orders-list').innerHTML = `
+          <div class="bg-rose-950/70 border-2 border-rose-500 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
+            <div class="font-black text-sm text-white">⚠️ Aún no existe la tabla "orders" en Supabase</div>
+            <p>Por eso los pedidos de la web no aparecen aquí todavía. Entra a <b>Supabase ➔ SQL Editor</b> y ejecuta el código SQL de creación de la tabla <code>orders</code>.</p>
+            <div class="text-[11px] text-rose-300 font-mono bg-black/40 p-2 rounded">Detalle: ${error.message}</div>
+          </div>
+        `;
+        return;
+      }
+
+      statusEl.className = "text-emerald-400 font-bold";
+      statusEl.innerText = "Escuchando pedidos en vivo (Conectado OK)";
 
       ordersData = data || [];
       let newOrderArrived = null;
@@ -467,7 +520,7 @@
       document.getElementById('pending-count').innerText = pendingCount;
 
       if (ordersData.length === 0) {
-        container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">Aún no hay pedidos registrados.</div>';
+        container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">✅ Tabla conectada correctamente. Esperando el primer pedido...</div>';
         return;
       }
 
@@ -479,7 +532,7 @@
           : '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">🖨️ IMPRESO</span>';
 
         const dt = new Date(o.created_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-        const items = Array.isArray(o.items) ? orderItemsSafe(o.items) : [];
+        const items = Array.isArray(o.items) ? o.items : [];
         let itemsHtml = '';
         items.forEach(it => {
           const opts = (it.options && it.options.length > 0)
@@ -538,8 +591,6 @@
       container.innerHTML = html;
     }
 
-    function orderItemsSafe(items) { return items || []; }
-
     let adminDishes = [];
     async function loadAdminDishes() {
       const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
@@ -580,8 +631,9 @@
       })
       .subscribe();
 
+    autoReconnectUsb();
     fetchOrders();
-    setInterval(fetchOrders, 5000);
+    setInterval(fetchOrders, 4000);
   </script>
 </body>
 </html>
