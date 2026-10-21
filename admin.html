@@ -46,7 +46,7 @@
         <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Impresora Térmica 80mm (SP-POS892UEd)</h2>
-            <p id="printer-status-text" class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo RawBT USB Activo (Estable y Completo)</p>
+            <p id="printer-status-text" class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo RawBT Directo Activo</p>
           </div>
           <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
@@ -172,13 +172,11 @@
         }
       };
 
-      // 初始化并强制设置国际字符集 USA（确保 $ 输出正常）
       pushBytes([ESC, 0x40]);
       pushBytes([FS, 0x2E]);
       pushBytes([ESC, 0x52, 0x00]);
       pushBytes([ESC, 0x74, 0x00]);
 
-      // 店名标题
       pushBytes([ESC, 0x61, 0x01]);
       pushBytes([ESC, 0x45, 0x01]);
       pushBytes([GS, 0x21, 0x11]);
@@ -190,7 +188,6 @@
       pushText("Camino de la Vina 1461, Huechuraba\n");
       pushText("================================================\n");
 
-      // 订单号与时间
       pushBytes([ESC, 0x61, 0x00]);
       pushBytes([ESC, 0x45, 0x01]);
       pushText(`PEDIDO: ${order.order_code}\n`);
@@ -199,7 +196,6 @@
       pushText(`FECHA:  ${dt}\n`);
       pushText("------------------------------------------------\n");
 
-      // 配送方式与预约时间
       pushBytes([ESC, 0x45, 0x01]);
       pushBytes([GS, 0x21, 0x01]);
       pushText(`SERVICIO: ${(order.service_type || '').toUpperCase()}\n`);
@@ -208,7 +204,6 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
-      // 客人信息
       pushBytes([ESC, 0x45, 0x01]);
       pushText(`CLIENTE:  ${order.customer_name}\n`);
       pushText(`TELEFONO: ${order.customer_phone}\n`);
@@ -222,7 +217,6 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
-      // 菜品明细列表
       const items = Array.isArray(order.items) ? order.items : [];
       items.forEach(item => {
         const lineTotal = "$" + Number(item.unitPrice * item.qty).toLocaleString('es-CL');
@@ -242,7 +236,6 @@
         pushText("------------------------------------------------\n");
       });
 
-      // 金额汇总
       pushText(formatLineLR("Subtotal:", "$" + Number(order.subtotal).toLocaleString('es-CL'), 48));
       pushText(formatLineLR("Costo de Entrega:", "$" + Number(order.delivery_fee).toLocaleString('es-CL'), 48));
 
@@ -261,7 +254,6 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("================================================\n");
 
-      // 底部致谢 + 充足走纸 6 行 + 自动切刀
       pushBytes([ESC, 0x61, 0x01]);
       pushText("Gracias por su preferencia!\n\n\n\n\n\n");
       pushBytes([GS, 0x56, 0x42, 0x00]);
@@ -269,7 +261,7 @@
       return new Uint8Array(bytes);
     }
 
-    // 通过 RawBT 桥接打印（完美完整输出 + 自动切纸）
+    // 🌟 统一使用 rawbt:base64 链接跳转，100% 稳定唤醒打印机并自动切纸
     function printOrderTicket(order) {
       const escposBytes = buildEscPosBytes(order);
       let binary = '';
@@ -277,22 +269,8 @@
         binary += String.fromCharCode(escposBytes[i]);
       }
       const base64Data = window.btoa(binary);
-
-      try {
-        const ws = new WebSocket('ws://127.0.0.1:40213/');
-        ws.onopen = () => {
-          ws.send(escposBytes);
-          setTimeout(() => ws.close(), 1500);
-          if (order.id) markOrderPrinted(order.id);
-        };
-        ws.onerror = () => {
-          window.location.href = 'rawbt:base64,' + base64Data;
-          if (order.id) markOrderPrinted(order.id);
-        };
-      } catch (e) {
-        window.location.href = 'rawbt:base64,' + base64Data;
-        if (order.id) markOrderPrinted(order.id);
-      }
+      window.location.href = 'rawbt:base64,' + base64Data;
+      if (order.id) markOrderPrinted(order.id);
     }
 
     function printTestTicket() {
@@ -330,13 +308,7 @@
 
       if (error) {
         statusEl.className = "text-rose-400 font-bold";
-        statusEl.innerText = "⚠️ Error tabla 'orders': " + error.message;
-        document.getElementById('orders-list').innerHTML = `
-          <div class="bg-rose-950/70 border-2 border-rose-500 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
-            <div class="font-black text-sm text-white">⚠️ Falta configurar permisos en Supabase</div>
-            <p>Ve a <b>Supabase ➔ SQL Editor</b> y ejecuta <code>alter table public.orders disable row level security;</code> para que los pedidos lleguen sin bloqueos.</p>
-          </div>
-        `;
+        statusEl.innerText = "⚠️ Error: " + error.message;
         return;
       }
 
@@ -473,7 +445,7 @@
     }
 
     async function toggleDishStock(id, newState) {
-      await db.from('dishes').update({ is_available: newState }).eq('id', id);
+      await db.from('dish').update({ is_available: newState }).eq('id', id);
       loadAdminDishes();
     }
 
