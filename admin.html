@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DRAGÓN DE ORO - Panel POS 80mm</title>
+  <title>DRAGÓN DE ORO - Panel POS 80mm (Red LAN)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -39,14 +39,14 @@
 
   <main class="max-w-3xl mx-auto p-3.5 space-y-4">
 
-    <!-- 面板 1：实时接单 & 80mm 打印控制台 -->
+    <!-- 面板 1：实时接单 & 网口打印控制台 -->
     <div id="view-orders" class="space-y-4">
 
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg space-y-3">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
           <div>
-            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🖨️ Impresora Térmica 80mm (SP-POS892UEd)</h2>
-            <p id="printer-status-text" class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo RawBT Directo Activo</p>
+            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🌐 Impresora Térmica 80mm (Conexión Red LAN)</h2>
+            <p class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo Red LAN (WiFi / Ethernet vía RawBT) Activo</p>
           </div>
           <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
@@ -54,10 +54,9 @@
           </label>
         </div>
 
-        <!-- 核心操作按钮 -->
         <div class="flex flex-wrap gap-2 pt-1">
           <button onclick="printTestTicket()" class="flex-1 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition">
-            <span>🧪 Imprimir Ticket Prueba (RawBT)</span>
+            <span>🧪 Imprimir Ticket de Prueba (LAN)</span>
           </button>
 
           <button onclick="enableAudioAndWakeLock()" id="btn-wakelock" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1 shadow transition">
@@ -77,25 +76,26 @@
       </div>
     </div>
 
-    <!-- 面板 2：菜品上下架与价格管理 -->
+    <!-- 面板 2：菜品上下架管理（只控制库存状态，不改动菜单结构） -->
     <div id="view-dishes" class="hidden space-y-4">
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-3.5">
-        <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato para cambiar precio o agotar..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
+        <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato para cambiar disponibilidad..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
       </div>
       <div id="admin-dishes-list" class="space-y-2"></div>
     </div>
 
   </main>
 
-  <!-- 🌟 全局防拦截打印引导遮罩 -->
+  <!-- 新订单防拦截一键打印弹窗 -->
   <div id="rawbt-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-800 border-2 border-red-500 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
       <div class="text-4xl">🖨️</div>
-      <h3 class="text-base font-black text-white">Nuevo Pedido Detectado</h3>
-      <p class="text-xs text-slate-300">Toca el botón de abajo para enviar el ticket a la impresora:</p>
-      <a id="rawbt-link-btn" href="#" target="_blank" onclick="closeRawbtModal()" class="block w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg text-sm active:scale-95 transition">
-        🖨️ Imprimir Inmediatamente
+      <h3 class="text-base font-black text-white">¡Nuevo Pedido Recibido!</h3>
+      <p id="modal-order-code" class="text-xs text-amber-300 font-bold"></p>
+      <a id="rawbt-link-btn" href="#" onclick="closeRawbtModal()" class="block w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg text-sm active:scale-95 transition">
+        🖨️ Imprimir Ticket Ahora
       </a>
+      <button onclick="closeRawbtModal()" class="text-xs text-slate-400 hover:text-white underline pt-1">Cerrar ventana</button>
     </div>
   </div>
 
@@ -112,8 +112,12 @@
     function switchAdminTab(tab) {
       document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
       document.getElementById('view-dishes').classList.toggle('hidden', tab !== 'dishes');
-      document.getElementById('tab-orders').className = tab === 'orders' ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
-      document.getElementById('tab-dishes').className = tab === 'dishes' ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      document.getElementById('tab-orders').className = tab === 'orders'
+        ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow'
+        : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      document.getElementById('tab-dishes').className = tab === 'dishes'
+        ? 'px-3 py-1.5 rounded-lg bg-red-600 text-white shadow'
+        : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
       if (tab === 'dishes') loadAdminDishes();
     }
 
@@ -168,7 +172,7 @@
     }
 
     // =====================================================
-    // 🧾 生成 80mm 纯西语 ESC/POS 字节流
+    // 🧾 生成 80mm 纯西语 ESC/POS 打印字节流
     // =====================================================
     function buildEscPosBytes(order) {
       const ESC = 0x1B;
@@ -184,11 +188,13 @@
         }
       };
 
+      // 初始化并强制切换国际字符集 USA，确保 $ 符号正常打印
       pushBytes([ESC, 0x40]);
       pushBytes([FS, 0x2E]);
       pushBytes([ESC, 0x52, 0x00]);
       pushBytes([ESC, 0x74, 0x00]);
 
+      // 店铺抬头
       pushBytes([ESC, 0x61, 0x01]);
       pushBytes([ESC, 0x45, 0x01]);
       pushBytes([GS, 0x21, 0x11]);
@@ -200,6 +206,7 @@
       pushText("Camino de la Vina 1461, Huechuraba\n");
       pushText("================================================\n");
 
+      // 订单编号与日期
       pushBytes([ESC, 0x61, 0x00]);
       pushBytes([ESC, 0x45, 0x01]);
       pushText(`PEDIDO: ${order.order_code}\n`);
@@ -208,6 +215,7 @@
       pushText(`FECHA:  ${dt}\n`);
       pushText("------------------------------------------------\n");
 
+      // 配送类型与时间（倍高醒目显示）
       pushBytes([ESC, 0x45, 0x01]);
       pushBytes([GS, 0x21, 0x01]);
       pushText(`SERVICIO: ${(order.service_type || '').toUpperCase()}\n`);
@@ -216,6 +224,7 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
+      // 客户信息
       pushBytes([ESC, 0x45, 0x01]);
       pushText(`CLIENTE:  ${order.customer_name}\n`);
       pushText(`TELEFONO: ${order.customer_phone}\n`);
@@ -229,6 +238,7 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("------------------------------------------------\n");
 
+      // 菜品列表（倍高大字方便后厨看单）
       const items = Array.isArray(order.items) ? order.items : [];
       items.forEach(item => {
         const lineTotal = "$" + Number(item.unitPrice * item.qty).toLocaleString('es-CL');
@@ -248,6 +258,7 @@
         pushText("------------------------------------------------\n");
       });
 
+      // 费用总计
       pushText(formatLineLR("Subtotal:", "$" + Number(order.subtotal).toLocaleString('es-CL'), 48));
       pushText(formatLineLR("Costo de Entrega:", "$" + Number(order.delivery_fee).toLocaleString('es-CL'), 48));
 
@@ -266,6 +277,7 @@
       pushBytes([ESC, 0x45, 0x00]);
       pushText("================================================\n");
 
+      // 底部走纸 6 行 + 自动切刀
       pushBytes([ESC, 0x61, 0x01]);
       pushText("Gracias por su preferencia!\n\n\n\n\n\n");
       pushBytes([GS, 0x56, 0x42, 0x00]);
@@ -273,23 +285,38 @@
       return new Uint8Array(bytes);
     }
 
-    // 🌟 核心优化：利用“弹窗防拦截机制”，通过用户点击按钮彻底绕过 Chrome 限制
-    function printOrderTicket(order) {
+    function buildRawbtUrl(order) {
       const escposBytes = buildEscPosBytes(order);
       let binary = '';
       for (let i = 0; i < escposBytes.byteLength; i++) {
         binary += String.fromCharCode(escposBytes[i]);
       }
-      const base64Data = window.btoa(binary);
-      const rawbtUrl = 'rawbt:base64,' + base64Data;
+      return 'rawbt:base64,' + window.btoa(binary);
+    }
 
-      if (document.getElementById('auto-print-toggle').checked) {
-        // 弹出醒目防拦截弹窗，用户只需点一下即可 100% 唤醒打印机
-        document.getElementById('rawbt-link-btn').href = rawbtUrl;
-        document.getElementById('rawbt-modal').classList.remove('hidden');
-      } else {
-        window.location.href = rawbtUrl;
-      }
+    // 手动点击打印按钮：直接唤起 RawBT 发送至网口打印机
+    function printOrderTicket(order) {
+      window.location.href = buildRawbtUrl(order);
+      if (order.id) markOrderPrinted(order.id);
+    }
+
+    // 来新单自动触发：优先通过 RawBT 后台服务静默打印，同时弹出防拦截确认框兜底
+    function triggerAutoPrint(order) {
+      const escposBytes = buildEscPosBytes(order);
+      const rawbtUrl = buildRawbtUrl(order);
+
+      document.getElementById('modal-order-code').innerText = `${order.order_code} • $${Number(order.total).toLocaleString('es-CL')} CLP`;
+      document.getElementById('rawbt-link-btn').href = rawbtUrl;
+      document.getElementById('rawbt-modal').classList.remove('hidden');
+
+      try {
+        const ws = new WebSocket('ws://127.0.0.1:40213/');
+        ws.onopen = () => {
+          ws.send(escposBytes);
+          setTimeout(() => ws.close(), 1500);
+          closeRawbtModal();
+        };
+      } catch (e) {}
 
       if (order.id) markOrderPrinted(order.id);
     }
@@ -301,7 +328,7 @@
     function printTestTicket() {
       const sampleOrder = {
         id: 0,
-        order_code: "TEST-80MM",
+        order_code: "TEST-LAN-80MM",
         created_at: new Date().toISOString(),
         service_type: "Delivery (Envio a domicilio)",
         timing_info: "Lo antes posible (Inmediato)",
@@ -316,7 +343,7 @@
         delivery_fee: 1800,
         total: 35100,
         payment_detail: "Efectivo $35.100 (monto recibido $40.000, vuelto $4.900)",
-        notes: "Ticket de prueba 80mm COMPLETO OK"
+        notes: "Conexion por cable de Red LAN OK"
       };
       printOrderTicket(sampleOrder);
     }
@@ -357,7 +384,9 @@
 
       if (newOrderArrived) {
         playBeepAlert();
-        printOrderTicket(newOrderArrived);
+        if (document.getElementById('auto-print-toggle').checked) {
+          triggerAutoPrint(newOrderArrived);
+        }
       }
     }
 
@@ -367,7 +396,7 @@
       document.getElementById('pending-count').innerText = pendingCount;
 
       if (ordersData.length === 0) {
-        container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">✅ Sistema listo. Esperando el primer pedido...</div>';
+        container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">✅ Sistema listo. Esperando pedidos...</div>';
         return;
       }
 
@@ -468,7 +497,7 @@
     }
 
     async function toggleDishStock(id, newState) {
-      await db.from('dish').update({ is_available: newState }).eq('id', id);
+      await db.from('dishes').update({ is_available: newState }).eq('id', id);
       loadAdminDishes();
     }
 
