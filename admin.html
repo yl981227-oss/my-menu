@@ -291,7 +291,8 @@
       for (let i = 0; i < escposBytes.byteLength; i++) {
         binary += String.fromCharCode(escposBytes[i]);
       }
-      return 'rawbt:base64,' + window.btoa(binary);
+      // 用 intent: 显式指定 RawBT 包名，直接拉起应用，绕开 Chrome 的协议确认框
+      return 'intent:base64,' + window.btoa(binary) + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
     }
 
     // 手动点击打印按钮：直接唤起 RawBT 发送至网口打印机
@@ -300,23 +301,13 @@
       if (order.id) markOrderPrinted(order.id);
     }
 
-    // 来新单自动触发：优先通过 RawBT 后台服务静默打印，同时弹出防拦截确认框兜底
+    // 来新单自动触发：弹出确认框，由用户点击后拉起 RawBT 打印
     function triggerAutoPrint(order) {
-      const escposBytes = buildEscPosBytes(order);
       const rawbtUrl = buildRawbtUrl(order);
 
       document.getElementById('modal-order-code').innerText = `${order.order_code} • $${Number(order.total).toLocaleString('es-CL')} CLP`;
       document.getElementById('rawbt-link-btn').href = rawbtUrl;
       document.getElementById('rawbt-modal').classList.remove('hidden');
-
-      try {
-        const ws = new WebSocket('ws://127.0.0.1:40213/');
-        ws.onopen = () => {
-          ws.send(escposBytes);
-          setTimeout(() => ws.close(), 1500);
-          closeRawbtModal();
-        };
-      } catch (e) {}
 
       if (order.id) markOrderPrinted(order.id);
     }
