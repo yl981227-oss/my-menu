@@ -315,6 +315,9 @@
       const v = input ? input.value.trim() : '';
       if (!v) { alert('Ingrese una IP valida'); return; }
       localStorage.setItem('printer_ip', v);
+      if (isNativeApp() && window.AndroidPrinter.saveConfig) {
+        try { window.AndroidPrinter.saveConfig(v, 9100); } catch (e) {}
+      }
       alert('IP guardada: ' + v);
     }
 
@@ -346,12 +349,16 @@
 
     // Inicializar IP y etiqueta de modo al cargar
     (function initPrinterUi() {
+      const ip = localStorage.getItem('printer_ip') || '10.0.4.250';
       const input = document.getElementById('printer-ip');
-      if (input) input.value = localStorage.getItem('printer_ip') || '10.0.4.250';
+      if (input) input.value = ip;
+      if (isNativeApp() && window.AndroidPrinter.saveConfig) {
+        try { window.AndroidPrinter.saveConfig(ip, 9100); } catch (e) {}
+      }
       const label = document.getElementById('printer-mode-label');
       if (label) {
         label.innerText = isNativeApp()
-          ? '✅ Modo APP Nativo (TCP directo puerto 9100)'
+          ? '✅ Modo APP Nativo · Impresión en 2do plano activa'
           : '✅ Modo Red LAN (WiFi / Ethernet vía RawBT)';
       }
     })();
@@ -363,17 +370,9 @@
     function triggerAutoPrint(order) {
       pendingOrder = order;
 
-      // APP 环境：直接发原生打印指令，不弹窗、不需要点击
+      // APP 内：由原生前台服务统一打印（后台也能工作），网页只负责提示，避免重复出票
       if (isNativeApp()) {
-        // 串行队列，间隔 1.3s，避免多单同时抢打印机 9100 端口
-        printChain = printChain
-          .then(() => new Promise(res => setTimeout(res, 1300)))
-          .then(() => {
-            const bytes = buildEscPosBytes(order);
-            window.AndroidPrinter.print(getPrinterIp(), 9100, bytesToBase64(bytes));
-            if (order.id) markOrderPrinted(order.id);
-          })
-          .catch(e => console.log('print chain error', e));
+        playBeepAlert();
         return;
       }
 
