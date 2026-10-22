@@ -46,12 +46,18 @@
         <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">🌐 Impresora Térmica 80mm (Conexión Red LAN)</h2>
-            <p class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo Red LAN (WiFi / Ethernet vía RawBT) Activo</p>
+            <p id="printer-mode-label" class="text-[11px] text-emerald-400 font-bold mt-0.5">✅ Modo Red LAN (WiFi / Ethernet vía RawBT) Activo</p>
           </div>
           <label class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <input type="checkbox" id="auto-print-toggle" checked class="w-4 h-4 rounded">
             <span>Auto-Imprimir</span>
           </label>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <span class="text-[11px] text-slate-400 font-bold whitespace-nowrap">IP Impresora</span>
+          <input id="printer-ip" type="text" inputmode="decimal" placeholder="10.0.4.250" class="flex-1 min-w-0 bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white font-mono">
+          <button onclick="savePrinterIp()" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white text-xs font-bold px-3 py-2 rounded-xl whitespace-nowrap">Guardar</button>
         </div>
 
         <div class="flex flex-wrap gap-2 pt-1">
@@ -295,11 +301,60 @@
       return 'intent:base64,' + window.btoa(binary) + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
     }
 
-    // 手动点击打印按钮：直接唤起 RawBT 发送至网口打印机
+    // =====================================================
+    // Impresion: dentro de la APP usa TCP nativo, en navegador usa RawBT
+    // =====================================================
+    function getPrinterIp() {
+      const input = document.getElementById('printer-ip');
+      const typed = input ? input.value.trim() : '';
+      return typed || localStorage.getItem('printer_ip') || '10.0.4.250';
+    }
+
+    function savePrinterIp() {
+      const input = document.getElementById('printer-ip');
+      const v = input ? input.value.trim() : '';
+      if (!v) { alert('Ingrese una IP valida'); return; }
+      localStorage.setItem('printer_ip', v);
+      alert('IP guardada: ' + v);
+    }
+
+    function bytesToBase64(bytes) {
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      return window.btoa(binary);
+    }
+
+    function isNativeApp() {
+      return !!(window.AndroidPrinter && typeof window.AndroidPrinter.print === 'function');
+    }
+
+    // 手动点击打印按钮：APP 内走原生 TCP，浏览器内唤起 RawBT
     function printOrderTicket(order) {
+      if (isNativeApp()) {
+        try {
+          const bytes = buildEscPosBytes(order);
+          window.AndroidPrinter.print(getPrinterIp(), 9100, bytesToBase64(bytes));
+          if (order.id) markOrderPrinted(order.id);
+          return;
+        } catch (e) {
+          console.log('native print failed, fallback to RawBT', e);
+        }
+      }
       window.location.href = buildRawbtUrl(order);
       if (order.id) markOrderPrinted(order.id);
     }
+
+    // Inicializar IP y etiqueta de modo al cargar
+    (function initPrinterUi() {
+      const input = document.getElementById('printer-ip');
+      if (input) input.value = localStorage.getItem('printer_ip') || '10.0.4.250';
+      const label = document.getElementById('printer-mode-label');
+      if (label) {
+        label.innerText = isNativeApp()
+          ? '✅ Modo APP Nativo (TCP directo puerto 9100)'
+          : '✅ Modo Red LAN (WiFi / Ethernet vía RawBT)';
+      }
+    })();
 
     // 来新单自动触发：弹出确认框，由用户点击后拉起 RawBT 打印
     function triggerAutoPrint(order) {
