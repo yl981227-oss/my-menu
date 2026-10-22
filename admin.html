@@ -98,7 +98,7 @@
       <div class="text-4xl">🖨️</div>
       <h3 class="text-base font-black text-white">¡Nuevo Pedido Recibido!</h3>
       <p id="modal-order-code" class="text-xs text-amber-300 font-bold"></p>
-      <a id="rawbt-link-btn" href="#" onclick="closeRawbtModal()" class="block w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg text-sm active:scale-95 transition">
+      <a id="rawbt-link-btn" href="#" onclick="printFromModal(); return false;" class="block w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg text-sm active:scale-95 transition">
         🖨️ Imprimir Ticket Ahora
       </a>
       <button onclick="closeRawbtModal()" class="text-xs text-slate-400 hover:text-white underline pt-1">Cerrar ventana</button>
@@ -356,15 +356,40 @@
       }
     })();
 
-    // 来新单自动触发：弹出确认框，由用户点击后拉起 RawBT 打印
-    function triggerAutoPrint(order) {
-      const rawbtUrl = buildRawbtUrl(order);
+    // 来新单触发：APP 内直接原生打印（全自动），浏览器内弹窗兜底
+    let pendingOrder = null;
+    let printChain = Promise.resolve();
 
+    function triggerAutoPrint(order) {
+      pendingOrder = order;
+
+      // APP 环境：直接发原生打印指令，不弹窗、不需要点击
+      if (isNativeApp()) {
+        // 串行队列，间隔 1.3s，避免多单同时抢打印机 9100 端口
+        printChain = printChain
+          .then(() => new Promise(res => setTimeout(res, 1300)))
+          .then(() => {
+            const bytes = buildEscPosBytes(order);
+            window.AndroidPrinter.print(getPrinterIp(), 9100, bytesToBase64(bytes));
+            if (order.id) markOrderPrinted(order.id);
+          })
+          .catch(e => console.log('print chain error', e));
+        return;
+      }
+
+      // 浏览器环境：弹出确认框，由用户点击后拉起 RawBT
+      const rawbtUrl = buildRawbtUrl(order);
       document.getElementById('modal-order-code').innerText = `${order.order_code} • $${Number(order.total).toLocaleString('es-CL')} CLP`;
       document.getElementById('rawbt-link-btn').href = rawbtUrl;
       document.getElementById('rawbt-modal').classList.remove('hidden');
 
       if (order.id) markOrderPrinted(order.id);
+    }
+
+    // 弹窗按钮：统一走 printOrderTicket，APP 内自动选择原生通道
+    function printFromModal() {
+      closeRawbtModal();
+      if (pendingOrder) printOrderTicket(pendingOrder);
     }
 
     function closeRawbtModal() {
@@ -414,13 +439,13 @@
       statusEl.innerText = "Escuchando pedidos en vivo (Conectado OK)";
 
       ordersData = data || [];
-      let newOrderArrived = null;
+      let newOrders = [];
 
       ordersData.forEach(o => {
         if (!knownOrderIds.has(o.id)) {
           knownOrderIds.add(o.id);
           if (!isFirstLoad && o.status === 'pending') {
-            newOrderArrived = o;
+            newOrders.push(o);
           }
         }
       });
@@ -428,10 +453,10 @@
       isFirstLoad = false;
       renderOrdersList();
 
-      if (newOrderArrived) {
+      if (newOrders.length > 0) {
         playBeepAlert();
         if (document.getElementById('auto-print-toggle').checked) {
-          triggerAutoPrint(newOrderArrived);
+          newOrders.reverse().forEach(o => triggerAutoPrint(o));
         }
       }
     }
