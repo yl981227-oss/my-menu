@@ -421,7 +421,14 @@
 
     async function markOrderPrinted(orderId) {
       if (!orderId) return;
-      await db.from('orders').update({ status: 'printed' }).eq('id', orderId);
+      // 只有新单（pending）才推进到 preparing，重复打印不会把已完成的单降级
+      await db.from('orders').update({ status: 'preparing' }).eq('id', orderId).eq('status', 'pending');
+      fetchOrders();
+    }
+
+    async function setOrderStatus(orderId, status) {
+      const { error } = await db.from('orders').update({ status: status }).eq('id', orderId);
+      if (error) { alert('Error: ' + error.message); return; }
       fetchOrders();
     }
 
@@ -474,9 +481,15 @@
       let html = '';
       ordersData.forEach(o => {
         const isPending = o.status === 'pending';
-        const statusBadge = isPending
-          ? '<span class="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full animate-pulse">🔔 NUEVO</span>'
-          : '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">🖨️ IMPRESO</span>';
+        const STATUS_STYLE = {
+          pending:   { text: '🔔 NUEVO',       cls: 'bg-red-600 text-white animate-pulse' },
+          preparing: { text: '👨‍🍳 PREPARANDO', cls: 'bg-blue-500/20 text-blue-300 border border-blue-500/40' },
+          printed:   { text: '👨‍🍳 PREPARANDO', cls: 'bg-blue-500/20 text-blue-300 border border-blue-500/40' },
+          ready:     { text: '✅ LISTO',        cls: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' },
+          delivered: { text: '📦 ENTREGADO',    cls: 'bg-slate-600/30 text-slate-400 border border-slate-600' }
+        };
+        const st = STATUS_STYLE[o.status] || STATUS_STYLE.pending;
+        const statusBadge = `<span class="${st.cls} text-[10px] font-black px-2.5 py-0.5 rounded-full">${st.text}</span>`;
 
         const dt = new Date(o.created_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const items = Array.isArray(o.items) ? o.items : [];
@@ -521,6 +534,21 @@
             <div class="text-[11px] text-slate-300 flex flex-wrap justify-between gap-2 pt-1">
               <div><b>Pago:</b> ${o.payment_detail}</div>
               ${o.notes ? `<div class="text-amber-300"><b>Nota:</b> ${o.notes}</div>` : ''}
+            </div>
+
+            <div class="flex gap-1.5 pt-1">
+              ${(o.status === 'pending' || o.status === 'printed' || !o.status)
+                ? `<button onclick="setOrderStatus(${o.id},'preparing')" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">👨‍🍳 Preparando</button>`
+                : ''}
+              ${(o.status === 'preparing' || o.status === 'printed')
+                ? `<button onclick="setOrderStatus(${o.id},'ready')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">✅ Listo</button>`
+                : ''}
+              ${o.status === 'ready'
+                ? `<button onclick="setOrderStatus(${o.id},'delivered')" class="flex-1 bg-slate-600 hover:bg-slate-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">📦 Entregado</button>`
+                : ''}
+              ${o.status === 'delivered'
+                ? `<div class="flex-1 text-center text-[11px] text-slate-500 font-bold py-2">Pedido completado</div>`
+                : ''}
             </div>
 
             <div class="flex gap-2 pt-1">

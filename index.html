@@ -3142,9 +3142,16 @@ nav > div{
           return '<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:14px;margin-bottom:10px">' +
             '<p style="font-size:12px;color:#94a3b8">' + escHtml(code) + ' · pedido no encontrado</p></div>';
         }
-        const done = o.status && o.status !== 'pending';
-        const statusText = done ? 'En preparación' : 'Recibido';
-        const statusColor = done ? '#22c55e' : '#fbbf24';
+        const STATUS_MAP = {
+          pending:   { text: 'Recibido',       color: '#fbbf24' },
+          preparing: { text: 'En preparación', color: '#3b82f6' },
+          printed:   { text: 'En preparación', color: '#3b82f6' },
+          ready:     { text: 'Listo',          color: '#22c55e' },
+          delivered: { text: 'Entregado',      color: '#64748b' }
+        };
+        const st = STATUS_MAP[o.status] || STATUS_MAP.pending;
+        const statusText = st.text;
+        const statusColor = st.color;
         const items = (Array.isArray(o.items) ? o.items : []).map(function (it) {
           const lineTotal = Number(it.unitPrice * it.qty).toLocaleString('es-CL');
           let opts = '';
