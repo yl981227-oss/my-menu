@@ -53,7 +53,7 @@
 
 <style id="dz-design">
 /* ============================================================
-   DRAGÓN DE ORO — 视觉系统 v2
+   CHINA IDEAL — 视觉系统 v2
    墨黑 + 漆红 + 香槟金 · 衬线标题 + 无衬线正文
    ============================================================ */
 :root{
@@ -882,11 +882,12 @@ nav > div{
   <!-- ======================================================== -->
   <script>
     const STORE_CONFIG = {
-      storeName: "DRAGÓN DE ORO",
-      slogan: "Comida China Tradicional & Sushi",
-      logoIcon: "🐉",
-      whatsapp: "56974142810",
-      orderCodePrefix: "DRAGON",
+      storeName: "CHINA IDEAL",
+      slogan: "Comida China Cantonesa & Sushi",
+      logoIcon: "🏮",
+      logoImage: "logo.png",
+      whatsapp: "56982601525",
+      orderCodePrefix: "CHINA",
       theme: "red",
       ratingText: "⭐ 4.9 (210+ reseñas)",
       prepTimeText: "⏱️ 20-30 min",
@@ -894,13 +895,13 @@ nav > div{
       promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!",
 
       // 📍 1. 店铺地址与 Google Maps 配置
-      address: "Camino de la Viña 1461, Huechuraba, Santiago, Chile",
-      addressReference: "Retiro en local y Delivery a domicilio en Huechuraba y alrededores",
+      address: "Camino de la Viña N° 1461, Huechuraba, Santiago, Chile",
+      addressReference: "Al costado del unicarc. Delivery mínimo $5.000",
       googleMapsLink: "https://www.google.com/maps/search/?api=1&query=Camino+de+la+Vi%C3%B1a+1461,+Huechuraba,+Santiago,+Chile",
 
       // ⏰ 2. 营业时间配置
       businessHours: [
-        { days: "Lunes a Domingo", hours: "12:00 - 23:00 hrs" }
+        { days: "Lunes a Domingo", hours: "12:20 - 23:00 hrs" }
       ],
 
       // 🔥 3. 促销活动列表
@@ -985,10 +986,10 @@ nav > div{
           <span class="text-[9px] font-black text-emerald-50" style="letter-spacing:.18em;">ABIERTO · 12:00 – 23:00</span>
         </div>
 
-        <div id="landing-logo" class="flex items-center justify-center">🐉</div>
+        <div id="landing-logo" class="flex items-center justify-center overflow-hidden"></div>
 
-        <h1 id="landing-title">DRAGÓN DE ORO</h1>
-        <p id="landing-slogan">Comida China Tradicional &amp; Sushi</p>
+        <h1 id="landing-title">CHINA IDEAL</h1>
+        <p id="landing-slogan">Comida China Cantonesa &amp; Sushi</p>
 
         <div class="flex flex-wrap items-center justify-center gap-1.5 mt-5">
           <span id="landing-rating">⭐ 4.9 (210+ reseñas)</span>
@@ -1053,7 +1054,7 @@ nav > div{
         </a>
       </div>
 
-      <p class="text-center text-[9px] pt-3 pb-1" style="color:var(--muted);letter-spacing:.2em;">DRAGÓN DE ORO · SANTIAGO DE CHILE</p>
+      <p class="text-center text-[9px] pt-3 pb-1" style="color:var(--muted);letter-spacing:.2em;">CHINA IDEAL · SANTIAGO DE CHILE</p>
     </div>
   </div>
 
@@ -1078,8 +1079,8 @@ nav > div{
     <div class="flex items-center gap-2.5">
       <div id="store-logo" class="w-10 h-10 flex items-center justify-center shrink-0">🐉</div>
       <div>
-        <h1 id="store-title">DRAGÓN DE ORO</h1>
-        <p id="store-slogan">Comida China Tradicional &amp; Sushi</p>
+        <h1 id="store-title">CHINA IDEAL</h1>
+        <p id="store-slogan">Comida China Cantonesa &amp; Sushi</p>
       </div>
     </div>
 
@@ -1809,7 +1810,14 @@ nav > div{
     }
 
     function initLandingPage() {
-      document.getElementById('landing-logo').innerText = STORE_CONFIG.logoIcon;
+      const logoEl = document.getElementById('landing-logo');
+      if (logoEl) {
+        if (STORE_CONFIG.logoImage) {
+          logoEl.innerHTML = '<img src="' + STORE_CONFIG.logoImage + '" alt="logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">';
+        } else {
+          logoEl.innerText = STORE_CONFIG.logoIcon;
+        }
+      }
       document.getElementById('landing-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('landing-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('landing-rating').innerText = STORE_CONFIG.ratingText;
