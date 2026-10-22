@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prueba RawBT - Diagnostico</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:16px;font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0}
+h1{font-size:17px;margin:0 0 6px}
+p.sub{font-size:13px;color:#94a3b8;margin:0 0 16px;line-height:1.6}
+.b{display:block;width:100%;padding:14px;margin-bottom:10px;border:0;border-radius:12px;font-size:14px;font-weight:600;color:#0f172a;background:#e2e8f0;text-align:left}
+.b:active{transform:scale(.98);opacity:.85}
+.b.on{background:#22c55e;color:#04210f}
+.n{display:inline-block;width:22px;font-weight:800;color:#0f172a}
+#log{margin-top:16px;padding:12px;border-radius:12px;background:#1e293b;font-size:12px;font-family:ui-monospace,monospace;white-space:pre-wrap;color:#94a3b8;min-height:60px}
+.tip{margin-top:14px;padding:12px;border-radius:12px;background:#422006;color:#fcd34d;font-size:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<h1>Diagnostico de impresion RawBT</h1>
+<p class="sub">Toque cada boton en orden. Anote cual hace que salga papel. Los que salen papel, ese metodo es el que usaremos en el sistema.</p>
+
+<button class="b" onclick="t1()"><span class="n">1</span>rawbt: texto simple (muy corto)</button>
+<button class="b" onclick="t2()"><span class="n">2</span>rawbt:base64 ESC/POS corto</button>
+<button class="b" onclick="t3()"><span class="n">3</span>rawbt:base64 ESC/POS largo (2KB)</button>
+<button class="b" onclick="t4()"><span class="n">4</span>enlace &lt;a&gt; con rawbt</button>
+<button class="b" onclick="t5()"><span class="n">5</span>intent: un slash</button>
+<button class="b" onclick="t6()"><span class="n">6</span>intent:// dos slashes</button>
+<button class="b" onclick="t7()"><span class="n">7</span>window.open rawbt</button>
+<button class="b" onclick="t8()"><span class="n">8</span>rawbt:base64 ticket real 80mm</button>
+
+<div id="log">Listo. Toque el boton 1.</div>
+<div class="tip">Si en alguno aparece el aviso "Abrir con RawBT?" y desaparece solo, anotelo. Si aparece y se queda, pulse Abrir.</div>
+
+<script>
+var ESC=0x1B, GS=0x1D, FS=0x1C;
+var logEl=document.getElementById('log');
+function log(m){ logEl.textContent += '\n> ' + m; }
+
+function bytesOf(text){
+  var b=[ESC,0x40,FS,0x2E,ESC,0x52,0x00,ESC,0x74,0x00];
+  for(var i=0;i<text.length;i++){ b.push(text.charCodeAt(i)&0xFF); }
+  b.push(0x0A,0x0A,0x0A,GS,0x56,0x42,0x00);
+  return b;
+}
+function b64(arr){
+  var s='';
+  for(var i=0;i<arr.length;i++){ s+=String.fromCharCode(arr[i]); }
+  return btoa(s);
+}
+function ticket(){
+  var L=[];
+  L.push('================================');
+  L.push('   DIAGNOSTICO RAWBT  OK');
+  L.push('================================');
+  L.push('IP   10.0.4.250  PORT 9100');
+  L.push('HORA ' + new Date().toLocaleTimeString('es-CL'));
+  L.push('--------------------------------');
+  L.push('Si lee esto, la impresion');
+  L.push('por red funciona bien.');
+  L.push('================================');
+  return L.join('\n');
+}
+function longText(){
+  var s='';
+  for(var i=0;i<30;i++){ s+='LINEA DE PRUEBA LARGA NUMERO ' + (i+1) + '\n'; }
+  return s;
+}
+
+function t1(){ log('1 rawbt texto'); location.href='rawbt:PRUEBA 1 OK'; }
+function t2(){ log('2 rawbt b64 corto'); location.href='rawbt:base64,'+b64(bytesOf('PRUEBA 2 OK')); }
+function t3(){ log('3 rawbt b64 largo'); location.href='rawbt:base64,'+b64(bytesOf(longText())); }
+function t4(){ log('4 enlace a');
+  var a=document.createElement('a');
+  a.href='rawbt:base64,'+b64(bytesOf('PRUEBA 4 OK'));
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); },800);
+}
+function t5(){ log('5 intent un slash');
+  location.href='intent:base64,'+b64(bytesOf('PRUEBA 5 OK'))+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
+}
+function t6(){ log('6 intent dos slashes');
+  location.href='intent://'+b64(bytesOf('PRUEBA 6 OK'))+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
+}
+function t7(){ log('7 window.open'); window.open('rawbt:base64,'+b64(bytesOf('PRUEBA 7 OK')),'_blank'); }
+function t8(){ log('8 ticket real'); location.href='rawbt:base64,'+b64(bytesOf(ticket())); }
+</script>
+</body>
+</html>
