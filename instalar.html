@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instalar China Ideal POS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.6;padding:20px 16px 48px}
+.wrap{max-width:560px;margin:0 auto}
+.logo{width:88px;height:88px;border-radius:50%;margin:8px auto 14px;display:block;border:2px solid rgba(232,176,75,.5);box-shadow:0 0 0 6px rgba(232,176,75,.08)}
+h1{font-size:22px;text-align:center;font-weight:700;letter-spacing:.02em}
+.sub{text-align:center;color:#94a3b8;font-size:13px;margin-bottom:26px}
+.step{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:16px;margin-bottom:12px}
+.step h2{font-size:14px;font-weight:700;color:#fbbf24;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fbbf24;color:#0f172a;font-size:12px;font-weight:800;flex-shrink:0}
+.step p{font-size:14px;color:#cbd5e1}
+.step ul{margin:6px 0 0 18px;font-size:14px;color:#cbd5e1}
+.step li{margin-bottom:4px}
+.btn{display:block;text-align:center;background:linear-gradient(135deg,#dc2626,#e11d48);color:#fff;text-decoration:none;font-weight:800;font-size:16px;padding:16px;border-radius:14px;margin-top:10px;box-shadow:0 8px 20px rgba(220,38,38,.3)}
+.btn:active{transform:scale(.98)}
+.ip{display:block;background:#0b1220;border:1px dashed #fbbf24;color:#fbbf24;font-family:ui-monospace,monospace;font-size:22px;font-weight:700;text-align:center;padding:14px;border-radius:12px;margin:10px 0;letter-spacing:.06em}
+.warn{background:#422006;border:1px solid #854d0e;border-radius:14px;padding:14px;margin-bottom:12px}
+.warn h2{color:#fcd34d;font-size:13px;font-weight:800;margin-bottom:6px}
+.warn p{font-size:13px;color:#fde68a}
+.req{background:#0b1220;border:1px solid #334155;border-radius:14px;padding:14px;margin-top:18px}
+.req h2{font-size:13px;color:#94a3b8;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.req li{font-size:13px;color:#cbd5e1;margin-left:16px;margin-bottom:5px}
+.foot{text-align:center;font-size:12px;color:#475569;margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <img class="logo" src="logo.png" alt="China Ideal">
+  <h1>China Ideal POS</h1>
+  <p class="sub">Guía de instalación · 5 pasos</p>
+
+  <div class="step">
+    <h2><span class="num">1</span> Descargar la aplicación</h2>
+    <p>Toca el botón para descargar el archivo. Son 3 MB.</p>
+    <a class="btn" href="https://github.com/yl981227-oss/dragonoro-pos-app/releases/download/v1.1/ChinaIdealPOS-v1.1.apk">⬇ Descargar China Ideal POS</a>
+  </div>
+
+  <div class="step">
+    <h2><span class="num">2</span> Instalar</h2>
+    <p>Abre el archivo descargado. El teléfono preguntará si permites instalar aplicaciones de origen desconocido — toca <strong>Permitir</strong> y luego <strong>Instalar</strong>.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="num">3</span> Configurar la impresora</h2>
+    <p>Abre la app y escribe esta dirección en el campo <strong>IP Impresora</strong>:</p>
+    <code class="ip">10.0.4.250</code>
+    <p>Después toca el botón <strong>Guardar</strong>.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="num">4</span> Probar</h2>
+    <p>Toca <strong>Imprimir Ticket de Prueba (LAN)</strong>. Debe salir un ticket de papel.</p>
+    <p style="margin-top:6px;color:#86efac">Si sale el ticket, ya está listo. Los pedidos se imprimirán solos.</p>
+  </div>
+
+  <div class="warn">
+    <h2>⚠ Paso 5 — Muy importante</h2>
+    <p>Para que la app reciba pedidos con la pantalla apagada, debes permitir que funcione en segundo plano:</p>
+    <ul style="margin:8px 0 0 18px;font-size:13px;color:#fde68a">
+      <li>Ajustes → Aplicaciones → China Ideal POS</li>
+      <li>Batería → <strong>Sin restricciones</strong></li>
+      <li>Si aparece "Inicio automático", actívalo</li>
+    </ul>
+  </div>
+
+  <div class="req">
+    <h2>Requisitos</h2>
+    <ul>
+      <li>El teléfono debe estar en el <strong>mismo WiFi</strong> que la impresora</li>
+      <li>No uses datos móviles para imprimir</li>
+      <li>Funciona en teléfonos <strong>Android</strong> (no iPhone)</li>
+      <li>La impresora debe estar encendida y con papel</li>
+    </ul>
+  </div>
+
+  <p class="foot">China Ideal · Camino de la Viña N° 1461, Huechuraba</p>
+
+</div>
+</body>
+</html>
