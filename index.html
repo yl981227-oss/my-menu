@@ -48,8 +48,17 @@
       background-repeat: no-repeat;
     }
   </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7f1010">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 flex flex-col notranslate" translate="no">
+
+<button id="fab-my-orders" onclick="openMyOrders()" style="position:fixed;top:12px;right:12px;z-index:120;background:linear-gradient(135deg,#f0c063,#c8912f);color:#1a1208;border:0;border-radius:999px;padding:9px 15px;font-size:12px;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;gap:5px;cursor:pointer;letter-spacing:.02em">
+  <span style="font-size:14px">📋</span><span>Mis pedidos</span>
+</button>
+
 
 <style id="dz-design">
 /* ============================================================
@@ -1088,7 +1097,7 @@ nav > div{
       </div>
     </div>
 
-    <button onclick="openLandingPage()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl active:scale-95 transition shrink-0" style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);">
+    <button onclick="goBackNav()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl active:scale-95 transition shrink-0" style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);">
       <span class="text-[10px]">📍</span>
       <span class="text-[9.5px] font-bold" style="letter-spacing:.06em;">Info</span>
     </button>
@@ -1148,7 +1157,7 @@ nav > div{
 </div>
 
   <!-- 5. 菜品定制弹窗 (增加 overflow-x-hidden 严防横向溢出) -->
-  <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <div id="option-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[140] flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
 
@@ -1365,14 +1374,14 @@ nav > div{
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🌿 Acompañamientos de Sushi</label>
-            <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$500 CLP c/u</span>
+            <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">1º gratis · luego +$300 c/u</span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-sushi-wasabi" onclick="toggleSushiExtra('wasabi')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
-              <span>🟢 Con Wasabi (+$500)</span>
+              <span>🟢 Con Wasabi</span>
             </button>
             <button type="button" id="btn-sushi-jengibre" onclick="toggleSushiExtra('jengibre')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
-              <span>🌸 Con Jengibre (+$500)</span>
+              <span>🌸 Con Jengibre</span>
             </button>
           </div>
         </div>
@@ -1432,7 +1441,7 @@ nav > div{
   </div>
 
   <!-- 6. 结账结算弹窗 -->
-  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <div id="checkout-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
       <div class="flex justify-between items-center mb-3 border-b pb-2.5">
@@ -1479,11 +1488,11 @@ nav > div{
 
       <div class="space-y-2.5 text-xs">
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre Completo *</label>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre <span class="text-gray-400 font-normal">(opcional para retiro)</span></label>
           <input id="cust-name" type="text" placeholder="Ej: Marcela González" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Teléfono WhatsApp *</label>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Teléfono WhatsApp <span class="text-gray-400 font-normal">(opcional para retiro)</span></label>
           <input id="cust-phone" type="tel" placeholder="Ej: 56912345678" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
         <div id="address-box" class="hidden">
@@ -1765,6 +1774,7 @@ nav > div{
     let selectedDrinkTempValue = 'Fría / Helada';
     let selectedSushiWasabi = false;
     let selectedSushiJengibre = false;
+    let sushiAccOrder = [];
 
     let selectedChinaExtras = {
       'Champiñón': false,
@@ -1805,13 +1815,31 @@ nav > div{
       });
     }
 
+    // ---- 导航栈：让手机返回键逐层后退，而不是直接退出 ----
     function enterMenuPage() {
       document.getElementById('landing-view').classList.add('hidden');
+      try { history.pushState({ page: 'menu' }, '', '#menu'); } catch (e) {}
     }
 
     function openLandingPage() {
       document.getElementById('landing-view').classList.remove('hidden');
     }
+
+    function goBackNav() {
+      if (history.length > 1) history.back();
+      else openLandingPage();
+    }
+
+    window.addEventListener('popstate', function (e) {
+      ['checkout-modal', 'option-modal', 'my-orders-modal'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const landing = document.getElementById('landing-view');
+      const page = (e.state && e.state.page) || 'landing';
+      if (page === 'landing') landing.classList.remove('hidden');
+      else landing.classList.add('hidden');
+    });
 
     function initLandingPage() {
       const logoEl = document.getElementById('landing-logo');
@@ -2044,14 +2072,33 @@ nav > div{
     function toggleSushiExtra(type) {
       if (type === 'wasabi') selectedSushiWasabi = !selectedSushiWasabi;
       if (type === 'jengibre') selectedSushiJengibre = !selectedSushiJengibre;
+
+      const active = { wasabi: selectedSushiWasabi, jengibre: selectedSushiJengibre };
+      sushiAccOrder = sushiAccOrder.filter(function (t) { return active[t]; });
+      if (active[type] && sushiAccOrder.indexOf(type) === -1) sushiAccOrder.push(type);
+
       renderSushiExtraButtons();
+    }
+
+    function sushiAccPriceLabel(type) {
+      const idx = sushiAccOrder.indexOf(type);
+      if (idx === -1) return '';
+      return idx === 0 ? ' (Gratis)' : ' (+$300)';
     }
 
     function renderSushiExtraButtons() {
       const btnW = document.getElementById('btn-sushi-wasabi');
       const btnJ = document.getElementById('btn-sushi-jengibre');
-      if (btnW) btnW.className = selectedSushiWasabi ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
-      if (btnJ) btnJ.className = selectedSushiJengibre ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      if (btnW) {
+        btnW.className = selectedSushiWasabi ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const s = btnW.querySelector('span');
+        if (s) s.textContent = '🟢 Con Wasabi' + sushiAccPriceLabel('wasabi');
+      }
+      if (btnJ) {
+        btnJ.className = selectedSushiJengibre ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const s = btnJ.querySelector('span');
+        if (s) s.textContent = '🌸 Con Jengibre' + sushiAccPriceLabel('jengibre');
+      }
     }
 
     function toggleAjiChoice(val) {
@@ -2748,6 +2795,7 @@ nav > div{
 
         selectedSushiWasabi = false;
         selectedSushiJengibre = false;
+        sushiAccOrder = [];
         renderSushiExtraButtons();
 
         selectPalitosChoice('Con palitos');
@@ -2863,13 +2911,15 @@ nav > div{
           optionsList.push(`Salsa adicional: ${extraParts.join(', ')} (+$${extraSauceCost.toLocaleString('es-CL')})`);
         }
 
-        if (selectedSushiWasabi) {
-          extraPrice += 500;
-          optionsList.push('Con Wasabi (+$500)');
-        }
-        if (selectedSushiJengibre) {
-          extraPrice += 500;
-          optionsList.push('Con Jengibre (+$500)');
+        // Acompañamientos: el primero gratis, del segundo en adelante $300 c/u
+        const accNames = [];
+        sushiAccOrder.forEach(function (t) {
+          accNames.push(t === 'wasabi' ? 'Wasabi' : 'Jengibre');
+        });
+        if (accNames.length > 0) {
+          const accCost = Math.max(0, accNames.length - 1) * 300;
+          extraPrice += accCost;
+          optionsList.push('Acompañamientos: ' + accNames.join(', ') + (accCost > 0 ? ' (+$' + accCost.toLocaleString('es-CL') + ')' : ' (1º gratis)'));
         }
 
         optionsList.push(selectedPalitosValue);
@@ -3002,15 +3052,19 @@ nav > div{
     }
 
     async function sendOrderToWhatsApp() {
-      const name = document.getElementById('cust-name').value.trim();
+      let name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
       const address = document.getElementById('cust-address').value.trim();
       const method = document.getElementById('pay-method').value;
       const cashGiven = parseFloat(document.getElementById('cust-cash').value) || 0;
       const notes = document.getElementById('cust-notes').value.trim();
 
-      if (!name || !phone) { alert("Por favor completa tu nombre y teléfono."); return; }
-      if (orderType === 'delivery' && !address) { alert("Por favor ingresa tu dirección para el envío."); return; }
+      if (orderType === 'delivery') {
+        if (!name || !phone) { alert("Para delivery necesitamos tu nombre y teléfono."); return; }
+        if (!address) { alert("Por favor ingresa tu dirección para el envío."); return; }
+      } else if (!name) {
+        name = 'Cliente';
+      }
 
       let scheduleTimeVal = "";
       if (timingType === 'schedule') {
@@ -3091,8 +3145,48 @@ nav > div{
         (notes ? notes : 'Sin comentarios');
 
       saveMyOrder(orderCode);
+      lastOrderMessage = message;
+      showSuccess(orderCode);
+    }
 
-      window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
+    // ---- 下单成功引导：发 WhatsApp / 保存到主屏幕 ----
+    let lastOrderMessage = '';
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function showSuccess(code) {
+      const el = document.getElementById('success-code');
+      if (el) el.innerText = code;
+      const m = document.getElementById('success-modal');
+      if (m) { m.classList.remove('hidden'); m.style.display = 'flex'; }
+    }
+
+    function hideSuccess() {
+      const m = document.getElementById('success-modal');
+      if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+    }
+
+    function sendLastOrderToWhatsApp() {
+      if (!lastOrderMessage) return;
+      window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(lastOrderMessage);
+    }
+
+    function closeSuccessAndShowOrders() {
+      hideSuccess();
+      openMyOrders();
+    }
+
+    function installPwa() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      } else {
+        alert('Para guardarlo en tu pantalla de inicio:\n\nAndroid Chrome: menú (tres puntos) → "Agregar a pantalla de inicio"\niPhone Safari: botón Compartir → "Añadir a pantalla de inicio"');
+      }
     }
 
     // =====================================================
@@ -3202,6 +3296,28 @@ nav > div{
       </div>
       <div id="my-orders-list"></div>
       <button onclick="closeMyOrders()" style="width:100%;margin-top:14px;padding:15px;border-radius:14px;background:#334155;color:#fff;font-weight:700;font-size:14px;border:0;cursor:pointer">Volver al menú</button>
+    </div>
+  </div>
+
+  <div id="success-modal" class="hidden" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:20px">
+    <div style="background:#fff;border-radius:22px;max-width:360px;width:100%;padding:26px 22px;text-align:center">
+      <div style="font-size:46px;line-height:1">&#9989;</div>
+      <h2 style="font-size:19px;font-weight:800;margin:10px 0 6px;color:#1a1a1a">¡Pedido recibido!</h2>
+      <p id="success-code" style="font-size:13px;color:#6b7280;font-weight:700;margin-bottom:18px"></p>
+
+      <button onclick="sendLastOrderToWhatsApp()" style="width:100%;padding:15px;border-radius:14px;border:0;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-size:15px;font-weight:800;margin-bottom:10px;cursor:pointer">
+        📲 Enviar por WhatsApp
+      </button>
+
+      <button onclick="installPwa()" style="width:100%;padding:14px;border-radius:14px;border:2px dashed #d1a24a;background:#fffdf7;color:#8a5a12;font-size:13px;font-weight:800;margin-bottom:10px;cursor:pointer">
+        🏠 Guardar el menú en tu pantalla de inicio
+      </button>
+
+      <button onclick="closeSuccessAndShowOrders()" style="width:100%;padding:13px;border-radius:14px;border:0;background:#f3f4f6;color:#374151;font-size:13px;font-weight:700;cursor:pointer">
+        📋 Ver mi pedido
+      </button>
+
+      <p style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.5">Guárdalo y la próxima vez pides en 2 toques, sin escanear el QR otra vez.</p>
     </div>
   </div>
 </body>
