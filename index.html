@@ -1303,12 +1303,13 @@ nav > div{
             <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$600 CLP c/u</span>
           </div>
           <div id="combo-extra-hint" class="hidden mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-900 font-semibold leading-relaxed">
-            ⚠️ Este menú incluye varios platos. Indica abajo a qué plato va cada extra.
+            ⚠️ Este menú incluye varios platos. Elige abajo el extra de cada plato.
           </div>
           <div id="combo-extra-note-box" class="hidden mb-2">
             <textarea id="combo-extra-note" rows="2" placeholder="Ej: Champiñón en la carne mongoliana, Alga en el arroz chaufán" class="w-full border-2 border-amber-400 bg-amber-50/50 rounded-xl p-2.5 text-xs outline-none focus:bg-white transition"></textarea>
           </div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
+          <div id="combo-per-dish-extras" class="hidden space-y-2"></div>
+          <div id="china-extra-grid" class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-extra-champinon" onclick="toggleChinaExtra('Champiñón')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>🍄 Champiñón (+$600)</span>
             </button>
@@ -1796,6 +1797,7 @@ nav > div{
       'Almendras': false,
       'Ajo': false
     };
+    let comboDishExtras = {};
 
     let currentSushiSauceChoices = [];
     let extraSoyaCount = 0;
@@ -1820,6 +1822,34 @@ nav > div{
       if (!box) return;
       const any = Object.keys(selectedChinaExtras).some(function (k) { return selectedChinaExtras[k]; });
       box.classList.toggle('hidden', !any);
+    }
+
+    // 套餐：每道子菜单独选加料
+    function renderComboPerDishExtras() {
+      const box = document.getElementById('combo-per-dish-extras');
+      const grid = document.getElementById('china-extra-grid');
+      if (!box || !grid) return;
+      const isCombo = currentComboOriginalItems.length > 0;
+      box.classList.toggle('hidden', !isCombo);
+      grid.classList.toggle('hidden', isCombo);
+      if (!isCombo) return;
+
+      box.innerHTML = currentComboOriginalItems.map(function (it, i) {
+        const cur = comboDishExtras[i] || '';
+        const opts = ['', 'Champiñón', 'Alga', 'Almendras', 'Ajo'].map(function (v) {
+          const label = v === '' ? 'Sin extra' : v + ' (+$600)';
+          return '<option value="' + v + '"' + (cur === v ? ' selected' : '') + '>' + label + '</option>';
+        }).join('');
+        return '<div class="flex items-center gap-2">' +
+          '<span class="flex-1 text-[11px] font-bold text-gray-800 truncate">' + escHtml(it.name) + '</span>' +
+          '<select onchange="onComboDishExtraChange(' + i + ', this)" class="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] font-semibold">' + opts + '</select>' +
+          '</div>';
+      }).join('');
+    }
+
+    function onComboDishExtraChange(idx, el) {
+      if (el.value) comboDishExtras[idx] = el.value;
+      else delete comboDishExtras[idx];
     }
 
     function renderChinaExtrasButtons() {
@@ -2793,6 +2823,7 @@ nav > div{
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isComboMenu);
       if (isComboMenu) populateMenuSwapSelectors(currentSelectedDish);
+      renderComboPerDishExtras();
 
       const comboHint = document.getElementById('combo-extra-hint');
       if (comboHint) comboHint.classList.toggle('hidden', !isComboMenu);
@@ -2836,6 +2867,7 @@ nav > div{
         selectedAjiValue = '';
         renderAjiButtons();
         selectedChinaExtras = { 'Champiñón': false, 'Alga': false, 'Almendras': false, 'Ajo': false };
+        comboDishExtras = {};
         const comboNoteEl = document.getElementById('combo-extra-note');
         if (comboNoteEl) comboNoteEl.value = '';
         const comboNoteBox = document.getElementById('combo-extra-note-box');
@@ -2970,6 +3002,16 @@ nav > div{
           if (selectedChinaExtras[item]) {
             extraPrice += 600;
             optionsList.push(`Extra ${item} (+$600)`);
+          }
+        });
+
+        // 套餐：每道子菜各自的加料
+        Object.keys(comboDishExtras).forEach(function (k) {
+          const item = currentComboOriginalItems[Number(k)];
+          const extra = comboDishExtras[k];
+          if (item && extra) {
+            extraPrice += 600;
+            optionsList.push(item.name + ': +' + extra + ' (+$600)');
           }
         });
 
