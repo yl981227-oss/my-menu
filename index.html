@@ -1303,10 +1303,7 @@ nav > div{
             <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$600 CLP c/u</span>
           </div>
           <div id="combo-extra-hint" class="hidden mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-900 font-semibold leading-relaxed">
-            ⚠️ Este menú incluye varios platos. Elige abajo el extra de cada plato.
-          </div>
-          <div id="combo-extra-note-box" class="hidden mb-2">
-            <textarea id="combo-extra-note" rows="2" placeholder="Ej: Champiñón en la carne mongoliana, Alga en el arroz chaufán" class="w-full border-2 border-amber-400 bg-amber-50/50 rounded-xl p-2.5 text-xs outline-none focus:bg-white transition"></textarea>
+            ⚠️ Este menú incluye varios platos. Al tocar un extra te preguntaremos a qué plato va.
           </div>
           <div id="china-extra-grid" class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-extra-champinon" onclick="toggleChinaExtra('Champiñón')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
@@ -1817,14 +1814,6 @@ nav > div{
       }
       selectedChinaExtras[item] = !selectedChinaExtras[item];
       renderChinaExtrasButtons();
-      updateComboNoteVisibility();
-    }
-
-    function updateComboNoteVisibility() {
-      const box = document.getElementById('combo-extra-note-box');
-      if (!box) return;
-      const any = Object.keys(selectedChinaExtras).some(function (k) { return selectedChinaExtras[k]; });
-      box.classList.toggle('hidden', !any);
     }
 
     // ===== 套餐：点加料 / 辣度 → 弹框选择加到哪道菜 =====
@@ -2945,10 +2934,6 @@ nav > div{
         selectedChinaExtras = { 'Champiñón': false, 'Alga': false, 'Almendras': false, 'Ajo': false };
         comboExtraAssign = {};
         comboAjiAssign = {};
-        const comboNoteEl = document.getElementById('combo-extra-note');
-        if (comboNoteEl) comboNoteEl.value = '';
-        const comboNoteBox = document.getElementById('combo-extra-note-box');
-        if (comboNoteBox) comboNoteBox.classList.add('hidden');
         renderChinaExtrasButtons();
 
         document.getElementById('pref-sal').checked = false;
@@ -3100,14 +3085,6 @@ nav > div{
               .filter(Boolean);
             if (names.length) optionsList.push(val + ' → ' + names.join(', '));
           });
-        }
-
-        // 套餐加料：读取「加到哪个菜」的说明
-        const anyExtra = Object.keys(selectedChinaExtras).some(k => selectedChinaExtras[k]);
-        if (anyExtra) {
-          const noteEl = document.getElementById('combo-extra-note');
-          const noteVal = noteEl ? noteEl.value.trim() : '';
-          if (noteVal) optionsList.push('→ ' + noteVal);
         }
 
         if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
