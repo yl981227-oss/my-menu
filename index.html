@@ -1297,6 +1297,9 @@ nav > div{
             <label class="block text-xs font-black text-gray-800">🍄 Agregar Extra al Plato</label>
             <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$600 CLP c/u</span>
           </div>
+          <div id="combo-extra-hint" class="hidden mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-900 font-semibold leading-relaxed">
+            ⚠️ Este menú incluye varios platos. Indica en <b>Comentarios</b> a qué plato va cada extra (ej: "Champiñón en la carne mongoliana").
+          </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-extra-champinon" onclick="toggleChinaExtra('Champiñón')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>🍄 Champiñón (+$600)</span>
@@ -1375,6 +1378,9 @@ nav > div{
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-black text-gray-800">🌿 Acompañamientos de Sushi</label>
             <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">1º gratis · luego +$300 c/u</span>
+          </div>
+          <div id="sushi-acc-hint" class="hidden mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-900 font-semibold leading-relaxed">
+            ⚠️ Esta promoción incluye varios rolls. Indica en <b>Comentarios</b> a qué roll va cada acompañamiento.
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-sushi-wasabi" onclick="toggleSushiExtra('wasabi')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
@@ -2771,6 +2777,11 @@ nav > div{
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isComboMenu);
       if (isComboMenu) populateMenuSwapSelectors(currentSelectedDish);
+
+      const comboHint = document.getElementById('combo-extra-hint');
+      if (comboHint) comboHint.classList.toggle('hidden', !isComboMenu);
+      const sushiAccHint = document.getElementById('sushi-acc-hint');
+      if (sushiAccHint) sushiAccHint.classList.toggle('hidden', currentSelectedDish.category !== 'cat-sushi-promos');
 
       document.getElementById('colacion-side-box').classList.toggle('hidden', !isColacion);
       if (isColacion) {
