@@ -2207,6 +2207,12 @@ nav > div{
     }
 
     function toggleAjiChoice(val) {
+      // Ají aparte 是单独包装，不进菜里，所以永远只做勾选，不弹选菜框
+      if (val === 'Ají aparte') {
+        selectedAjiValue = (selectedAjiValue === 'Ají aparte') ? '' : 'Ají aparte';
+        renderAjiButtons();
+        return;
+      }
       if (currentComboOriginalItems.length > 0) {
         openComboTarget('aji', val);
         return;
@@ -2227,9 +2233,9 @@ nav > div{
         if (s) s.textContent = 'Con ají 🔥' + (isCombo && conCount > 0 ? ' (' + conCount + ')' : '');
       }
       if (btnAparte) {
-        btnAparte.className = (isCombo ? aparteCount > 0 : selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        btnAparte.className = (selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
         const s2 = btnAparte.querySelector('span');
-        if (s2) s2.textContent = 'Ají aparte' + (isCombo && aparteCount > 0 ? ' (' + aparteCount + ')' : '');
+        if (s2) s2.textContent = 'Ají aparte';
       }
     }
 
@@ -2891,6 +2897,7 @@ nav > div{
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isComboMenu);
       if (isComboMenu) populateMenuSwapSelectors(currentSelectedDish);
+      else currentComboOriginalItems = [];
       renderChinaExtrasButtons();
       renderAjiButtons();
 
