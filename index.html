@@ -1308,7 +1308,6 @@ nav > div{
           <div id="combo-extra-note-box" class="hidden mb-2">
             <textarea id="combo-extra-note" rows="2" placeholder="Ej: Champiñón en la carne mongoliana, Alga en el arroz chaufán" class="w-full border-2 border-amber-400 bg-amber-50/50 rounded-xl p-2.5 text-xs outline-none focus:bg-white transition"></textarea>
           </div>
-          <div id="combo-per-dish-extras" class="hidden space-y-2"></div>
           <div id="china-extra-grid" class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-extra-champinon" onclick="toggleChinaExtra('Champiñón')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
               <span>🍄 Champiñón (+$600)</span>
@@ -1812,6 +1811,10 @@ nav > div{
     const BTN_INACTIVE_STYLE = "opt-btn";
 
     function toggleChinaExtra(item) {
+      if (currentComboOriginalItems.length > 0) {
+        openComboTarget('extra', item);
+        return;
+      }
       selectedChinaExtras[item] = !selectedChinaExtras[item];
       renderChinaExtrasButtons();
       updateComboNoteVisibility();
@@ -1824,32 +1827,74 @@ nav > div{
       box.classList.toggle('hidden', !any);
     }
 
-    // 套餐：每道子菜单独选加料
-    function renderComboPerDishExtras() {
-      const box = document.getElementById('combo-per-dish-extras');
-      const grid = document.getElementById('china-extra-grid');
-      if (!box || !grid) return;
-      const isCombo = currentComboOriginalItems.length > 0;
-      box.classList.toggle('hidden', !isCombo);
-      grid.classList.toggle('hidden', isCombo);
-      if (!isCombo) return;
+    // ===== 套餐：点加料 / 辣度 → 弹框选择加到哪道菜 =====
+    let comboExtraAssign = {};
+    let comboAjiAssign = {};
+    let comboTargetMode = null;
+    let comboTargetSel = [];
 
-      box.innerHTML = currentComboOriginalItems.map(function (it, i) {
-        const cur = comboDishExtras[i] || '';
-        const opts = ['', 'Champiñón', 'Alga', 'Almendras', 'Ajo'].map(function (v) {
-          const label = v === '' ? 'Sin extra' : v + ' (+$600)';
-          return '<option value="' + v + '"' + (cur === v ? ' selected' : '') + '>' + label + '</option>';
-        }).join('');
-        return '<div class="flex items-center gap-2">' +
-          '<span class="flex-1 text-[11px] font-bold text-gray-800 truncate">' + escHtml(it.name) + '</span>' +
-          '<select onchange="onComboDishExtraChange(' + i + ', this)" class="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] font-semibold">' + opts + '</select>' +
-          '</div>';
-      }).join('');
+    // 只有「菜」能加料：排除 arroz / aperitivo / sopa
+    function isExtraEligibleComboItem(it) {
+      if (!it) return false;
+      if (it.type !== 'plato') return false;
+      const n = (it.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (n.indexOf('sopa') !== -1 || n.indexOf('sopaipilla') !== -1 || n.indexOf('caldo') !== -1) return false;
+      return true;
     }
 
-    function onComboDishExtraChange(idx, el) {
-      if (el.value) comboDishExtras[idx] = el.value;
-      else delete comboDishExtras[idx];
+    function openComboTarget(kind, value) {
+      const list = currentComboOriginalItems
+        .map(function (it, i) { return { it: it, i: i }; })
+        .filter(function (x) { return isExtraEligibleComboItem(x.it); });
+
+      if (list.length === 0) {
+        alert('Este menú no tiene platos a los que se pueda agregar. Los aperitivos, el arroz y las sopas no admiten extras.');
+        return;
+      }
+
+      comboTargetMode = { kind: kind, value: value };
+      const store = kind === 'extra' ? comboExtraAssign : comboAjiAssign;
+      comboTargetSel = (store[value] || []).slice();
+
+      document.getElementById('combo-target-title').textContent = value;
+      document.getElementById('combo-target-sub').textContent = kind === 'extra'
+        ? '¿A qué plato quieres agregar ' + value + '? (+$600 por plato)'
+        : '¿A qué plato aplicamos «' + value + '»?';
+
+      document.getElementById('combo-target-list').innerHTML = list.map(function (x) {
+        const checked = comboTargetSel.indexOf(x.i) !== -1 ? ' checked' : '';
+        return '<label style="display:flex;align-items:center;gap:9px;padding:11px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa;cursor:pointer">' +
+          '<input type="checkbox" value="' + x.i + '"' + checked + ' style="width:17px;height:17px" onchange="onComboTargetToggle(' + x.i + ', this.checked)">' +
+          '<span style="font-size:12px;font-weight:700;color:#1f2937">' + escHtml(x.it.name) + '</span></label>';
+      }).join('');
+
+      const m = document.getElementById('combo-target-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+
+    function onComboTargetToggle(idx, checked) {
+      const p = comboTargetSel.indexOf(idx);
+      if (checked && p === -1) comboTargetSel.push(idx);
+      if (!checked && p !== -1) comboTargetSel.splice(p, 1);
+    }
+
+    function closeComboTarget() {
+      const m = document.getElementById('combo-target-modal');
+      if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+      comboTargetMode = null;
+      comboTargetSel = [];
+    }
+
+    function confirmComboTarget() {
+      if (!comboTargetMode) return;
+      const store = comboTargetMode.kind === 'extra' ? comboExtraAssign : comboAjiAssign;
+      if (comboTargetSel.length === 0) delete store[comboTargetMode.value];
+      else store[comboTargetMode.value] = comboTargetSel.slice();
+
+      closeComboTarget();
+      renderChinaExtrasButtons();
+      renderAjiButtons();
     }
 
     function renderChinaExtrasButtons() {
@@ -1861,8 +1906,16 @@ nav > div{
       };
       Object.keys(idMap).forEach(k => {
         const btn = document.getElementById(idMap[k]);
-        if (btn) {
-          btn.className = selectedChinaExtras[k] ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        if (!btn) return;
+        const isCombo = currentComboOriginalItems.length > 0;
+        const count = (comboExtraAssign[k] || []).length;
+        const active = isCombo ? count > 0 : selectedChinaExtras[k];
+        btn.className = active ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const span = btn.querySelector('span');
+        if (span) {
+          span.textContent = isCombo
+            ? (count > 0 ? k + ' (' + count + ' plato' + (count > 1 ? 's' : '') + ')' : k + ' (+$600)')
+            : k + ' (+$600)';
         }
       });
     }
@@ -2154,15 +2207,30 @@ nav > div{
     }
 
     function toggleAjiChoice(val) {
+      if (currentComboOriginalItems.length > 0) {
+        openComboTarget('aji', val);
+        return;
+      }
       selectedAjiValue = (selectedAjiValue === val) ? '' : val;
       renderAjiButtons();
     }
 
     function renderAjiButtons() {
+      const isCombo = currentComboOriginalItems.length > 0;
       const btnCon = document.getElementById('btn-aji-con');
       const btnAparte = document.getElementById('btn-aji-aparte');
-      if (btnCon) btnCon.className = (selectedAjiValue === 'Con ají') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
-      if (btnAparte) btnAparte.className = (selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+      const conCount = (comboAjiAssign['Con ají'] || []).length;
+      const aparteCount = (comboAjiAssign['Ají aparte'] || []).length;
+      if (btnCon) {
+        btnCon.className = (isCombo ? conCount > 0 : selectedAjiValue === 'Con ají') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const s = btnCon.querySelector('span');
+        if (s) s.textContent = 'Con ají 🔥' + (isCombo && conCount > 0 ? ' (' + conCount + ')' : '');
+      }
+      if (btnAparte) {
+        btnAparte.className = (isCombo ? aparteCount > 0 : selectedAjiValue === 'Ají aparte') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
+        const s2 = btnAparte.querySelector('span');
+        if (s2) s2.textContent = 'Ají aparte' + (isCombo && aparteCount > 0 ? ' (' + aparteCount + ')' : '');
+      }
     }
 
     function selectSingleBaoFlavor(flavor) {
@@ -2823,7 +2891,8 @@ nav > div{
       const boxMenuNotes = document.getElementById('box-menu-notes');
       boxMenuNotes.classList.toggle('hidden', !isComboMenu);
       if (isComboMenu) populateMenuSwapSelectors(currentSelectedDish);
-      renderComboPerDishExtras();
+      renderChinaExtrasButtons();
+      renderAjiButtons();
 
       const comboHint = document.getElementById('combo-extra-hint');
       if (comboHint) comboHint.classList.toggle('hidden', !isComboMenu);
@@ -2867,7 +2936,8 @@ nav > div{
         selectedAjiValue = '';
         renderAjiButtons();
         selectedChinaExtras = { 'Champiñón': false, 'Alga': false, 'Almendras': false, 'Ajo': false };
-        comboDishExtras = {};
+        comboExtraAssign = {};
+        comboAjiAssign = {};
         const comboNoteEl = document.getElementById('combo-extra-note');
         if (comboNoteEl) comboNoteEl.value = '';
         const comboNoteBox = document.getElementById('combo-extra-note-box');
@@ -3005,15 +3075,25 @@ nav > div{
           }
         });
 
-        // 套餐：每道子菜各自的加料
-        Object.keys(comboDishExtras).forEach(function (k) {
-          const item = currentComboOriginalItems[Number(k)];
-          const extra = comboDishExtras[k];
-          if (item && extra) {
-            extraPrice += 600;
-            optionsList.push(item.name + ': +' + extra + ' (+$600)');
-          }
-        });
+        // 套餐：加料与辣度按「哪道菜」记录
+        if (currentComboOriginalItems.length > 0) {
+          Object.keys(comboExtraAssign).forEach(function (extra) {
+            const names = (comboExtraAssign[extra] || [])
+              .map(function (i) { return currentComboOriginalItems[i] ? currentComboOriginalItems[i].name : ''; })
+              .filter(Boolean);
+            if (names.length) {
+              const cost = 600 * names.length;
+              extraPrice += cost;
+              optionsList.push(extra + ' → ' + names.join(', ') + ' (+$' + cost.toLocaleString('es-CL') + ')');
+            }
+          });
+          Object.keys(comboAjiAssign).forEach(function (val) {
+            const names = (comboAjiAssign[val] || [])
+              .map(function (i) { return currentComboOriginalItems[i] ? currentComboOriginalItems[i].name : ''; })
+              .filter(Boolean);
+            if (names.length) optionsList.push(val + ' → ' + names.join(', '));
+          });
+        }
 
         // 套餐加料：读取「加到哪个菜」的说明
         const anyExtra = Object.keys(selectedChinaExtras).some(k => selectedChinaExtras[k]);
@@ -3400,6 +3480,18 @@ nav > div{
       </button>
 
       <p style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.5">Guárdalo y la próxima vez pides en 2 toques, sin escanear el QR otra vez.</p>
+    </div>
+  </div>
+
+  <div id="combo-target-modal" class="hidden" style="display:none;position:fixed;inset:0;z-index:145;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:18px">
+    <div style="background:#fff;border-radius:20px;max-width:380px;width:100%;padding:20px;max-height:82vh;overflow-y:auto">
+      <h3 id="combo-target-title" style="font-size:15px;font-weight:800;color:#111;margin-bottom:4px"></h3>
+      <p id="combo-target-sub" style="font-size:11px;color:#6b7280;margin-bottom:14px">Solo los platos admiten extras.</p>
+      <div id="combo-target-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="closeComboTarget()" style="flex:1;padding:12px;border-radius:12px;border:1px solid #d1d5db;background:#f9fafb;color:#374151;font-weight:700;font-size:13px">Cancelar</button>
+        <button onclick="confirmComboTarget()" style="flex:1.4;padding:12px;border-radius:12px;border:0;background:linear-gradient(135deg,#dc2626,#e11d48);color:#fff;font-weight:800;font-size:13px">Confirmar</button>
+      </div>
     </div>
   </div>
 </body>
