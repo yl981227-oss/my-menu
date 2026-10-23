@@ -55,7 +55,7 @@
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 flex flex-col notranslate" translate="no">
 
-<button id="fab-my-orders" onclick="openMyOrders()" style="position:fixed;top:12px;right:12px;z-index:120;background:linear-gradient(135deg,#f0c063,#c8912f);color:#1a1208;border:0;border-radius:999px;padding:9px 15px;font-size:12px;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;gap:5px;cursor:pointer;letter-spacing:.02em">
+<button id="fab-my-orders" onclick="openMyOrders()" style="position:fixed;bottom:88px;right:12px;z-index:120;background:linear-gradient(135deg,#f0c063,#c8912f);color:#1a1208;border:0;border-radius:999px;padding:8px 13px;font-size:11px;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;gap:4px;cursor:pointer;letter-spacing:.02em;opacity:.94">
   <span style="font-size:14px">📋</span><span>Mis pedidos</span>
 </button>
 
@@ -1011,9 +1011,14 @@ nav > div{
           <span class="text-sm">→</span>
         </button>
 
-        <button onclick="openMyOrders()" class="mt-3 text-xs font-bold underline active:opacity-60" style="color:#e8b04b;background:none;border:0">
-          📋 Ver mis pedidos
-        </button>
+        <div class="mt-3 flex flex-col items-center gap-2">
+          <button onclick="openMyOrders()" class="text-xs font-bold underline active:opacity-60" style="color:#e8b04b;background:none;border:0">
+            📋 Ver mis pedidos
+          </button>
+          <button onclick="installPwa()" class="text-[11px] active:opacity-60" style="color:rgba(255,255,255,.62);background:none;border:0">
+            🏠 Guardar el menú en tu pantalla de inicio
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1298,7 +1303,10 @@ nav > div{
             <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">+$600 CLP c/u</span>
           </div>
           <div id="combo-extra-hint" class="hidden mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-900 font-semibold leading-relaxed">
-            ⚠️ Este menú incluye varios platos. Indica en <b>Comentarios</b> a qué plato va cada extra (ej: "Champiñón en la carne mongoliana").
+            ⚠️ Este menú incluye varios platos. Indica abajo a qué plato va cada extra.
+          </div>
+          <div id="combo-extra-note-box" class="hidden mb-2">
+            <textarea id="combo-extra-note" rows="2" placeholder="Ej: Champiñón en la carne mongoliana, Alga en el arroz chaufán" class="w-full border-2 border-amber-400 bg-amber-50/50 rounded-xl p-2.5 text-xs outline-none focus:bg-white transition"></textarea>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <button type="button" id="btn-extra-champinon" onclick="toggleChinaExtra('Champiñón')" class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold transition">
@@ -1494,7 +1502,7 @@ nav > div{
 
       <div class="space-y-2.5 text-xs">
         <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre <span class="text-gray-400 font-normal">(opcional para retiro)</span></label>
+          <label class="block text-[11px] font-bold text-gray-700 mb-1">Tu Nombre *</label>
           <input id="cust-name" type="text" placeholder="Ej: Marcela González" class="w-full border border-gray-200 bg-gray-50/50 rounded-xl p-2.5 text-xs outline-none focus:border-gray-800 focus:bg-white transition">
         </div>
         <div>
@@ -1804,6 +1812,14 @@ nav > div{
     function toggleChinaExtra(item) {
       selectedChinaExtras[item] = !selectedChinaExtras[item];
       renderChinaExtrasButtons();
+      updateComboNoteVisibility();
+    }
+
+    function updateComboNoteVisibility() {
+      const box = document.getElementById('combo-extra-note-box');
+      if (!box) return;
+      const any = Object.keys(selectedChinaExtras).some(function (k) { return selectedChinaExtras[k]; });
+      box.classList.toggle('hidden', !any);
     }
 
     function renderChinaExtrasButtons() {
@@ -2820,6 +2836,10 @@ nav > div{
         selectedAjiValue = '';
         renderAjiButtons();
         selectedChinaExtras = { 'Champiñón': false, 'Alga': false, 'Almendras': false, 'Ajo': false };
+        const comboNoteEl = document.getElementById('combo-extra-note');
+        if (comboNoteEl) comboNoteEl.value = '';
+        const comboNoteBox = document.getElementById('combo-extra-note-box');
+        if (comboNoteBox) comboNoteBox.classList.add('hidden');
         renderChinaExtrasButtons();
 
         document.getElementById('pref-sal').checked = false;
@@ -2953,6 +2973,14 @@ nav > div{
           }
         });
 
+        // 套餐加料：读取「加到哪个菜」的说明
+        const anyExtra = Object.keys(selectedChinaExtras).some(k => selectedChinaExtras[k]);
+        if (anyExtra) {
+          const noteEl = document.getElementById('combo-extra-note');
+          const noteVal = noteEl ? noteEl.value.trim() : '';
+          if (noteVal) optionsList.push('→ ' + noteVal);
+        }
+
         if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
         if (document.getElementById('pref-sillao').checked) optionsList.push('Poco sillao');
         if (document.getElementById('pref-cebollin').checked) optionsList.push('Sin cebollín');
@@ -3070,11 +3098,10 @@ nav > div{
       const cashGiven = parseFloat(document.getElementById('cust-cash').value) || 0;
       const notes = document.getElementById('cust-notes').value.trim();
 
+      if (!name) { alert("Por favor ingresa tu nombre para el pedido."); return; }
       if (orderType === 'delivery') {
-        if (!name || !phone) { alert("Para delivery necesitamos tu nombre y teléfono."); return; }
+        if (!phone) { alert("Para delivery necesitamos tu teléfono."); return; }
         if (!address) { alert("Por favor ingresa tu dirección para el envío."); return; }
-      } else if (!name) {
-        name = 'Cliente';
       }
 
       let scheduleTimeVal = "";
@@ -3157,7 +3184,9 @@ nav > div{
 
       saveMyOrder(orderCode);
       lastOrderMessage = message;
-      showSuccess(orderCode);
+
+      // 直接跳转 WhatsApp：保留聊天记录，方便店家后续联系客人
+      window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
 
     // ---- 下单成功引导：发 WhatsApp / 保存到主屏幕 ----
