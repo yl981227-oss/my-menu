@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>China Ideal · Panel de ventas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0b1120;color:#e2e8f0}.panel{background:#111b2d;border:1px solid #24344c;border-radius:18px}.kpi{background:linear-gradient(135deg,#17253c,#111b2d);border:1px solid #2b3c55;border-radius:17px}.bar-track{height:9px;background:#1e293b;border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#dc2626,#f59e0b)}.select{background:#111b2d;border:1px solid #334155;border-radius:11px;color:#e2e8f0;padding:9px 12px;font-size:12px}.muted{color:#94a3b8}.chart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:26px;flex:1}.chart-bar{width:100%;max-width:36px;min-height:3px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#fbbf24,#dc2626)}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body class="min-h-screen pb-12">
+<header class="sticky top-0 z-20 bg-slate-950/95 backdrop-blur border-b border-slate-800">
+ <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+  <div class="flex items-center gap-3"><img src="logo.png" class="w-10 h-10 rounded-full border border-amber-400 object-cover" alt=""><div><h1 class="font-black text-sm">CHINA IDEAL</h1><p class="text-[10px] text-slate-400">Panel de ventas · Solo lectura</p></div></div>
+  <div class="flex items-center gap-2"><a href="admin.html" class="text-xs font-bold px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl">← Pedidos</a><button onclick="loadDashboard()" class="text-xs font-bold px-3 py-2 bg-red-700 rounded-xl">↻ Actualizar</button></div>
+ </div>
+</header>
+<main class="max-w-5xl mx-auto p-4 space-y-4">
+ <div class="flex flex-wrap items-end justify-between gap-3 pt-2">
+  <div><h2 class="text-xl font-black">Resumen del negocio</h2><p id="updated-at" class="text-[11px] muted mt-1">Cargando datos…</p></div>
+  <div class="flex items-center gap-2"><label for="range" class="text-[11px] muted">Periodo</label><select id="range" class="select" onchange="renderDashboard()"><option value="today">Hoy</option><option value="7" selected>Últimos 7 días</option><option value="30">Últimos 30 días</option></select></div>
+ </div>
+ <div id="error-box" class="hidden panel p-4 border-rose-700 text-sm text-rose-200"></div>
+ <div id="loading" class="panel p-10 text-center text-sm muted"><span class="spin inline-block mr-2">◌</span> Cargando ventas…</div>
+ <div id="dashboard" class="hidden space-y-4">
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+   <article class="kpi p-4"><p class="text-[11px] muted">Ventas del periodo</p><p id="kpi-revenue" class="text-2xl font-black text-amber-300 mt-2">$0</p><p id="kpi-revenue-sub" class="text-[10px] muted mt-1">CLP</p></article>
+   <article class="kpi p-4"><p class="text-[11px] muted">Pedidos</p><p id="kpi-orders" class="text-2xl font-black text-white mt-2">0</p><p id="kpi-orders-sub" class="text-[10px] muted mt-1">en el periodo</p></article>
+   <article class="kpi p-4"><p class="text-[11px] muted">Ticket promedio</p><p id="kpi-average" class="text-2xl font-black text-sky-300 mt-2">$0</p><p class="text-[10px] muted mt-1">por pedido</p></article>
+   <article class="kpi p-4"><p class="text-[11px] muted">Pendientes ahora</p><p id="kpi-pending" class="text-2xl font-black text-rose-300 mt-2">0</p><p id="kpi-completed" class="text-[10px] muted mt-1">0 completados</p></article>
+  </section>
+  <section class="grid lg:grid-cols-2 gap-4">
+   <article class="panel p-4"><div class="flex justify-between items-center mb-4"><div><h3 class="font-black text-sm">Ventas por día</h3><p class="text-[10px] muted mt-1">Ingresos diarios del periodo</p></div><span class="text-amber-300">▥</span></div><div id="daily-chart" class="h-44 flex items-end gap-2 border-b border-slate-700 pb-2"></div></article>
+   <article class="panel p-4"><div class="flex justify-between items-center mb-4"><div><h3 class="font-black text-sm">Pedidos por hora</h3><p class="text-[10px] muted mt-1">Hora local de Santiago</p></div><span class="text-sky-300">◷</span></div><div id="hour-chart" class="h-44 flex items-end gap-1 border-b border-slate-700 pb-2"></div></article>
+  </section>
+  <section class="grid lg:grid-cols-2 gap-4">
+   <article class="panel p-4"><h3 class="font-black text-sm mb-1">Platos más vendidos</h3><p class="text-[10px] muted mb-4">Unidades, basado en los pedidos del periodo</p><div id="top-items" class="space-y-3"></div></article>
+   <article class="panel p-4"><h3 class="font-black text-sm mb-1">Tipo de pedido</h3><p class="text-[10px] muted mb-4">Retiro o delivery</p><div id="service-mix" class="space-y-4"></div><div class="border-t border-slate-700 mt-5 pt-4"><h4 class="text-xs font-bold mb-3">Estado de los pedidos</h4><div id="status-mix" class="grid grid-cols-2 gap-2"></div></div></article>
+  </section>
+  <p class="text-[10px] text-slate-500 text-center px-3">Los datos son un resumen de los pedidos registrados. No muestra nombres, teléfonos ni direcciones.</p>
+ </div>
+</main>
+<script>
+const SUPABASE_URL="https://ecjxlhhhywxsqtwbujxr.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let allOrders=[];
+const money=n=>'$'+Math.round(n||0).toLocaleString('es-CL');
+const fmtDate=d=>new Intl.DateTimeFormat('es-CL',{timeZone:'America/Santiago',day:'2-digit',month:'2-digit'}).format(d);
+const dateKey=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Santiago',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function loadDashboard(){
+ const loading=document.getElementById('loading'), error=document.getElementById('error-box'), dashboard=document.getElementById('dashboard');
+ loading.classList.remove('hidden');dashboard.classList.add('hidden');error.classList.add('hidden');
+ const since=new Date(Date.now()-100*86400000).toISOString();
+ const {data,error:err}=await db.from('orders').select('created_at,total,items,service_type,status').gte('created_at',since).order('created_at',{ascending:false}).limit(5000);
+ loading.classList.add('hidden');
+ if(err){error.textContent='No se pudieron cargar los datos. '+err.message;error.classList.remove('hidden');return;}
+ allOrders=data||[];
+ document.getElementById('updated-at').textContent='Actualizado: '+new Date().toLocaleString('es-CL',{timeZone:'America/Santiago'});
+ renderDashboard();
+}
+function selectedOrders(){
+ const v=document.getElementById('range').value;
+ const now=new Date();const today=dateKey(now);
+ if(v==='today')return allOrders.filter(o=>dateKey(new Date(o.created_at))===today);
+ const days=Number(v);const from=new Date(now.getTime()-(days-1)*86400000);const key=dateKey(from);
+ return allOrders.filter(o=>dateKey(new Date(o.created_at))>=key);
+}
+function renderDashboard(){
+ const orders=selectedOrders();const revenue=orders.reduce((s,o)=>s+Number(o.total||0),0);const avg=orders.length?revenue/orders.length:0;
+ const pending=allOrders.filter(o=>o.status==='pending').length;const completed=orders.filter(o=>o.status==='delivered').length;
+ document.getElementById('kpi-revenue').textContent=money(revenue);
+ document.getElementById('kpi-revenue-sub').textContent='CLP · '+orders.length+' pedidos';
+ document.getElementById('kpi-orders').textContent=orders.length;
+ document.getElementById('kpi-average').textContent=money(avg);
+ document.getElementById('kpi-pending').textContent=pending;
+ document.getElementById('kpi-completed').textContent=completed+' entregados';
+ renderDaily(orders);renderHourly(orders);renderTop(orders);renderService(orders);renderStatuses(orders);
+ document.getElementById('dashboard').classList.remove('hidden');
+}
+function renderDaily(orders){
+ const days=Number(document.getElementById('range').value==='today'?1:document.getElementById('range').value);
+ const buckets=[];const today=new Date();
+ for(let i=days-1;i>=0;i--){const d=new Date(today.getFullYear(),today.getMonth(),today.getDate()-i);buckets.push({key:dateKey(d),label:days===1?'Hoy':fmtDate(d),value:0});}
+ orders.forEach(o=>{const k=dateKey(new Date(o.created_at));const b=buckets.find(x=>x.key===k);if(b)b.value+=Number(o.total||0);});
+ const max=Math.max(1,...buckets.map(x=>x.value));
+ document.getElementById('daily-chart').innerHTML=buckets.map(b=>`<div class="chart-col" title="${b.label}: ${money(b.value)}"><span class="text-[9px] text-slate-400 truncate max-w-full">${b.value?money(b.value):''}</span><div class="chart-bar" style="height:${Math.max(3,130*b.value/max)}px;opacity:${b.value?.98:.22}"></div><span class="text-[9px] text-slate-400">${b.label}</span></div>`).join('');
+}
+function renderHourly(orders){
+ const hours=Array(24).fill(0);
+ orders.forEach(o=>{const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Santiago',hour:'2-digit',hourCycle:'h23'}).format(new Date(o.created_at)));if(h>=0&&h<24)hours[h]++;});
+ const max=Math.max(1,...hours);const active=hours.map((v,i)=>({v,i})).filter(x=>x.v>0);let display=hours.map((v,i)=>({v,i}));
+ if(active.length>0){const lo=Math.max(0,active[0].i-1),hi=Math.min(23,active[active.length-1].i+1);display=display.slice(lo,hi+1);}
+ document.getElementById('hour-chart').innerHTML=display.map(x=>`<div class="chart-col" title="${String(x.i).padStart(2,'0')}:00 · ${x.v} pedidos"><div class="chart-bar" style="height:${Math.max(3,128*x.v/max)}px;background:linear-gradient(180deg,#38bdf8,#2563eb);opacity:${x.v?.98:.18}"></div><span class="text-[9px] text-slate-400">${String(x.i).padStart(2,'0')}</span></div>`).join('');
+}
+function renderTop(orders){
+ const map={};orders.forEach(o=>(Array.isArray(o.items)?o.items:[]).forEach(it=>{const n=String(it.name||'Producto');map[n]=(map[n]||0)+Number(it.qty||0);}));
+ const top=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,7);const max=Math.max(1,...top.map(x=>x[1]));
+ document.getElementById('top-items').innerHTML=top.length?top.map(([n,q],i)=>`<div><div class="flex justify-between gap-3 text-xs mb-1"><span class="font-bold truncate"><span class="text-amber-300 mr-1">${i+1}.</span>${escapeHtml(n)}</span><span class="text-slate-300 whitespace-nowrap">${q} u.</span></div><div class="bar-track"><div class="bar-fill" style="width:${100*q/max}%"></div></div></div>`).join(''):'<p class="text-xs muted py-4">No hay ventas en este periodo.</p>';
+}
+function renderService(orders){
+ let pickup=0,delivery=0;orders.forEach(o=>{const s=(o.service_type||'').toLowerCase();if(s.includes('delivery'))delivery++;else pickup++;});const total=Math.max(1,pickup+delivery);
+ document.getElementById('service-mix').innerHTML=`<div><div class="flex justify-between text-xs mb-2"><span>🛍️ Retiro en local</span><b>${pickup} · ${Math.round(pickup/total*100)}%</b></div><div class="bar-track"><div class="bar-fill" style="width:${pickup/total*100}%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div><div><div class="flex justify-between text-xs mb-2"><span>🛵 Delivery</span><b>${delivery} · ${Math.round(delivery/total*100)}%</b></div><div class="bar-track"><div class="bar-fill" style="width:${delivery/total*100}%;background:linear-gradient(90deg,#3b82f6,#38bdf8)"></div></div></div>`;
+}
+function renderStatuses(orders){
+ const labels={pending:['Nuevos','#f87171'],preparing:['Preparando','#60a5fa'],printed:['Preparando','#60a5fa'],ready:['Listos','#4ade80'],delivered:['Entregados','#94a3b8']};const counts={};
+ orders.forEach(o=>{const s=labels[o.status]?o.status:'pending';counts[s]=(counts[s]||0)+1;});
+ document.getElementById('status-mix').innerHTML=Object.entries(labels).filter(([k])=>k!=='printed').map(([k,[label,color]])=>`<div class="bg-slate-900/70 border border-slate-800 rounded-xl p-3"><p class="text-[10px] muted">${label}</p><p class="font-black text-lg mt-1" style="color:${color}">${(counts[k]||0)+(k==='preparing'?(counts.printed||0):0)}</p></div>`).join('');
+}
+loadDashboard();
+</script>
+</body>
+</html>
