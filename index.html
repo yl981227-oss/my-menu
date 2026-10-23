@@ -1478,6 +1478,9 @@ nav > div{
       </div>
 
       <div class="mb-3.5 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
+        <div id="closed-notice" class="hidden mb-2.5 p-2.5 rounded-xl bg-indigo-50 border border-indigo-300 text-[11px] text-indigo-900 font-semibold leading-relaxed">
+          🌙 Ahora estamos cerrados. Tu pedido quedará como <b>reserva</b> y lo prepararemos al abrir (12:20). Elige la hora a la que quieres retirarlo.
+        </div>
         <label class="block text-xs font-black text-gray-800 mb-2">⏰ Horario de entrega / retiro *</label>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
           <button type="button" id="btn-time-asap" onclick="setTimingType('asap')" class="p-2.5 rounded-xl border-2 theme-border-primary bg-white theme-text-primary shadow-sm text-center transition">
@@ -1775,6 +1778,37 @@ nav > div{
     let modalQty = 1;
     let orderType = 'pickup';
     let timingType = 'asap';
+
+    // 营业时间 12:20 - 23:00；打烊后只接预定单
+    const OPEN_MIN = 12 * 60 + 20;
+    const CLOSE_MIN = 23 * 60;
+
+    function isStoreOpenNow() {
+      const n = new Date();
+      const cur = n.getHours() * 60 + n.getMinutes();
+      return cur >= OPEN_MIN && cur < CLOSE_MIN;
+    }
+
+    function applyClosedMode() {
+      const open = isStoreOpenNow();
+      const notice = document.getElementById('closed-notice');
+      const asapBtn = document.getElementById('btn-time-asap');
+      const timeInput = document.getElementById('cust-schedule-time');
+      if (notice) notice.classList.toggle('hidden', open);
+
+      if (!open && asapBtn) {
+        asapBtn.disabled = true;
+        asapBtn.style.opacity = '.45';
+        asapBtn.style.pointerEvents = 'none';
+        asapBtn.innerHTML = '⚡ Cerrado ahora<br><span class="text-[10px] font-normal text-gray-500">Solo pedidos programados</span>';
+        if (timeInput && !timeInput.value) timeInput.value = '12:30';
+        if (timingType !== 'schedule') setTimingType('schedule');
+      }
+      if (timeInput) {
+        timeInput.min = '12:20';
+        timeInput.max = '22:50';
+      }
+    }
     let isUserClickingCategory = false;
     let currentMenuSwapDifference = 0;
 
@@ -3211,9 +3245,19 @@ nav > div{
       }
 
       let scheduleTimeVal = "";
+      if (!isStoreOpenNow() && timingType !== 'schedule') {
+        alert("Ahora estamos cerrados. Elige una hora para retirar tu pedido (12:20 - 22:50).");
+        return;
+      }
       if (timingType === 'schedule') {
         scheduleTimeVal = document.getElementById('cust-schedule-time').value;
         if (!scheduleTimeVal) { alert("Por favor indica la hora deseada para retirar o recibir tu pedido."); return; }
+        const tParts = scheduleTimeVal.split(':');
+        const tMins = parseInt(tParts[0], 10) * 60 + parseInt(tParts[1], 10);
+        if (isNaN(tMins) || tMins < OPEN_MIN || tMins > CLOSE_MIN - 10) {
+          alert("Elige una hora entre 12:20 y 22:50 hrs (nuestro horario de atención).");
+          return;
+        }
       }
 
       const orderCode = STORE_CONFIG.orderCodePrefix + '-' + Math.floor(1000000000 + Math.random() * 9000000000);
@@ -3248,7 +3292,9 @@ nav > div{
 
       const serviceType = orderType === 'pickup' ? 'Para llevar (Retiro en local)' : 'Delivery (Envío a domicilio)';
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
-      const timingLine = timingType === 'asap' ? '⚡ Lo antes posible (Inmediato)' : '📅 Programado para las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
+      const timingLine = timingType === 'asap'
+        ? '⚡ Lo antes posible (Inmediato)'
+        : '📅 Programado: ' + (isStoreOpenNow() ? 'hoy' : 'mañana') + ' a las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
 
       try {
         await db.from('orders').insert([{
@@ -3429,6 +3475,7 @@ nav > div{
     }
 
     applyStoreConfig();
+    applyClosedMode();
     initLandingPage();
     autoDetectAndSetBanner();
     loadLiveMenu();
