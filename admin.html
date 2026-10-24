@@ -393,8 +393,7 @@
       document.getElementById('modal-order-code').innerText = `${order.order_code} • $${Number(order.total).toLocaleString('es-CL')} CLP`;
       document.getElementById('rawbt-link-btn').href = rawbtUrl;
       document.getElementById('rawbt-modal').classList.remove('hidden');
-
-      if (order.id) markOrderPrinted(order.id);
+      // 只展示确认框，不改变订单状态；状态在用户点击“Imprimir Ticket Ahora”后更新。
     }
 
     // 弹窗按钮：统一走 printOrderTicket，APP 内自动选择原生通道
