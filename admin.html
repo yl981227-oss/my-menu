@@ -116,6 +116,17 @@
     let knownOrderIds = new Set();
     let isFirstLoad = true;
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function printOrderById(id) {
+      const order = ordersData.find(o => Number(o.id) === Number(id));
+      if (!order) { alert('Pedido no encontrado. Actualiza la lista.'); return; }
+      printOrderTicket(order);
+    }
+
     function switchAdminTab(tab) {
       document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
       document.getElementById('view-dishes').classList.toggle('hidden', tab !== 'dishes');
@@ -408,7 +419,7 @@
         customer_address: "Camino de la Vina 1461, Huechuraba",
         items: [
           { qty: 1, name: "Menu 2 personas B", unitPrice: 26800, options: ["Arroz: Cambiar x1 por Arroz Blanco", "Cambio: Wantan frito -> Carne Mongoliana", "Con aji"] },
-          { qty: 1, name: "California Ebi", unitPrice: 6500, options: ["Envuelto en: Sesamo", "Salsa incluida: Salsa Soya", "Acompañamientos: Wasabi (1º gratis)"] }
+          { qty: 1, name: "California Ebi", unitPrice: 6500, options: ["Envuelto en: Sesamo", "Salsa incluida: Salsa Soya", "Con Wasabi (+$500)"] }
         ],
         subtotal: 33300,
         delivery_fee: 1800,
@@ -422,7 +433,8 @@
     async function markOrderPrinted(orderId) {
       if (!orderId) return;
       // 只有新单（pending）才推进到 preparing，重复打印不会把已完成的单降级
-      await db.from('orders').update({ status: 'preparing' }).eq('id', orderId).eq('status', 'pending');
+      const { error } = await db.from('orders').update({ status: 'preparing' }).eq('id', orderId).eq('status', 'pending');
+      if (error) { alert('No se pudo actualizar el estado del pedido. Revisa la conexión y los permisos.'); return; }
       fetchOrders();
     }
 
@@ -496,12 +508,12 @@
         let itemsHtml = '';
         items.forEach(it => {
           const opts = (it.options && it.options.length > 0)
-            ? `<div class="text-[11px] text-amber-300 font-semibold mt-0.5">• ${it.options.join(' | ')}</div>`
+            ? `<div class="text-[11px] text-amber-300 font-semibold mt-0.5">• ${it.options.map(escapeHtml).join(' | ')}</div>`
             : '';
           itemsHtml += `
             <div class="py-1.5 border-b border-slate-700/60 last:border-0 flex justify-between items-start">
               <div>
-                <span class="font-black text-white text-xs">${it.qty}x ${it.name}</span>
+                <span class="font-black text-white text-xs">${Number(it.qty)}x ${escapeHtml(it.name)}</span>
                 ${opts}
               </div>
               <span class="text-xs font-bold text-slate-300">$${Number(it.unitPrice * it.qty).toLocaleString('es-CL')}</span>
@@ -514,17 +526,17 @@
             <div class="flex items-center justify-between border-b border-slate-700 pb-2">
               <div class="flex items-center gap-2">
                 ${statusBadge}
-                <span class="font-black text-sm text-white">${o.order_code}</span>
+                <span class="font-black text-sm text-white">${escapeHtml(o.order_code)}</span>
                 <span class="text-xs text-slate-400">⏰ ${dt}</span>
               </div>
               <span class="text-base font-black text-emerald-400">$${Number(o.total).toLocaleString('es-CL')} CLP</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs bg-slate-900/70 p-2.5 rounded-xl border border-slate-700/80">
-              <div><span class="text-slate-400">Servicio:</span> <span class="font-black text-amber-300">${o.service_type}</span></div>
-              <div><span class="text-slate-400">Horario:</span> <span class="font-black text-white">${o.timing_info}</span></div>
-              <div><span class="text-slate-400">Cliente:</span> <span class="font-bold text-white">${o.customer_name} (${o.customer_phone})</span></div>
-              ${o.customer_address ? `<div><span class="text-slate-400">Dirección:</span> <span class="font-bold text-rose-300">${o.customer_address}</span></div>` : ''}
+              <div><span class="text-slate-400">Servicio:</span> <span class="font-black text-amber-300">${escapeHtml(o.service_type)}</span></div>
+              <div><span class="text-slate-400">Horario:</span> <span class="font-black text-white">${escapeHtml(o.timing_info)}</span></div>
+              <div><span class="text-slate-400">Cliente:</span> <span class="font-bold text-white">${escapeHtml(o.customer_name)} (${escapeHtml(o.customer_phone)})</span></div>
+              ${o.customer_address ? `<div><span class="text-slate-400">Dirección:</span> <span class="font-bold text-rose-300">${escapeHtml(o.customer_address)}</span></div>` : ''}
             </div>
 
             <div class="bg-slate-900/40 rounded-xl p-2.5 border border-slate-700/50">
@@ -532,19 +544,19 @@
             </div>
 
             <div class="text-[11px] text-slate-300 flex flex-wrap justify-between gap-2 pt-1">
-              <div><b>Pago:</b> ${o.payment_detail}</div>
-              ${o.notes ? `<div class="text-amber-300"><b>Nota:</b> ${o.notes}</div>` : ''}
+              <div><b>Pago:</b> ${escapeHtml(o.payment_detail)}</div>
+              ${o.notes ? `<div class="text-amber-300"><b>Nota:</b> ${escapeHtml(o.notes)}</div>` : ''}
             </div>
 
             <div class="flex gap-1.5 pt-1">
               ${(o.status === 'pending' || o.status === 'printed' || !o.status)
-                ? `<button onclick="setOrderStatus(${o.id},'preparing')" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">👨‍🍳 Preparando</button>`
+                ? `<button onclick="setOrderStatus(${Number(o.id)},'preparing')" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">👨‍🍳 Preparando</button>`
                 : ''}
               ${(o.status === 'preparing' || o.status === 'printed')
-                ? `<button onclick="setOrderStatus(${o.id},'ready')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">✅ Listo</button>`
+                ? `<button onclick="setOrderStatus(${Number(o.id)},'ready')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">✅ Listo</button>`
                 : ''}
               ${o.status === 'ready'
-                ? `<button onclick="setOrderStatus(${o.id},'delivered')" class="flex-1 bg-slate-600 hover:bg-slate-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">📦 Entregado</button>`
+                ? `<button onclick="setOrderStatus(${Number(o.id)},'delivered')" class="flex-1 bg-slate-600 hover:bg-slate-500 active:scale-95 text-white font-black py-2 rounded-xl text-[11px]">📦 Entregado</button>`
                 : ''}
               ${o.status === 'delivered'
                 ? `<div class="flex-1 text-center text-[11px] text-slate-500 font-bold py-2">Pedido completado</div>`
@@ -552,7 +564,7 @@
             </div>
 
             <div class="flex gap-2 pt-1">
-              <button onclick='printOrderTicket(${JSON.stringify(o).replace(/'/g, "&#39;")})' class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
+              <button onclick="printOrderById(${Number(o.id)})" class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition">
                 <span>🖨️ Imprimir Ticket 80mm</span>
               </button>
               <a href="https://wa.me/${(o.customer_phone || '').replace(/\D/g, '')}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1">
@@ -568,7 +580,11 @@
 
     let adminDishes = [];
     async function loadAdminDishes() {
-      const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
+      const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
+      if (error) {
+        document.getElementById('admin-dishes-list').textContent = 'No se pudo cargar el menú. Revisa la conexión y los permisos.';
+        return;
+      }
       adminDishes = data || [];
       renderAdminDishes();
     }
@@ -583,7 +599,7 @@
         html += `
           <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
             <div class="flex-1">
-              <div class="font-bold text-white">${d.name}</div>
+              <div class="font-bold text-white">${escapeHtml(d.name)}</div>
               <div class="text-emerald-400 font-black mt-0.5">$${Number(d.price).toLocaleString('es-CL')} CLP</div>
             </div>
             <button onclick="toggleDishStock(${d.id}, ${!d.is_available})" class="px-3 py-2 rounded-xl font-black ${d.is_available ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
@@ -596,8 +612,13 @@
     }
 
     async function toggleDishStock(id, newState) {
-      await db.from('dishes').update({ is_available: newState }).eq('id', id);
-      loadAdminDishes();
+      try {
+        const { error } = await db.from('dishes').update({ is_available: newState }).eq('id', id);
+        if (error) throw error;
+        await loadAdminDishes();
+      } catch (error) {
+        alert('No se pudo guardar la disponibilidad. Revisa tu conexión y permisos.');
+      }
     }
 
     db.channel('orders-channel')

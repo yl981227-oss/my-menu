@@ -1494,7 +1494,7 @@ nav > div{
           <label class="block text-[11px] font-bold text-gray-700 mb-1">¿A qué hora deseas retirar o recibir? *</label>
           <div class="flex items-center gap-2">
             <input id="cust-schedule-time" type="time" class="flex-1 border theme-border-primary theme-bg-light rounded-xl p-2.5 text-xs font-black outline-none focus:bg-white transition text-gray-800">
-            <span class="text-[10px] font-bold text-gray-400">12:00 a 23:00 hrs</span>
+            <span class="text-[10px] font-bold text-gray-400">12:20 a 22:50 hrs · Santiago</span>
           </div>
           <p class="text-[10px] text-gray-500 mt-1 leading-tight">💡 Prepararemos tu comida fresca para la hora exacta que elijas.</p>
         </div>
@@ -1779,35 +1779,77 @@ nav > div{
     let orderType = 'pickup';
     let timingType = 'asap';
 
-    // 营业时间 12:20 - 23:00；打烊后只接预定单
+    // Todos los horarios se calculan en Santiago, no en la zona del cliente.
+    const STORE_TIME_ZONE = 'America/Santiago';
     const OPEN_MIN = 12 * 60 + 20;
     const CLOSE_MIN = 23 * 60;
 
-    function isStoreOpenNow() {
-      const n = new Date();
-      const cur = n.getHours() * 60 + n.getMinutes();
+    function getStoreClock(now = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: STORE_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      }).formatToParts(now);
+      const values = {};
+      parts.forEach(p => { values[p.type] = p.value; });
+      return {
+        date: values.year + '-' + values.month + '-' + values.day,
+        minutes: Number(values.hour) * 60 + Number(values.minute),
+        time: values.hour + ':' + values.minute
+      };
+    }
+
+    function nextCalendarDate(date) {
+      const d = new Date(date + 'T12:00:00Z');
+      d.setUTCDate(d.getUTCDate() + 1);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function isStoreOpenNow(now = new Date()) {
+      const cur = getStoreClock(now).minutes;
       return cur >= OPEN_MIN && cur < CLOSE_MIN;
     }
 
-    function applyClosedMode() {
-      const open = isStoreOpenNow();
+    function getReservation(time, now = new Date()) {
+      if (!/^\d{2}:\d{2}$/.test(time)) throw new Error('Elige una hora para tu pedido.');
+      const [hh, mm] = time.split(':').map(Number);
+      const minutes = hh * 60 + mm;
+      if (hh > 23 || mm > 59 || minutes < OPEN_MIN || minutes > CLOSE_MIN - 10) {
+        throw new Error('Elige una hora entre 12:20 y 22:50 hrs.');
+      }
+      const clock = getStoreClock(now);
+      // Antes de abrir: hoy. Despues de cerrar: el siguiente dia calendario.
+      const date = clock.minutes >= CLOSE_MIN ? nextCalendarDate(clock.date) : clock.date;
+      if (date === clock.date && minutes <= clock.minutes) {
+        throw new Error('Esa hora ya pasó. Elige una hora posterior a la actual.');
+      }
+      return { date, time, dayLabel: date === clock.date ? 'hoy' : 'mañana' };
+    }
+
+    function applyClosedMode(now = new Date()) {
+      const open = isStoreOpenNow(now);
+      const clock = getStoreClock(now);
       const notice = document.getElementById('closed-notice');
       const asapBtn = document.getElementById('btn-time-asap');
       const timeInput = document.getElementById('cust-schedule-time');
-      if (notice) notice.classList.toggle('hidden', open);
-
-      if (!open && asapBtn) {
-        asapBtn.disabled = true;
-        asapBtn.style.opacity = '.45';
-        asapBtn.style.pointerEvents = 'none';
-        asapBtn.innerHTML = '⚡ Cerrado ahora<br><span class="text-[10px] font-normal text-gray-500">Solo pedidos programados</span>';
+      if (notice) {
+        notice.classList.toggle('hidden', open);
+        notice.textContent = 'Ahora estamos cerrados. Solo reservas para ' +
+          (clock.minutes >= CLOSE_MIN ? 'mañana' : 'hoy') +
+          '. Elige tu hora de retiro entre 12:20 y 22:50.';
+      }
+      if (asapBtn) {
+        asapBtn.disabled = !open;
+        asapBtn.style.opacity = open ? '' : '.45';
+        asapBtn.style.pointerEvents = open ? '' : 'none';
+        asapBtn.innerHTML = open
+          ? '⚡ Lo antes posible<br><span class="text-[10px] font-normal text-gray-500">20-30 min aprox.</span>'
+          : '⚡ Cerrado ahora<br><span class="text-[10px] font-normal text-gray-500">Solo pedidos programados</span>';
+      }
+      if (!open) {
         if (timeInput && !timeInput.value) timeInput.value = '12:30';
         if (timingType !== 'schedule') setTimingType('schedule');
       }
-      if (timeInput) {
-        timeInput.min = '12:20';
-        timeInput.max = '22:50';
-      }
+      if (timeInput) { timeInput.min = '12:20'; timeInput.max = '22:50'; }
     }
     let isUserClickingCategory = false;
     let currentMenuSwapDifference = 0;
@@ -2453,10 +2495,10 @@ nav > div{
           const descText = dish.description || '';
           const priceStr = Number(dish.price).toLocaleString('es-CL');
 
-          html += '<div ' + clickAttr + ' class="dish-card' + (isSoldOut ? ' is-soldout' : '') + '" data-dishname="' + dish.name.toLowerCase() + '" data-dishdesc="' + descText.toLowerCase() + '">';
+          html += '<div ' + clickAttr + ' class="dish-card' + (isSoldOut ? ' is-soldout' : '') + '" data-dishname="' + escHtml(dish.name.toLowerCase()) + '" data-dishdesc="' + escHtml(descText.toLowerCase()) + '">';
           html += '  <div class="dish-main">';
-          html += '    <h3 class="dish-name">' + dish.name + badge + '</h3>';
-          if (descText) html += '    <p class="dish-desc">' + descText + '</p>';
+          html += '    <h3 class="dish-name">' + escHtml(dish.name) + badge + '</h3>';
+          if (descText) html += '    <p class="dish-desc">' + escHtml(descText) + '</p>';
           html += '    <div class="dish-price"><span class="cur">$</span><span class="num">' + priceStr + '</span><span class="unit">CLP</span></div>';
           html += '  </div>';
           html += '  <div id="dish-action-' + dish.id + '" data-dish-action-id="' + dish.id + '" class="dish-act">' + renderDishActionBtn(dish.id) + '</div>';
@@ -3159,6 +3201,7 @@ nav > div{
     }
 
     function setTimingType(type) {
+      if (type === 'asap' && !isStoreOpenNow()) type = 'schedule';
       timingType = type;
       const btnAsap = document.getElementById('btn-time-asap');
       const btnSchedule = document.getElementById('btn-time-schedule');
@@ -3194,13 +3237,14 @@ nav > div{
         dzToast("Tu carrito está vacío · Agrega platos para continuar");
         return;
       }
+      applyClosedMode();
       const container = document.getElementById('cart-items-preview');
       let previewHtml = '';
       cart.forEach((item, index) => {
         const itemTotal = (item.unitPrice * item.qty).toLocaleString('es-CL');
-        const optText = item.options.length > 0 ? '<div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:3px">• ' + item.options.join('<br>• ') + '</div>' : '';
+        const optText = item.options.length > 0 ? '<div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:3px">• ' + item.options.map(escHtml).join('<br>• ') + '</div>' : '';
         previewHtml += '<div class="py-2.5 flex justify-between items-start gap-2">';
-        previewHtml += '  <div class="flex-1 min-w-0"><div style="font-size:12px;font-weight:800;color:var(--ink);line-height:1.35">' + item.qty + ' × ' + item.name + '</div>' + optText + '<div style="font-size:11.5px;font-weight:800;color:var(--red);margin-top:4px">$ ' + itemTotal + '</div></div>';
+        previewHtml += '  <div class="flex-1 min-w-0"><div style="font-size:12px;font-weight:800;color:var(--ink);line-height:1.35">' + Number(item.qty) + ' × ' + escHtml(item.name) + '</div>' + optText + '<div style="font-size:11.5px;font-weight:800;color:var(--red);margin-top:4px">$ ' + itemTotal + '</div></div>';
         previewHtml += '  <button onclick="removeFromCart(' + index + ')" style="font-size:10px;font-weight:800;color:var(--red);background:#FDF0EE;border:1px solid rgba(168,30,36,.18);border-radius:9px;padding:5px 9px;flex:none">Quitar</button>';
         previewHtml += '</div>';
       });
@@ -3221,16 +3265,20 @@ nav > div{
     }
 
     function getChileDateTime() {
-      const now = new Date();
-      const dd = String(now.getDate()).padStart(2, '0');
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const yyyy = now.getFullYear();
-      const hh = String(now.getHours()).padStart(2, '0');
-      const min = String(now.getMinutes()).padStart(2, '0');
-      return { date: dd + '/' + mm + '/' + yyyy, time: hh + ':' + min };
+      const clock = getStoreClock();
+      const [yyyy, mm, dd] = clock.date.split('-');
+      return { date: dd + '/' + mm + '/' + yyyy, time: clock.time };
     }
 
+    let orderSubmissionInFlight = false;
+
     async function sendOrderToWhatsApp() {
+      if (orderSubmissionInFlight) return;
+      if (!cart.length) { dzToast('Tu carrito está vacío.'); return; }
+      if (cart.some(item => !Number.isInteger(item.qty) || item.qty < 1 || !Number.isFinite(item.unitPrice) || item.unitPrice < 0)) {
+        alert('Revisa tu pedido antes de enviarlo.');
+        return;
+      }
       let name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
       const address = document.getElementById('cust-address').value.trim();
@@ -3244,18 +3292,18 @@ nav > div{
         if (!address) { alert("Por favor ingresa tu dirección para el envío."); return; }
       }
 
-      let scheduleTimeVal = "";
-      if (!isStoreOpenNow() && timingType !== 'schedule') {
-        alert("Ahora estamos cerrados. Elige una hora para retirar tu pedido (12:20 - 22:50).");
+      let reservation = null;
+      const submittedAt = new Date();
+      if (!isStoreOpenNow(submittedAt) && timingType !== 'schedule') {
+        applyClosedMode(submittedAt);
+        alert('Ahora estamos cerrados. Elige una hora para tu reserva.');
         return;
       }
       if (timingType === 'schedule') {
-        scheduleTimeVal = document.getElementById('cust-schedule-time').value;
-        if (!scheduleTimeVal) { alert("Por favor indica la hora deseada para retirar o recibir tu pedido."); return; }
-        const tParts = scheduleTimeVal.split(':');
-        const tMins = parseInt(tParts[0], 10) * 60 + parseInt(tParts[1], 10);
-        if (isNaN(tMins) || tMins < OPEN_MIN || tMins > CLOSE_MIN - 10) {
-          alert("Elige una hora entre 12:20 y 22:50 hrs (nuestro horario de atención).");
+        try {
+          reservation = getReservation(document.getElementById('cust-schedule-time').value, submittedAt);
+        } catch (error) {
+          alert(error.message);
           return;
         }
       }
@@ -3292,19 +3340,23 @@ nav > div{
 
       const serviceType = orderType === 'pickup' ? 'Para llevar (Retiro en local)' : 'Delivery (Envío a domicilio)';
       const addressLine = orderType === 'delivery' ? '\nDirección: ' + address : '';
-      const timingLine = timingType === 'asap'
+      const timingLine = !reservation
         ? '⚡ Lo antes posible (Inmediato)'
-        : '📅 Programado: ' + (isStoreOpenNow() ? 'hoy' : 'mañana') + ' a las ' + scheduleTimeVal + ' hrs (⚠️ PEDIDO PROGRAMADO)';
+        : '📅 Programado: ' + reservation.dayLabel + ' a las ' + reservation.time +
+          ' hrs [fecha ' + reservation.date + ', America/Santiago] (⚠️ PEDIDO PROGRAMADO)';
 
+      // Lock before the first await; snapshot the cart so edits cannot alter this order.
+      const orderItems = JSON.parse(JSON.stringify(cart));
+      orderSubmissionInFlight = true;
       try {
-        await db.from('orders').insert([{
+        const { error } = await db.from('orders').insert([{
           order_code: orderCode,
           service_type: serviceType,
           timing_info: timingLine,
           customer_name: name,
           customer_phone: phone,
           customer_address: orderType === 'delivery' ? address : '',
-          items: cart,
+          items: orderItems,
           subtotal: subtotal,
           delivery_fee: deliveryFee,
           total: total,
@@ -3312,8 +3364,11 @@ nav > div{
           notes: notes || 'Sin comentarios',
           status: 'pending'
         }]);
-      } catch (err) {
-        console.error("Error guardando pedido:", err);
+        if (error) throw error;
+      } catch (error) {
+        orderSubmissionInFlight = false;
+        alert('No pudimos confirmar el pedido. No se abrirá WhatsApp. Si hubo un corte de conexión, verifica con el local antes de reenviar para evitar duplicados.');
+        return;
       }
 
       const message = orderCode + '\n' +
@@ -3334,10 +3389,17 @@ nav > div{
         'Comentarios adicionales:\n' +
         (notes ? notes : 'Sin comentarios');
 
-      saveMyOrder(orderCode);
+      // A confirmed order must not be sent a second time when returning from WhatsApp.
+      try { saveMyOrder(orderCode); } catch (error) {
+        alert('Pedido confirmado: ' + orderCode + '. Tu navegador no pudo guardar el historial; conserva este número.');
+      }
       lastOrderMessage = message;
+      cart = [];
+      updateCartUI();
+      closeCheckoutModal();
+      orderSubmissionInFlight = false;
 
-      // 直接跳转 WhatsApp：保留聊天记录，方便店家后续联系客人
+      // WhatsApp abre un borrador; el cliente todavía debe tocar Enviar.
       window.location.href = 'https://wa.me/' + STORE_CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
     }
 
