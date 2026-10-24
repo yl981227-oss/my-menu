@@ -1907,6 +1907,17 @@ nav > div{
       return true;
     }
 
+    // 返回套餐某一位置当前实际的菜名（考虑已确认的换菜）。
+    // 加料/辣度一直绑定“位置索引”，但展示和下单必须使用换菜后的名称。
+    function getComboItemDisplayName(index) {
+      const original = currentComboOriginalItems[index];
+      if (!original) return '';
+      const swap = progressiveSwaps.find(function (step) {
+        return String(step.fromIdx) === String(index) && step.toId && step.toName;
+      });
+      return swap ? swap.toName : original.name;
+    }
+
     function openComboTarget(kind, value) {
       const list = currentComboOriginalItems
         .map(function (it, i) { return { it: it, i: i }; })
@@ -1930,7 +1941,7 @@ nav > div{
         const checked = comboTargetSel.indexOf(x.i) !== -1 ? ' checked' : '';
         return '<label style="display:flex;align-items:center;gap:9px;padding:11px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa;cursor:pointer">' +
           '<input type="checkbox" value="' + x.i + '"' + checked + ' style="width:17px;height:17px" onchange="onComboTargetToggle(' + x.i + ', this.checked)">' +
-          '<span style="font-size:12px;font-weight:700;color:#1f2937">' + escHtml(x.it.name) + '</span></label>';
+          '<span style="font-size:12px;font-weight:700;color:#1f2937">' + escHtml(getComboItemDisplayName(x.i)) + '</span></label>';
       }).join('');
 
       const m = document.getElementById('combo-target-modal');
@@ -3147,7 +3158,7 @@ nav > div{
         if (currentComboOriginalItems.length > 0) {
           Object.keys(comboExtraAssign).forEach(function (extra) {
             const names = (comboExtraAssign[extra] || [])
-              .map(function (i) { return currentComboOriginalItems[i] ? currentComboOriginalItems[i].name : ''; })
+              .map(function (i) { return getComboItemDisplayName(i); })
               .filter(Boolean);
             if (names.length) {
               const cost = 600 * names.length;
@@ -3157,7 +3168,7 @@ nav > div{
           });
           Object.keys(comboAjiAssign).forEach(function (val) {
             const names = (comboAjiAssign[val] || [])
-              .map(function (i) { return currentComboOriginalItems[i] ? currentComboOriginalItems[i].name : ''; })
+              .map(function (i) { return getComboItemDisplayName(i); })
               .filter(Boolean);
             if (names.length) optionsList.push(val + ' → ' + names.join(', '));
           });
