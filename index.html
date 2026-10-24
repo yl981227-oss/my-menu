@@ -901,6 +901,9 @@ nav > div{
       ratingText: "⭐ 4.9 (210+ reseñas)",
       prepTimeText: "⏱️ 20-30 min",
       deliveryFee: 1800,
+      // Actividades promocionales: dejar en false durante el periodo de prueba.
+      // Cambiar a true cuando el cliente quiera volver a mostrarlas.
+      showPromotions: false,
       promoBanner: "🎁 ¡Por compras sobre $20.000 te regalamos Wantán frito!",
 
       // 📍 1. 店铺地址与 Google Maps 配置
@@ -1025,7 +1028,7 @@ nav > div{
     <!-- 内容 -->
     <div class="max-w-md mx-auto px-4 mt-5 space-y-3.5">
 
-      <div class="land-card">
+      <div id="landing-promotions-card" class="land-card">
         <div class="land-card-head">
           <span class="ico">🎁</span>
           <h2>Promociones Destacadas</h2>
@@ -2040,6 +2043,8 @@ nav > div{
       document.getElementById('landing-preptime').innerText = STORE_CONFIG.prepTimeText;
       document.getElementById('landing-delivery').innerText = "🛵 Envío $" + Number(STORE_CONFIG.deliveryFee).toLocaleString('es-CL') + " CLP";
 
+      const promotionsCard = document.getElementById('landing-promotions-card');
+      if (promotionsCard) promotionsCard.style.display = STORE_CONFIG.showPromotions ? '' : 'none';
       const promosEl = document.getElementById('landing-promos-list');
       let promosHtml = '';
       (STORE_CONFIG.promotions || []).forEach(p => {
@@ -2390,10 +2395,10 @@ nav > div{
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
       document.getElementById('store-logo').innerText = STORE_CONFIG.logoIcon;
-      if (STORE_CONFIG.promoBanner) {
-        document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
-      } else {
-        document.getElementById('store-promo-bar').style.display = 'none';
+      const storePromoBar = document.getElementById('store-promo-bar');
+      if (storePromoBar) {
+        storePromoBar.style.display = STORE_CONFIG.showPromotions && STORE_CONFIG.promoBanner ? '' : 'none';
+        if (STORE_CONFIG.promoBanner) document.getElementById('store-promo-text').innerText = STORE_CONFIG.promoBanner;
       }
       document.getElementById('badge-rating').innerText = STORE_CONFIG.ratingText;
       document.getElementById('badge-preptime').innerText = STORE_CONFIG.prepTimeText;
