@@ -1325,16 +1325,16 @@ nav > div{
           <label class="block text-xs font-black text-gray-800 mb-2">🧂 Preferencias de cocina</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-sal" value="Bajo en sal" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Bajo en sal</span>
+              <input type="checkbox" id="pref-sal" value="Poca sal" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Poca sal</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-sillao" value="Poco sillao" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Poco sillao</span>
+              <input type="checkbox" id="pref-sillao" value="Poca soya" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Poca soya</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-cebollin" value="Sin cebollín" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin cebollín</span>
+              <input type="checkbox" id="pref-cebollin" value="Poco aceite" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Poco aceite</span>
             </label>
             <label class="flex items-center gap-2 p-2.5 rounded-xl border bg-gray-50/60 cursor-pointer">
-              <input type="checkbox" id="pref-diente" value="Sin diente" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin diente dragón</span>
+              <input type="checkbox" id="pref-diente" value="Sin chuño" class="w-4 h-4 rounded"><span class="font-semibold text-gray-700">Sin chuño</span>
             </label>
           </div>
         </div>
@@ -1559,7 +1559,10 @@ nav > div{
     const REMOVED_DISH_NAMES = new Set([
       'promo 30 piezas mixtas',
       'promo 40 piezas especial',
-      'promo 60 piezas familiar'
+      'promo 60 piezas familiar',
+      'tori hot roll (10u)',
+      'ebi hot roll (10u)',
+      'sake hot roll (10u)'
     ]);
 
     const categoriesChina = [
@@ -3174,10 +3177,10 @@ nav > div{
           });
         }
 
-        if (document.getElementById('pref-sal').checked) optionsList.push('Bajo en sal');
-        if (document.getElementById('pref-sillao').checked) optionsList.push('Poco sillao');
-        if (document.getElementById('pref-cebollin').checked) optionsList.push('Sin cebollín');
-        if (document.getElementById('pref-diente').checked) optionsList.push('Sin diente');
+        if (document.getElementById('pref-sal').checked) optionsList.push('Poca sal');
+        if (document.getElementById('pref-sillao').checked) optionsList.push('Poca soya');
+        if (document.getElementById('pref-cebollin').checked) optionsList.push('Poco aceite');
+        if (document.getElementById('pref-diente').checked) optionsList.push('Sin chuño');
       }
 
       const finalUnitPrice = Math.max(0, currentSelectedDish.price + extraPrice);
