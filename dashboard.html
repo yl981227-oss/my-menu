@@ -12,6 +12,9 @@
 </style>
 </head>
 <body class="min-h-screen pb-12">
+<div id="auth-gate" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-5">
+ <div class="panel max-w-sm w-full p-6"><div class="text-3xl mb-3">🔐</div><h2 class="text-lg font-black">Acceso del personal</h2><p class="text-xs muted mt-1 mb-4">Inicia sesión desde el panel POS para ver ventas.</p><button onclick="location.href='admin.html'" class="w-full bg-red-700 rounded-xl py-3 font-black text-sm">Abrir panel POS</button></div>
+</div>
 <header class="sticky top-0 z-20 bg-slate-950/95 backdrop-blur border-b border-slate-800">
  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
   <div class="flex items-center gap-3"><img src="logo.png" class="w-10 h-10 rounded-full border border-amber-400 object-cover" alt=""><div><h1 class="font-black text-sm">CHINA IDEAL</h1><p class="text-[10px] text-slate-400">Panel de ventas · Solo lectura</p></div></div>
@@ -47,12 +50,19 @@
 const SUPABASE_URL="https://ecjxlhhhywxsqtwbujxr.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let allOrders=[];
+let allOrders=[]; let staffSession=null;
+async function requireStaff(){
+ const {data}=await db.auth.getSession();
+ if(!data.session){document.getElementById('auth-gate').classList.remove('hidden');return false;}
+ staffSession=data.session;document.getElementById('auth-gate').classList.add('hidden');return true;
+}
+db.auth.onAuthStateChange((_event,session)=>{staffSession=session;if(session){document.getElementById('auth-gate').classList.add('hidden');loadDashboard();}else{document.getElementById('auth-gate').classList.remove('hidden');}});
 const money=n=>'$'+Math.round(n||0).toLocaleString('es-CL');
 const fmtDate=d=>new Intl.DateTimeFormat('es-CL',{timeZone:'America/Santiago',day:'2-digit',month:'2-digit'}).format(d);
 const dateKey=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Santiago',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function loadDashboard(){
+ if(!(await requireStaff()))return;
  const loading=document.getElementById('loading'), error=document.getElementById('error-box'), dashboard=document.getElementById('dashboard');
  loading.classList.remove('hidden');dashboard.classList.add('hidden');error.classList.add('hidden');
  const since=new Date(Date.now()-100*86400000).toISOString();

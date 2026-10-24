@@ -3320,6 +3320,7 @@ nav > div{
       }
 
       const orderCode = STORE_CONFIG.orderCodePrefix + '-' + Math.floor(1000000000 + Math.random() * 9000000000);
+      const lookupToken = generateLookupToken();
       const dt = getChileDateTime();
 
       let subtotal = 0;
@@ -3362,6 +3363,7 @@ nav > div{
       try {
         const { error } = await db.from('orders').insert([{
           order_code: orderCode,
+          lookup_token: lookupToken,
           service_type: serviceType,
           timing_info: timingLine,
           customer_name: name,
@@ -3401,7 +3403,7 @@ nav > div{
         (notes ? notes : 'Sin comentarios');
 
       // A confirmed order must not be sent a second time when returning from WhatsApp.
-      try { saveMyOrder(orderCode); } catch (error) {
+      try { saveMyOrder(orderCode, lookupToken); } catch (error) {
         alert('Pedido confirmado: ' + orderCode + '. Tu navegador no pudo guardar el historial; conserva este número.');
       }
       lastOrderMessage = message;
@@ -3457,10 +3459,18 @@ nav > div{
     // =====================================================
     // Mis Pedidos — historial local del cliente
     // =====================================================
-    function saveMyOrder(code) {
+    function generateLookupToken() {
+      const bytes = new Uint8Array(24);
+      if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(bytes);
+      else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+      return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function saveMyOrder(code, lookupToken) {
       try {
         let list = JSON.parse(localStorage.getItem('my_orders') || '[]');
-        if (list.indexOf(code) === -1) list.unshift(code);
+        list = list.filter(item => (typeof item === 'string' ? item : item.code) !== code);
+        list.unshift({ code: code, token: lookupToken });
         localStorage.setItem('my_orders', JSON.stringify(list.slice(0, 10)));
       } catch (e) {}
     }
@@ -3478,24 +3488,29 @@ nav > div{
       modal.classList.remove('hidden');
       listEl.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:13px;padding:32px 0">Cargando...</p>';
 
-      let codes = [];
-      try { codes = JSON.parse(localStorage.getItem('my_orders') || '[]'); } catch (e) {}
+      let savedOrders = [];
+      try { savedOrders = JSON.parse(localStorage.getItem('my_orders') || '[]'); } catch (e) {}
+      savedOrders = savedOrders.map(function (item) {
+        return typeof item === 'string' ? { code: item, token: '' } : item;
+      }).filter(item => item && item.code);
 
-      if (!codes.length) {
+      if (!savedOrders.length) {
         listEl.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:13px;padding:32px 0">Todavía no tienes pedidos en este dispositivo.</p>';
         return;
       }
 
-      const { data, error } = await db.from('orders').select('*').in('order_code', codes);
-      if (error) {
-        listEl.innerHTML = '<p style="text-align:center;color:#f87171;font-size:13px;padding:32px 0">No se pudo cargar. Revisa tu conexión.</p>';
-        return;
-      }
-
+      const results = await Promise.all(savedOrders.map(function (item) {
+        if (!item.token) return Promise.resolve({ data: [], error: null });
+        return db.rpc('lookup_my_order', { p_order_code: item.code, p_lookup_token: item.token });
+      }));
       const map = {};
-      (data || []).forEach(function (o) { map[o.order_code] = o; });
+      results.forEach(function (result) {
+        if (result.error) return;
+        (result.data || []).forEach(function (o) { map[o.order_code] = o; });
+      });
 
-      listEl.innerHTML = codes.map(function (code) {
+      listEl.innerHTML = savedOrders.map(function (saved) {
+        const code = saved.code;
         const o = map[code];
         if (!o) {
           return '<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:14px;margin-bottom:10px">' +
