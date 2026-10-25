@@ -7,7 +7,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * { box-sizing: border-box; min-width: 0; }
+    html, body { width: 100%; max-width: 100%; margin: 0; overflow-x: hidden; }
     body { font-family: system-ui, -apple-system, sans-serif; }
+    @media (max-width: 600px) {
+      header > div, main { width: 100%; max-width: none; }
+      header { padding-left: 10px; padding-right: 10px; }
+      header > div { justify-content: center; }
+      header > div > div:last-child { width: 100%; overflow-x: auto; justify-content: center; }
+      #orders-list, #admin-dishes-list { width: 100%; min-width: 0; }
+    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen pb-20">

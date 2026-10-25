@@ -8,8 +8,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root{color-scheme:dark}*{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0b1120;color:#e2e8f0}.panel{background:#111b2d;border:1px solid #24344c;border-radius:18px}.kpi{background:linear-gradient(135deg,#17253c,#111b2d);border:1px solid #2b3c55;border-radius:17px}.bar-track{height:9px;background:#1e293b;border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#dc2626,#f59e0b)}.select{background:#111b2d;border:1px solid #334155;border-radius:11px;color:#e2e8f0;padding:9px 12px;font-size:12px}.muted{color:#94a3b8}.chart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:26px;flex:1}.chart-bar{width:100%;max-width:36px;min-height:3px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#fbbf24,#dc2626)}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-</style>
+:root{color-scheme:dark}*{box-sizing:border-box;min-width:0}html,body{width:100%;max-width:100%;margin:0;overflow-x:hidden}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0b1120;color:#e2e8f0}.panel{background:#111b2d;border:1px solid #24344c;border-radius:18px;min-width:0;overflow:hidden}.kpi{background:linear-gradient(135deg,#17253c,#111b2d);border:1px solid #2b3c55;border-radius:17px;min-width:0}.bar-track{height:9px;background:#1e293b;border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#dc2626,#f59e0b)}.select{background:#111b2d;border:1px solid #334155;border-radius:11px;color:#e2e8f0;padding:9px 12px;font-size:12px;max-width:100%}.muted{color:#94a3b8}.chart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:0;flex:1;overflow:hidden}.chart-bar{width:100%;max-width:36px;min-height:3px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#fbbf24,#dc2626)}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:600px){
+ header>div,main{width:100%;max-width:none}
+ header>div{padding-left:12px;padding-right:12px}
+ main{padding:12px}
+ main>div:first-child{align-items:stretch}
+ main>div:first-child>div:last-child{justify-content:space-between;width:100%}
+ #dashboard>section{grid-template-columns:minmax(0,1fr)!important}
+ #dashboard .panel{width:100%;min-width:0}
+ #daily-chart,#hour-chart{width:100%;min-width:0;overflow:hidden}
+}
+  </style>
 </head>
 <body class="min-h-screen pb-12">
 <div id="auth-gate" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-5">
