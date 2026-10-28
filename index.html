@@ -2420,8 +2420,10 @@ nav > div{
 
     async function loadLiveMenu() {
       const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
-      const dbDishes = (data || []).filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
-      const existingNames = new Set(dbDishes.map(d => (d.name || '').toLowerCase().trim()));
+      const rawDbDishes = (data || []).filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
+      // is_hidden 从菜单完全隐藏，但保留数据库记录和历史订单；is_available=false 仍显示为售罄。
+      const existingNames = new Set(rawDbDishes.map(d => (d.name || '').toLowerCase().trim()));
+      const dbDishes = rawDbDishes.filter(d => d.is_hidden !== true);
       const mergedDishes = [...dbDishes];
 
       BUILT_IN_SUSHI_DISHES.forEach(sushiItem => {

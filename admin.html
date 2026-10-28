@@ -103,15 +103,36 @@
       </div>
     </div>
 
-    <!-- 面板 2：菜品上下架管理（只控制库存状态，不改动菜单结构） -->
+    <!-- 面板 2：菜品管理 -->
     <div id="view-dishes" class="hidden space-y-4">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-3.5">
-        <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato para cambiar disponibilidad..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-3.5 space-y-3">
+        <div class="flex items-center gap-2">
+          <input id="admin-search-dish" oninput="renderAdminDishes()" type="text" placeholder="🔍 Buscar plato..." class="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-red-500">
+          <button onclick="openDishEditor()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-2.5 rounded-xl text-xs whitespace-nowrap">＋ Nuevo plato</button>
+        </div>
+        <p class="text-[11px] text-slate-400">Puedes cambiar nombre, precio, descripción, categoría, disponibilidad y visibilidad. Ocultar no borra el plato ni los pedidos históricos.</p>
       </div>
       <div id="admin-dishes-list" class="space-y-2"></div>
     </div>
 
   </main>
+
+  <!-- 菜品编辑弹窗 -->
+  <div id="dish-editor-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-600 rounded-3xl p-5 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between mb-4"><h3 id="dish-editor-title" class="text-base font-black text-white">Nuevo plato</h3><button onclick="closeDishEditor()" class="text-slate-400 text-xl">×</button></div>
+      <input id="dish-editor-id" type="hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="text-xs font-bold text-slate-300">Nombre<input id="dish-editor-name" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white"></label>
+        <label class="text-xs font-bold text-slate-300">Precio CLP<input id="dish-editor-price" type="number" min="0" step="100" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white"></label>
+      </div>
+      <label class="block text-xs font-bold text-slate-300 mt-3">Categoría<select id="dish-editor-category" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white"></select></label>
+      <label class="block text-xs font-bold text-slate-300 mt-3">Descripción<textarea id="dish-editor-description" rows="3" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white"></textarea></label>
+      <div class="flex flex-wrap gap-4 mt-3 text-xs text-slate-300"><label><input id="dish-editor-available" type="checkbox" class="mr-1"> Disponible para pedir</label><label><input id="dish-editor-hidden" type="checkbox" class="mr-1"> Ocultar del menú</label></div>
+      <p id="dish-editor-error" class="text-xs text-rose-300 min-h-5 mt-3"></p>
+      <div class="flex gap-2 mt-2"><button onclick="closeDishEditor()" class="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl text-sm">Cancelar</button><button onclick="saveDishEditor()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-black py-3 rounded-xl text-sm">Guardar</button></div>
+    </div>
+  </div>
 
   <!-- 新订单防拦截一键打印弹窗 -->
   <div id="rawbt-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -631,12 +652,20 @@
     }
 
     let adminDishes = [];
+    const DISH_CATEGORIES = [
+      ['cat-menus', 'Menús combinados'], ['cat-colaciones', 'Colaciones'], ['cat-aperitivos', 'Aperitivos'],
+      ['cat-vacuno', 'Carne'], ['cat-pollo', 'Pollo'], ['cat-cerdo', 'Cerdo'], ['cat-chaumin', 'Chaumín'],
+      ['cat-arroz', 'Arroz'], ['cat-sopas', 'Sopas'], ['cat-chapsui', 'Chapsui'], ['cat-dragon', 'Diente dragón'],
+      ['cat-mariscos', 'Mariscos'], ['cat-parrilladas', 'Parrilladas'], ['cat-bebidas', 'Bebidas'],
+      ['cat-sushi-promos', 'Promos sushi'], ['cat-sushi-nuevos', 'Nuevos sushi'], ['cat-sushi-california', 'California'],
+      ['cat-sushi-palta', 'Especial palta'], ['cat-sushi-queso', 'Especial queso'], ['cat-sushi-hot', 'Rolls calientes'],
+      ['cat-sushi-salmon', 'Especial salmón'], ['cat-sushi-vegetales', 'Vegetales'], ['cat-sushi-handrolls', 'Hand rolls'],
+      ['cat-sushi-hosomaki', 'Hosomaki'], ['cat-sushi-piqueos', 'Piqueos']
+    ];
+
     async function loadAdminDishes() {
       const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
-      if (error) {
-        document.getElementById('admin-dishes-list').textContent = 'No se pudo cargar el menú. Revisa la conexión y los permisos.';
-        return;
-      }
+      if (error) { document.getElementById('admin-dishes-list').textContent = 'No se pudo cargar el menú. Revisa la conexión y los permisos.'; return; }
       adminDishes = data || [];
       renderAdminDishes();
     }
@@ -644,34 +673,53 @@
     function renderAdminDishes() {
       const q = (document.getElementById('admin-search-dish').value || '').toLowerCase().trim();
       const list = document.getElementById('admin-dishes-list');
-      const filtered = adminDishes.filter(d => (d.name || '').toLowerCase().includes(q));
-
-      let html = '';
-      filtered.forEach(d => {
-        html += `
-          <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
-            <div class="flex-1">
-              <div class="font-bold text-white">${escapeHtml(d.name)}</div>
-              <div class="text-emerald-400 font-black mt-0.5">$${Number(d.price).toLocaleString('es-CL')} CLP</div>
-            </div>
-            <button onclick="toggleDishStock(${d.id}, ${!d.is_available})" class="px-3 py-2 rounded-xl font-black ${d.is_available ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
-              ${d.is_available ? '✅ Disponible' : '🚫 Agotado'}
-            </button>
-          </div>
-        `;
-      });
-      list.innerHTML = html;
+      const filtered = adminDishes.filter(d => ((d.name || '') + ' ' + (d.description || '')).toLowerCase().includes(q));
+      list.innerHTML = filtered.map(d => `
+        <div class="bg-slate-800 border ${d.is_hidden ? 'border-slate-600 opacity-70' : 'border-slate-700'} rounded-xl p-3 space-y-2 text-xs">
+          <div class="flex items-start justify-between gap-2"><div class="flex-1 min-w-0"><div class="font-bold text-white break-words">${escapeHtml(d.name)}</div><div class="text-slate-400 mt-0.5">${escapeHtml(d.category || '')} · ${d.is_hidden ? '隐藏' : (d.is_available ? '可售' : '售罄')}</div></div><div class="text-amber-300 font-black whitespace-nowrap">$${Number(d.price).toLocaleString('es-CL')}</div></div>
+          <div class="flex flex-wrap gap-1.5"><button onclick="openDishEditor(${Number(d.id)})" class="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg">编辑名称/价格</button><button onclick="toggleDishAvailability(${Number(d.id)}, ${!d.is_available})" class="${d.is_available ? 'bg-emerald-600' : 'bg-rose-600'} text-white font-bold px-3 py-2 rounded-lg">${d.is_available ? '设为售罄' : '恢复可售'}</button><button onclick="toggleDishHidden(${Number(d.id)}, ${!d.is_hidden})" class="bg-slate-600 text-white font-bold px-3 py-2 rounded-lg">${d.is_hidden ? '恢复显示' : '隐藏菜单'}</button></div>
+        </div>`).join('') || '<div class="text-center py-12 text-slate-500">没有找到菜品</div>';
     }
 
-    async function toggleDishStock(id, newState) {
-      try {
-        const { error } = await db.from('dishes').update({ is_available: newState }).eq('id', id);
-        if (error) throw error;
-        await loadAdminDishes();
-      } catch (error) {
-        alert('No se pudo guardar la disponibilidad. Revisa tu conexión y permisos.');
-      }
+    function fillDishCategories(selected) {
+      document.getElementById('dish-editor-category').innerHTML = DISH_CATEGORIES.map(([id, label]) => `<option value="${id}" ${id === selected ? 'selected' : ''}>${label}</option>`).join('');
     }
+
+    function openDishEditor(id) {
+      const dish = id ? adminDishes.find(d => Number(d.id) === Number(id)) : null;
+      document.getElementById('dish-editor-title').textContent = dish ? 'Editar plato' : 'Nuevo plato';
+      document.getElementById('dish-editor-id').value = dish ? dish.id : '';
+      document.getElementById('dish-editor-name').value = dish ? (dish.name || '') : '';
+      document.getElementById('dish-editor-price').value = dish ? Number(dish.price || 0) : '';
+      document.getElementById('dish-editor-description').value = dish ? (dish.description || '') : '';
+      document.getElementById('dish-editor-available').checked = dish ? dish.is_available !== false : true;
+      document.getElementById('dish-editor-hidden').checked = dish ? dish.is_hidden === true : false;
+      fillDishCategories(dish ? dish.category : 'cat-aperitivos');
+      document.getElementById('dish-editor-error').textContent = '';
+      const modal = document.getElementById('dish-editor-modal'); modal.classList.remove('hidden'); modal.style.display = 'flex';
+    }
+
+    function closeDishEditor() { const modal = document.getElementById('dish-editor-modal'); modal.classList.add('hidden'); modal.style.display = 'none'; }
+
+    async function saveDishEditor() {
+      const errorEl = document.getElementById('dish-editor-error');
+      const id = document.getElementById('dish-editor-id').value;
+      const name = document.getElementById('dish-editor-name').value.trim();
+      const price = Number(document.getElementById('dish-editor-price').value);
+      if (!name || !Number.isFinite(price) || price < 0) { errorEl.textContent = 'Completa un nombre y un precio válido.'; return; }
+      const payload = { name, price, category: document.getElementById('dish-editor-category').value, description: document.getElementById('dish-editor-description').value.trim(), is_available: document.getElementById('dish-editor-available').checked, is_hidden: document.getElementById('dish-editor-hidden').checked, is_colacion: false };
+      const result = id ? await db.from('dishes').update(payload).eq('id', id) : await db.from('dishes').insert(payload);
+      if (result.error) { errorEl.textContent = 'No se pudo guardar. Ejecuta primero la migración de permisos y vuelve a intentarlo.'; return; }
+      closeDishEditor(); await loadAdminDishes();
+    }
+
+    async function updateDishFields(id, payload) {
+      const { error } = await db.from('dishes').update(payload).eq('id', id);
+      if (error) { alert('No se pudo guardar. Ejecuta la migración de permisos y vuelve a intentarlo.'); return; }
+      await loadAdminDishes();
+    }
+    async function toggleDishAvailability(id, newState) { await updateDishFields(id, { is_available: newState }); }
+    async function toggleDishHidden(id, newState) { await updateDishFields(id, { is_hidden: newState }); }
 
     let realtimeStarted = false;
     function startRealtimeAfterLogin() {
