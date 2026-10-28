@@ -707,15 +707,19 @@
       const name = document.getElementById('dish-editor-name').value.trim();
       const price = Number(document.getElementById('dish-editor-price').value);
       if (!name || !Number.isFinite(price) || price < 0) { errorEl.textContent = 'Completa un nombre y un precio válido.'; return; }
+      const { data: authData } = await db.auth.getSession();
+      if (!authData.session) { errorEl.textContent = 'La sesión del empleado no está activa. Cierra y vuelve a iniciar sesión en el APP.'; return; }
       const payload = { name, price, category: document.getElementById('dish-editor-category').value, description: document.getElementById('dish-editor-description').value.trim(), is_available: document.getElementById('dish-editor-available').checked, is_hidden: document.getElementById('dish-editor-hidden').checked, is_colacion: false };
       const result = id ? await db.from('dishes').update(payload).eq('id', id) : await db.from('dishes').insert(payload);
-      if (result.error) { errorEl.textContent = 'No se pudo guardar. Ejecuta primero la migración de permisos y vuelve a intentarlo.'; return; }
+      if (result.error) { errorEl.textContent = 'Error de base de datos [' + (result.error.code || 'sin código') + ']: ' + result.error.message; return; }
       closeDishEditor(); await loadAdminDishes();
     }
 
     async function updateDishFields(id, payload) {
+      const { data: authData } = await db.auth.getSession();
+      if (!authData.session) { alert('La sesión del empleado no está activa. Cierra y vuelve a iniciar sesión en el APP.'); return; }
       const { error } = await db.from('dishes').update(payload).eq('id', id);
-      if (error) { alert('No se pudo guardar. Ejecuta la migración de permisos y vuelve a intentarlo.'); return; }
+      if (error) { alert('Error de base de datos [' + (error.code || 'sin código') + ']: ' + error.message); return; }
       await loadAdminDishes();
     }
     async function toggleDishAvailability(id, newState) { await updateDishFields(id, { is_available: newState }); }
