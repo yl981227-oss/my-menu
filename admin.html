@@ -715,8 +715,10 @@
         if (latestError) { errorEl.textContent = 'No se pudo preparar el nuevo plato: ' + latestError.message; return; }
         newId = Number(latest && latest[0] ? latest[0].id : 0) + 1;
       }
-      const payload = { id: newId, name, price, category: document.getElementById('dish-editor-category').value, description: document.getElementById('dish-editor-description').value.trim(), is_available: document.getElementById('dish-editor-available').checked, is_hidden: document.getElementById('dish-editor-hidden').checked, is_colacion: false };
-      const result = id ? await db.from('dishes').update(payload).eq('id', id) : await db.from('dishes').insert(payload);
+      const fields = { name, price, category: document.getElementById('dish-editor-category').value, description: document.getElementById('dish-editor-description').value.trim(), is_available: document.getElementById('dish-editor-available').checked, is_hidden: document.getElementById('dish-editor-hidden').checked, is_colacion: false };
+      const result = id
+        ? await db.from('dishes').update(fields).eq('id', id)
+        : await db.from('dishes').insert({ id: newId, ...fields });
       if (result.error) { errorEl.textContent = 'Error de base de datos [' + (result.error.code || 'sin código') + ']: ' + result.error.message; return; }
       closeDishEditor(); await loadAdminDishes();
     }
