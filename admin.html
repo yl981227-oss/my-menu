@@ -98,6 +98,10 @@
         <button onclick="fetchOrders()" class="text-xs font-bold text-blue-400 hover:text-blue-300">🔄 Actualizar ahora</button>
       </div>
 
+      <div id="unprinted-warning" class="hidden bg-amber-500/15 border border-amber-500/40 text-amber-200 text-[11px] font-bold px-3 py-2 rounded-xl leading-relaxed">
+        ⚠ <span id="unprinted-count">0</span> pedido(s) llevan más de 2 min en NUEVO sin ticket impreso. Pulsa 🖨️ en el pedido para imprimir.
+      </div>
+
       <div id="orders-list" class="space-y-3">
         <div class="text-center py-16 text-slate-500 text-xs">Cargando pedidos...</div>
       </div>
@@ -199,6 +203,46 @@
       const order = ordersData.find(o => Number(o.id) === Number(id));
       if (!order) { alert('Pedido no encontrado. Actualiza la lista.'); return; }
       printOrderTicket(order);
+    }
+
+    // ------------------------------------------------------------------
+    // Red de seguridad anti pedido-perdido (solo web, no requiere actualizar la APP)
+    // El servicio nativo imprime y después pasa el pedido a "preparing". Si alguien
+    // marca "Preparando" antes de que imprima, el servicio deja de verlo y el ticket
+    // nunca sale. Aquí lo detectamos y avisamos en el momento de aceptar el pedido.
+    // ------------------------------------------------------------------
+    const UNPRINTED_GRACE_MS = 120000; // 2 min en NUEVO sin ticket = sospechoso
+
+    function isSuspectUnprinted(o) {
+      if (!o || o.status !== 'pending' || o.printed_at) return false;
+      const t = Date.parse(o.created_at || '');
+      if (!t || isNaN(t)) return false;
+      return Date.now() - t > UNPRINTED_GRACE_MS;
+    }
+
+    // Deja constancia de que el ticket se envió, sin tocar el estado del pedido.
+    async function markPrintedAt(id) {
+      try {
+        await db.from('orders')
+          .update({ printed_at: new Date().toISOString() })
+          .eq('id', Number(id))
+          .is('printed_at', null);
+      } catch (e) { console.log('markPrintedAt failed', e); }
+    }
+
+    // Reimprime sin cambiar el estado (no saca el pedido de NUEVO, no pisa el estado del personal).
+    function reprintTicketOnly(id) {
+      const order = ordersData.find(o => Number(o.id) === Number(id));
+      if (!order) { alert('Pedido no encontrado. Actualiza la lista.'); return; }
+      if (isNativeApp()) {
+        try {
+          window.AndroidPrinter.print(getPrinterIp(), 9100, bytesToBase64(buildEscPosBytes(order)));
+          markPrintedAt(order.id).then(fetchOrders);
+          return;
+        } catch (e) { console.log('native reprint failed, fallback to RawBT', e); }
+      }
+      window.location.href = buildRawbtUrl(order);
+      markPrintedAt(order.id).then(fetchOrders);
     }
 
     function switchAdminTab(tab) {
@@ -512,6 +556,17 @@
     }
 
     async function setOrderStatus(orderId, status) {
+      // Última barrera: si el pedido se acepta sin ticket, se ofrece imprimirlo aquí mismo.
+      // Solo dentro del APP: en navegador la impresión sale por RawBT y rompería el flujo.
+      const order = ordersData.find(o => Number(o.id) === Number(orderId));
+      if (status === 'preparing' && order && isNativeApp() && isSuspectUnprinted(order)) {
+        const doPrint = confirm(
+          '⚠ Este pedido lleva más de 2 minutos en NUEVO y no consta ticket impreso.\n\n' +
+          'Aceptar = imprimir el ticket ahora y pasar a PREPARANDO\n' +
+          'Cancelar = pasar a PREPARANDO sin imprimir (comprueba el papel antes)'
+        );
+        if (doPrint) reprintTicketOnly(orderId);
+      }
       const { error } = await db.from('orders').update({ status: status }).eq('id', orderId);
       if (error) { alert('Error: ' + error.message); return; }
       fetchOrders();
@@ -558,6 +613,13 @@
       const pendingCount = ordersData.filter(o => o.status === 'pending').length;
       document.getElementById('pending-count').innerText = pendingCount;
 
+      const unprinted = ordersData.filter(isSuspectUnprinted);
+      const warnEl = document.getElementById('unprinted-warning');
+      if (warnEl) {
+        document.getElementById('unprinted-count').innerText = unprinted.length;
+        warnEl.classList.toggle('hidden', unprinted.length === 0);
+      }
+
       if (ordersData.length === 0) {
         container.innerHTML = '<div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-xs">✅ Sistema listo. Esperando pedidos...</div>';
         return;
@@ -575,6 +637,9 @@
         };
         const st = STATUS_STYLE[o.status] || STATUS_STYLE.pending;
         const statusBadge = `<span class="${st.cls} text-[10px] font-black px-2.5 py-0.5 rounded-full">${st.text}</span>`;
+        const unprintedBadge = isSuspectUnprinted(o)
+          ? '<span class="bg-amber-500 text-slate-900 text-[10px] font-black px-2.5 py-0.5 rounded-full">⚠ SIN TICKET</span>'
+          : '';
 
         const dt = new Date(o.created_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const items = Array.isArray(o.items) ? o.items : [];
@@ -599,6 +664,7 @@
             <div class="flex items-center justify-between border-b border-slate-700 pb-2">
               <div class="flex items-center gap-2">
                 ${statusBadge}
+                ${unprintedBadge}
                 <span class="font-black text-sm text-white">${escapeHtml(o.order_code)}</span>
                 <span class="text-xs text-slate-400">⏰ ${dt}</span>
               </div>
@@ -739,6 +805,10 @@
       realtimeStarted = true;
       db.channel('orders-channel')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
+          if (staffSession) fetchOrders();
+        })
+        // Los cambios de estado de otro dispositivo (o del servicio nativo tras imprimir) también entran en vivo.
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => {
           if (staffSession) fetchOrders();
         })
         .subscribe();
