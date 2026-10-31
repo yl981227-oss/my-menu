@@ -213,7 +213,11 @@
     // ------------------------------------------------------------------
     const UNPRINTED_GRACE_MS = 120000; // 2 min en NUEVO sin ticket = sospechoso
 
+    // 数据库还没加 printed_at 字段时，整套兜底自动关闭，界面上看不到任何变化。
+    let printedAtSupported = false;
+
     function isSuspectUnprinted(o) {
+      if (!printedAtSupported) return false;
       if (!o || o.status !== 'pending' || o.printed_at) return false;
       const t = Date.parse(o.created_at || '');
       if (!t || isNaN(t)) return false;
@@ -222,6 +226,7 @@
 
     // Deja constancia de que el ticket se envió, sin tocar el estado del pedido.
     async function markPrintedAt(id) {
+      if (!printedAtSupported) return;
       try {
         await db.from('orders')
           .update({ printed_at: new Date().toISOString() })
@@ -586,6 +591,10 @@
       statusEl.innerText = "Escuchando pedidos en vivo (Conectado OK)";
 
       ordersData = data || [];
+      // La columna printed_at solo existe si ya se aplicó la migración SQL.
+      if (data && data.length > 0) {
+        printedAtSupported = Object.prototype.hasOwnProperty.call(data[0], 'printed_at');
+      }
       let newOrders = [];
 
       ordersData.forEach(o => {
