@@ -1593,6 +1593,38 @@ nav > div{
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // ===== DragonOro · 多租户支持 =====
+    // 用法：index.html?shop=<slug>；无参数 = 默认店铺（China Ideal, shop_id=1）。
+    // shops 表尚未创建（迁移未跑）或 slug 不存在时，SHOP 保持 null，
+    // 页面行为与多租户改造之前完全一致，不会报错。
+    const DEFAULT_SHOP_ID = 1;
+    let SHOP = null;
+    const shopReady = (async () => {
+      const slug = new URLSearchParams(location.search).get('shop');
+      if (!slug) return;
+      try {
+        const { data, error } = await db.from('shops').select('*').eq('slug', slug).maybeSingle();
+        if (error || !data) { console.log('DragonOro: shop no encontrada:', slug); return; }
+        SHOP = data;
+      } catch (e) { console.log('DragonOro: shops 表不存在，使用默认店铺'); }
+    })();
+
+    // 店铺加载完成后，用shops里的品牌信息覆盖页面的店名/副标题/联系方式。
+    shopReady.then(() => {
+      if (!SHOP) return;
+      if (SHOP.name) { STORE_CONFIG.storeName = SHOP.name; document.title = SHOP.name; }
+      if (SHOP.tagline) STORE_CONFIG.slogan = SHOP.tagline;
+      if (SHOP.phone) STORE_CONFIG.whatsapp = String(SHOP.phone).replace(/[^0-9]/g, '');
+      ['landing-title', 'store-title'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = STORE_CONFIG.storeName;
+      });
+      ['landing-slogan', 'store-slogan'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && SHOP.tagline) el.innerText = SHOP.tagline;
+      });
+    });
+
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
     const REMOVED_DISH_NAMES = new Set([
@@ -2459,8 +2491,18 @@ nav > div{
     }
 
     async function loadLiveMenu() {
+      await shopReady;
       const { data } = await db.from('dishes').select('*').order('id', { ascending: true });
-      const rawDbDishes = (data || []).filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
+      let liveDishes = (data || []);
+      // 多租户：指定店铺时只显示该店的菜品，且不合并 China Ideal 的内置寿司数据。
+      if (SHOP) {
+        liveDishes = liveDishes.filter(d => d.shop_id === SHOP.id);
+        allDishes = liveDishes.filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim())).filter(d => d.is_hidden !== true);
+        renderCurrentMenu();
+        setupScrollSpy();
+        return;
+      }
+      const rawDbDishes = liveDishes.filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
       // is_hidden 从菜单完全隐藏，但保留数据库记录和历史订单；is_available=false 仍显示为售罄。
       const existingNames = new Set(rawDbDishes.map(d => (d.name || '').toLowerCase().trim()));
       const dbDishes = rawDbDishes.filter(d => d.is_hidden !== true);
@@ -3633,7 +3675,7 @@ nav > div{
       const orderItems = JSON.parse(JSON.stringify(cart));
       orderSubmissionInFlight = true;
       try {
-        const { error } = await db.from('orders').insert([{
+        const orderPayload = {
           order_code: orderCode,
           lookup_token: lookupToken,
           service_type: serviceType,
@@ -3648,7 +3690,10 @@ nav > div{
           payment_detail: payDetail,
           notes: orderNotes,
           status: 'pending'
-        }]);
+        };
+        // 多租户：指定店铺时才写入 shop_id（迁移未跑前不带该字段，避免报错）。
+        if (SHOP) orderPayload.shop_id = SHOP.id;
+        const { error } = await db.from('orders').insert([orderPayload]);
         if (error) throw error;
       } catch (error) {
         orderSubmissionInFlight = false;

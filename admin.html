@@ -157,6 +157,21 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // ===== DragonOro · 多租户支持 =====
+    // 用法：admin.html?shop=<slug>；无参数 = 默认店铺（China Ideal）。
+    // 指定店铺后，订单与菜单只显示该店数据；shops 表未迁移时自动退回默认行为。
+    let SHOP = null;
+    const shopReady = (async () => {
+      const slug = new URLSearchParams(location.search).get('shop');
+      if (!slug) return;
+      try {
+        const { data, error } = await db.from('shops').select('*').eq('slug', slug).maybeSingle();
+        if (error || !data) { console.log('DragonOro: shop no encontrada:', slug); return; }
+        SHOP = data;
+        if (SHOP.name) document.title = SHOP.name + ' · POS';
+      } catch (e) { console.log('DragonOro: shops 表不存在，使用默认店铺'); }
+    })();
+
     let ordersData = [];
     let knownOrderIds = new Set();
     let staffSession = null;
@@ -578,8 +593,11 @@
     }
 
     async function fetchOrders() {
+      await shopReady;
       const statusEl = document.getElementById('realtime-status');
-      const { data, error } = await db.from('orders').select('*').order('id', { ascending: false }).limit(40);
+      let query = db.from('orders').select('*').order('id', { ascending: false }).limit(40);
+      if (SHOP) query = query.eq('shop_id', SHOP.id);
+      const { data, error } = await query;
 
       if (error) {
         statusEl.className = "text-rose-400 font-bold";
@@ -739,7 +757,10 @@
     ];
 
     async function loadAdminDishes() {
-      const { data, error } = await db.from('dishes').select('*').order('id', { ascending: true });
+      await shopReady;
+      let query = db.from('dishes').select('*').order('id', { ascending: true });
+      if (SHOP) query = query.eq('shop_id', SHOP.id);
+      const { data, error } = await query;
       if (error) { document.getElementById('admin-dishes-list').textContent = 'No se pudo cargar el menú. Revisa la conexión y los permisos.'; return; }
       adminDishes = data || [];
       renderAdminDishes();
@@ -791,6 +812,8 @@
         newId = Number(latest && latest[0] ? latest[0].id : 0) + 1;
       }
       const fields = { name, price, category: document.getElementById('dish-editor-category').value, description: document.getElementById('dish-editor-description').value.trim(), is_available: document.getElementById('dish-editor-available').checked, is_hidden: document.getElementById('dish-editor-hidden').checked, is_colacion: false };
+      // 多租户：新菜品挂到当前店铺（迁移未跑时 SHOP 为 null，不带该字段）。
+      if (SHOP) fields.shop_id = SHOP.id;
       const result = id
         ? await db.from('dishes').update(fields).eq('id', id)
         : await db.from('dishes').insert({ id: newId, ...fields });
