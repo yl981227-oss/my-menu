@@ -3,58 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRAGÓN DE ORO — Menú Clásico</title>
+    <title>DRAGÓN DE ORO — Estilo Imersivo & Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-      body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="text-slate-800 pb-24">
-    <header class="bg-slate-900 text-white px-4 py-3.5 sticky top-0 z-40 shadow-md">
-        <div class="max-w-xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <span class="text-2xl">🏮</span>
+<body class="text-slate-800 pb-28">
+
+    <!-- 顶部时尚 Banner -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-amber-500 flex items-center justify-center text-white font-black text-base shadow-sm">🐉</div>
                 <div>
                     <h1 class="font-black text-sm tracking-wide">DRAGÓN DE ORO</h1>
-                    <p class="text-[10px] text-slate-400">Estilo 2: Lista Compacta (Tipo App de Delivery)</p>
+                    <p class="text-[10px] text-amber-400 font-medium">Camino de la Vina 1461, Huechuraba</p>
                 </div>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-emerald-500/30">
+                🟢 Abierto
+            </span>
+        </div>
+        <!-- 搜索栏 -->
+        <div class="px-4 pb-3 max-w-xl mx-auto">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                <input type="text" id="searchInput" placeholder="Busca tu plato favorito..." class="w-full bg-slate-800 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500">
             </div>
         </div>
     </header>
 
-    <main class="max-w-xl mx-auto flex h-[calc(100vh-100px)]">
-        <aside class="w-28 bg-white border-r border-slate-200 p-2 space-y-1">
-            <button class="w-full p-2.5 text-left text-xs font-bold rounded-xl bg-slate-900 text-white">Platos</button>
-            <button class="w-full p-2.5 text-left text-xs font-bold rounded-xl text-slate-600">Entradas</button>
-        </aside>
-        <section class="flex-1 bg-white p-4 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                    <h4 class="font-bold text-xs text-slate-800">Colación Pollo Mongoliciano</h4>
-                    <p class="text-[10px] text-slate-400">Arroz chaufán + arrollados</p>
-                    <span class="font-black text-xs text-amber-600 mt-1 block">$7.300 CLP</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="w-7 h-7 rounded-lg bg-slate-100 font-bold">-</button>
-                    <span class="text-xs font-bold">1</span>
-                    <button class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold">+</button>
-                </div>
-            </div>
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                    <h4 class="font-bold text-xs text-slate-800">Arrollado Primavera (5 u.)</h4>
-                    <p class="text-[10px] text-slate-400">Crujientes</p>
-                    <span class="font-black text-xs text-amber-600 mt-1 block">$4.200 CLP</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="w-7 h-7 rounded-lg bg-slate-100 font-bold">-</button>
-                    <span class="text-xs font-bold">0</span>
-                    <button class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold">+</button>
-                </div>
-            </div>
-        </section>
+    <!-- 分类标签横向吸顶 -->
+    <nav class="sticky top-[105px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 overflow-x-auto no-scrollbar shadow-xs">
+        <div class="max-w-xl mx-auto px-4 py-2.5 flex space-x-2" id="categoryTabs">
+            <!-- 动态生成分类 -->
+        </div>
+    </nav>
+
+    <!-- 主体菜品单列大图沉浸流 -->
+    <main class="max-w-xl mx-auto p-4 space-y-4" id="menuFeedContainer">
+        <!-- 动态渲染 -->
     </main>
+
+    <!-- 底部悬浮购物车大胶囊 -->
+    <div id="cartBar" class="fixed bottom-4 left-4 right-4 z-40 max-w-xl mx-auto transform translate-y-28 transition-all">
+        <div class="bg-slate-900 text-white rounded-2xl p-4 shadow-2xl flex items-center justify-between border border-slate-800">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 w-11 h-11 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md shadow-amber-500/30 relative">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-slate-900">0</span>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-wider">Total estimado</p>
+                    <p id="cartTotalText" class="text-base font-black text-white">$0 CLP</p>
+                </div>
+            </div>
+            <button onclick="openCheckoutModal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-black px-5 py-3 rounded-xl shadow-lg transition-all active:scale-95">
+                Ver Canasta <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 结算模态框 -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 class="font-black text-sm text-slate-900">Resumen de tu Pedido</h2>
+                <button onclick="closeCheckoutModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"><i class="fa-solid fa-xmark text-xs"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-4">
+                <div id="modalItemList" class="divide-y divide-slate-100 text-xs"></div>
+                <!-- 配送与客户信息 -->
+                <div class="space-y-3 pt-3 border-t border-slate-100">
+                    <p class="text-xs font-bold text-slate-700">Tipo de Servicio</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setService('Para llevar')" id="btnRetiro" class="py-2.5 rounded-xl text-xs font-bold border-2 border-amber-500 bg-amber-50 text-amber-700">Retiro en local</button>
+                        <button type="button" onclick="setService('Despacho')" id="btnDespacho" class="py-2.5 rounded-xl text-xs font-bold border-2 border-slate-200 text-slate-600">Despacho a domicilio</button>
+                    </div>
+                    <input type="text" id="custName" placeholder="Nombre y Apellido" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500">
+                    <input type="tel" id="custPhone" placeholder="Teléfono / WhatsApp (+569...)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500">
+                    <input type="text" id="custAddress" placeholder="Dirección exacta (para despacho)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500 hidden">
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-slate-50">
+                <button onclick="submitOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs shadow-lg transition-all flex items-center justify-center space-x-2">
+                    <span>Confirmar y Enviar Pedido</span>
+                    <i class="fa-solid fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 逻辑脚本 -->
+    <script>
+        const SUPABASE_URL = 'https://ecjxlhhhywxsqtwbujxr.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let menuData = [];
+        let cart = [];
+        let activeCategory = 'todos';
+        let serviceType = 'Para llevar';
+
+        async function loadMenu() {
+            const { data } = await supabaseClient.from('dishes').select('*').eq('available', true);
+            menuData = data || [];
+            renderCategories();
+            renderFeed('todos');
+        }
+
+        function renderCategories() {
+            const cats = ['todos', ...new Set(menuData.map(d => d.category))];
+            document.getElementById('categoryTabs').innerHTML = cats.map(c => `
+                <button onclick="filterCat('${c}')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold ${c === activeCategory ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'} transition-all shrink-0 uppercase tracking-wider">
+                    ${c}
+                </button>
+            `).join('');
+        }
+
+        function filterCat(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderFeed(cat);
+        }
+
+        function renderFeed(cat) {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let items = cat === 'todos' ? menuData : menuData.filter(d => d.category.toLowerCase() === cat.toLowerCase());
+            if (query) {
+                items = items.filter(d => d.name.toLowerCase().includes(query) || (d.description && d.description.toLowerCase().includes(query)));
+            }
+
+            document.getElementById('menuFeedContainer').innerHTML = items.map(d => `
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex items-center justify-between space-x-4">
+                    <div class="flex-1">
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md uppercase">${d.category}</span>
+                        <h3 class="font-bold text-sm text-slate-900 mt-1">${d.name}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">${d.description || ''}</p>
+                        <p class="font-black text-sm text-slate-900 mt-2">$${d.price.toLocaleString('es-CL')} CLP</p>
+                    </div>
+                    <div class="flex flex-col items-end justify-between h-full space-y-3">
+                        <div class="w-20 h-20 rounded-xl bg-slate-100 overflow-hidden shrink-0">
+                            <img src="${d.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}" alt="${d.name}" class="w-full h-full object-cover">
+                        </div>
+                        <button onclick='addToCart(${JSON.stringify(d).replace(/'/g, "&apos;")})' class="bg-slate-900 hover:bg-amber-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm active:scale-95 flex items-center space-x-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> <span>Agregar</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', () => {
+            renderFeed(activeCategory);
+        });
+
+        function addToCart(item) {
+            let ex = cart.find(i => i.id === item.id);
+            if (ex) { ex.qty++; } else { cart.push({ ...item, qty: 1 }); }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((s, i) => s + i.qty, 0);
+            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            document.getElementById('cartBadge').textContent = count;
+            document.getElementById('cartTotalText').textContent = `$${total.toLocaleString('es-CL')} CLP`;
+
+            const bar = document.getElementById('cartBar');
+            if (count > 0) { bar.classList.remove('translate-y-28'); } else { bar.classList.add('translate-y-28'); }
+        }
+
+        function openCheckoutModal() {
+            document.getElementById('modalItemList').innerHTML = cart.map(i => `
+                <div class="py-2.5 flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-xs text-slate-900">${i.name}</p>
+                        <p class="text-[10px] text-slate-400">$${i.price.toLocaleString('es-CL')} c/u</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="changeQty(${i.id}, -1)" class="w-6 h-6 rounded-lg bg-slate-100 font-bold text-xs">-</button>
+                        <span class="font-bold text-xs">${i.qty}</span>
+                        <button onclick="changeQty(${i.id}, 1)" class="w-6 h-6 rounded-lg bg-slate-900 text-white font-bold text-xs">+</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
+
+        function changeQty(id, delta) {
+            let item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+            openCheckoutModal();
+            if (cart.length === 0) closeCheckoutModal();
+        }
+
+        function setService(type) {
+            serviceType = type;
+            document.getElementById('btnRetiro').className = type === 'Para llevar' ? "py-2.5 rounded-xl text-xs font-bold border-2 border-amber-500 bg-amber-50 text-amber-700" : "py-2.5 rounded-xl text-xs font-bold border-2 border-slate-200 text-slate-600";
+            document.getElementById('btnDespacho').className = type === 'Despacho' ? "py-2.5 rounded-xl text-xs font-bold border-2 border-amber-500 bg-amber-50 text-amber-700" : "py-2.5 rounded-xl text-xs font-bold border-2 border-slate-200 text-slate-600";
+            document.getElementById('custAddress').classList.toggle('hidden', type === 'Para llevar');
+        }
+
+        async function submitOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+
+            if (!name || !phone) { alert('Por favor ingresa tu nombre y teléfono.'); return; }
+            if (serviceType === 'Despacho' && !address) { alert('Por favor ingresa tu dirección.'); return; }
+
+            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            const code = 'DRAGON-' + Math.floor(100000 + Math.random() * 900000);
+
+            await supabaseClient.from('orders').insert([{
+                order_code: code, service_type: serviceType, timing_info: 'Inmediato',
+                customer_name: name, customer_phone: phone, customer_address: address,
+                items: cart, subtotal: total, delivery_fee: 0, total: total,
+                payment_detail: 'Efectivo / Transferencia', status: 'pending'
+            }]);
+
+            alert('¡Pedido enviado con éxito! Código: ' + code);
+            cart = [];
+            updateCartUI();
+            closeCheckoutModal();
+        }
+
+        loadMenu();
+    </script>
 </body>
 </html>
