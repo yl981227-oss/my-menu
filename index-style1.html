@@ -3,52 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRAGÓN DE ORO — Menú Moderno</title>
+    <title>China Ideal — Flujo Completo de Pedidos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
       body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="text-slate-800 pb-28">
-    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3 shadow-sm">
-        <div class="max-w-xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md">🐉</div>
-                <div>
-                    <h1 class="font-extrabold text-base tracking-tight">DRAGÓN DE ORO</h1>
-                    <p class="text-xs text-slate-500">Estilo 1: Tarjetas Modernas (Grid)</p>
-                </div>
+<body class="text-slate-800 pb-20">
+
+    <!-- 顶部导航指示 -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+                <h1 class="font-extrabold text-base text-slate-900">China Ideal · Completo Flujo de Pedidos</h1>
+                <p class="text-xs text-slate-400">Inicio → Buscar → Seleccionar sabor → Enviar pedido</p>
             </div>
+            <span class="bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
+                🎨 Vista Previa Interactiva (No afecta la tienda en vivo)
+            </span>
         </div>
     </header>
 
-    <main class="max-w-xl mx-auto p-4">
-        <div id="menuGrid" class="grid grid-cols-2 gap-3.5"></div>
-    </main>
+    <!-- 主体多栏概念看板 (仿照设计图的多面板预览) -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
 
-    <script>
-        const sampleDishes = [
-            { id: 1, name: "Colación Pollo Mongoliciano", category: "Platos", price: 7300, description: "Con Arroz Chaufán y 2 arrollados primavera" },
-            { id: 2, name: "Arrollado Primavera (5 u.)", category: "Entradas", price: 4200, description: "Crujientes y recién hechos" },
-            { id: 3, name: "Wantán Frito (10 u.)", category: "Entradas", price: 5500, description: "Acompañado de salsa agridulce" },
-            { id: 4, name: "Carne Wantán", category: "Platos", price: 8900, description: "Trocitos de carne con verduras salteadas" }
-        ];
-
-        document.getElementById('menuGrid').innerHTML = sampleDishes.map(d => `
-            <div class="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs flex flex-col justify-between">
+        <!-- Panel 1: 首页 / 快捷导航 -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                    <div class="w-full h-32 rounded-xl bg-amber-50 mb-2 flex items-center justify-center text-3xl">🍲</div>
-                    <h3 class="font-bold text-xs text-slate-800">${d.name}</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">${d.description}</p>
+                    <h2 class="font-black text-slate-900 text-base">China Ideal</h2>
+                    <p class="text-[11px] text-slate-400">Comida china · Sushi</p>
                 </div>
-                <div class="mt-3 flex items-center justify-between">
-                    <span class="font-black text-xs text-amber-600">$${d.price.toLocaleString('es-CL')}</span>
-                    <button class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center"><i class="fa-solid fa-plus text-xs"></i></button>
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm shadow-md">CI</div>
+            </div>
+            <input type="text" placeholder="Buscar receta o ingrediente..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">¿Qué te gustaría?</p>
+                <div class="space-y-2">
+                    <div onclick="filterCat('Chino')" class="p-3.5 rounded-2xl bg-rose-500 text-white font-bold text-xs flex justify-between items-center cursor-pointer shadow-md shadow-rose-500/20">
+                        <span>🇨🇳 中餐 / Chino</span>
+                        <span class="text-[10px] bg-rose-600 px-2 py-0.5 rounded-full">80+ items</span>
+                    </div>
+                    <div onclick="filterCat('Sushi')" class="p-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs flex justify-between items-center cursor-pointer shadow-md shadow-indigo-600/20">
+                        <span>🍣 寿司 / Sushi</span>
+                        <span class="text-[10px] bg-indigo-700 px-2 py-0.5 rounded-full">40+ items</span>
+                    </div>
                 </div>
             </div>
-        `).join('');
+        </div>
+
+        <!-- Panel 2: 中餐菜单 / 列表与分类 -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4 md:col-span-1">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div>
+                    <h2 class="font-black text-slate-900 text-sm">中餐菜单</h2>
+                    <p class="text-[11px] text-slate-400">Selecciona por categorías</p>
+                </div>
+            </div>
+            <div class="flex space-x-1.5 overflow-x-auto no-scrollbar pb-1" id="catButtons">
+                <button onclick="filterCat('todos')" class="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold shrink-0">Todos</button>
+            </div>
+            <div class="space-y-3 max-h-[600px] overflow-y-auto pr-1" id="menuListContainer">
+                <!-- 动态加载菜品 -->
+            </div>
+        </div>
+
+        <!-- Panel 3: 规格口味选择器 (右侧联动) -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4 md:col-span-1" id="customizerPanel">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 id="selectedDishTitle" class="font-black text-slate-900 text-sm">Selecciona una receta</h2>
+                <p class="text-[11px] text-slate-400">Personaliza sabor y extras</p>
+            </div>
+            <div id="customizerContent" class="space-y-4 text-xs text-slate-400">
+                <p class="text-center py-10">👈 Haz clic en "Agregar" en cualquier plato para configurar sus opciones aquí.</p>
+            </div>
+        </div>
+
+        <!-- Panel 4: 购物车与结算确认 -->
+        <div class="bg-slate-900 text-white rounded-3xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+            <div>
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                    <h2 class="font-black text-amber-400 text-sm">Tu Pedido</h2>
+                    <span id="cartCountBadge" class="bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0 items</span>
+                </div>
+                <div id="cartItemsList" class="space-y-2 max-h-64 overflow-y-auto text-xs text-slate-300 divide-y divide-slate-800/60">
+                    <p class="text-slate-500 text-center py-6">Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="space-y-3 pt-3 border-t border-slate-800">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-400">Total a pagar</span>
+                    <span id="cartTotalPrice" class="text-lg font-black text-amber-400">$0 CLP</span>
+                </div>
+                <button onclick="submitOrder()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-2xl text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 active:scale-95">
+                    Confirmar y Enviar a Cocina
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 逻辑脚本 -->
+    <script>
+        const SUPABASE_URL = 'https://ecjxlhhhywxsqtwbujxr.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let menuData = [];
+        let cart = [];
+        let currentSelectedDish = null;
+        let selectedOptions = { prefs: [], qty: 1 };
+
+        async function loadMenu() {
+            const { data } = await supabaseClient.from('dishes').select('*').eq('available', true);
+            menuData = data || [];
+            renderCategories();
+            renderMenu('todos');
+        }
+
+        function renderCategories() {
+            const cats = ['todos', ...new Set(menuData.map(d => d.category))];
+            document.getElementById('catButtons').innerHTML = cats.map(c => `
+                <button onclick="filterCat('${c}')" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 text-xs font-bold shrink-0 uppercase transition-all">${c}</button>
+            `).join('');
+        }
+
+        function filterCat(cat) {
+            const items = cat === 'todos' ? menuData : menuData.filter(d => d.category.toLowerCase() === cat.toLowerCase());
+            renderMenuGrid(items);
+        }
+
+        function renderMenuGrid(items) {
+            document.getElementById('menuListContainer').innerHTML = items.map(d => `
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:border-amber-400 transition-all">
+                    <div>
+                        <h4 class="font-bold text-xs text-slate-900">${d.name}</h4>
+                        <p class="text-[10px] text-slate-400 line-clamp-1 mt-0.5">${d.description || ''}</p>
+                        <span class="font-black text-xs text-amber-600 mt-1 block">$${d.price.toLocaleString('es-CL')}</span>
+                    </div>
+                    <button onclick="selectDish(${d.id})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition-all active:scale-95">
+                        Agregar
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function selectDish(id) {
+            const dish = menuData.find(d => d.id === id);
+            if (!dish) return;
+            currentSelectedDish = dish;
+            selectedOptions = { prefs: [], qty: 1 };
+
+            document.getElementById('selectedDishTitle').textContent = dish.name;
+            document.getElementById('customizerContent').innerHTML = `
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 mb-1">Precio base</p>
+                    <p class="text-base font-black text-amber-600">$${dish.price.toLocaleString('es-CL')} CLP</p>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 mb-1.5">Preferencias de cocina</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs cursor-pointer"><input type="checkbox" value="Poca soya" onchange="togglePref(this)"> <span>Poca soya</span></label>
+                        <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs cursor-pointer"><input type="checkbox" value="Sin picante" onchange="togglePref(this)"> <span>Sin picante</span></label>
+                        <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs cursor-pointer"><input type="checkbox" value="Poca sal" onchange="togglePref(this)"> <span>Poca sal</span></label>
+                        <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs cursor-pointer"><input type="checkbox" value="Extra salsa" onchange="togglePref(this)"> <span>Extra salsa</span></label>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 mb-1.5">Cantidad</p>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="adjustQty(-1)" class="w-8 h-8 rounded-xl bg-slate-100 font-bold text-slate-600 flex items-center justify-center">-</button>
+                        <span id="qtyDisplay" class="font-black text-sm">1</span>
+                        <button onclick="adjustQty(1)" class="w-8 h-8 rounded-xl bg-slate-900 font-bold text-white flex items-center justify-center">+</button>
+                    </div>
+                </div>
+                <button onclick="confirmAddToCart()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-2xl shadow-md transition-all">
+                    Agregar al pedido · $<span id="btnTotalPrice">${dish.price.toLocaleString('es-CL')}</span>
+                </button>
+            `;
+        }
+
+        function togglePref(el) {
+            if (el.checked) { selectedOptions.prefs.push(el.value); } 
+            else { selectedOptions.prefs = selectedOptions.prefs.filter(p => p !== el.value); }
+        }
+
+        function adjustQty(delta) {
+            selectedOptions.qty += delta;
+            if (selectedOptions.qty < 1) selectedOptions.qty = 1;
+            document.getElementById('qtyDisplay').textContent = selectedOptions.qty;
+            document.getElementById('btnTotalPrice').textContent = (currentSelectedDish.price * selectedOptions.qty).toLocaleString('es-CL');
+        }
+
+        function confirmAddToCart() {
+            if (!currentSelectedDish) return;
+            cart.push({
+                ...currentSelectedDish,
+                qty: selectedOptions.qty,
+                prefs: [...selectedOptions.prefs]
+            });
+            updateCartUI();
+            alert('¡Plato agregado al pedido!');
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((s, i) => s + i.qty, 0);
+            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+            document.getElementById('cartCountBadge').textContent = `${count} items`;
+            document.getElementById('cartTotalPrice').textContent = `$${total.toLocaleString('es-CL')} CLP`;
+
+            if (cart.length === 0) {
+                document.getElementById('cartItemsList').innerHTML = `<p class="text-slate-500 text-center py-6">Tu carrito está vacío</p>`;
+            } else {
+                document.getElementById('cartItemsList').innerHTML = cart.map(i => `
+                    <div class="py-2">
+                        <div class="flex justify-between font-bold text-xs">
+                            <span>${i.name} (x${i.qty})</span>
+                            <span>$${(i.price * i.qty).toLocaleString('es-CL')}</span>
+                        </div>
+                        ${i.prefs.length ? `<p class="text-[10px] text-amber-400">Prefs: ${i.prefs.join(', ')}</p>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function submitOrder() {
+            if (cart.length === 0) { alert('El carrito está vacío'); return; }
+            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            const code = 'DRAGON-' + Math.floor(100000 + Math.random() * 900000);
+
+            await supabaseClient.from('orders').insert([{
+                order_code: code, service_type: 'Para llevar', timing_info: 'Inmediato',
+                customer_name: 'Cliente Vista Previa', customer_phone: '+56900000000',
+                items: cart, subtotal: total, delivery_fee: 0, total: total,
+                payment_detail: 'Efectivo', status: 'pending'
+            }]);
+            alert('¡Pedido de prueba enviado con éxito! Código: ' + code);
+            cart = [];
+            updateCartUI();
+        }
+
+        loadMenu();
     </script>
 </body>
 </html>
