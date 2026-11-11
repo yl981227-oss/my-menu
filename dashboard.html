@@ -60,11 +60,21 @@
 const SUPABASE_URL="https://ecjxlhhhywxsqtwbujxr.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let allOrders=[]; let staffSession=null;
+let allOrders=[]; let staffSession=null; let dashShop=undefined;
 async function requireStaff(){
  const {data}=await db.auth.getSession();
  if(!data.session){document.getElementById('auth-gate').classList.remove('hidden');return false;}
  staffSession=data.session;document.getElementById('auth-gate').classList.add('hidden');return true;
+}
+// 解析员工所属店铺（shop_members），报表只统计本店；未绑定时保持现状（全量）。
+async function resolveDashShop(){
+ if(dashShop!==undefined)return dashShop;
+ try{
+  const {data:m}=await db.from('shop_members').select('shop_id').eq('user_id',staffSession.user.id).limit(1).maybeSingle();
+  if(m){const {data:s}=await db.from('shops').select('*').eq('id',m.shop_id).maybeSingle();dashShop=s||null;if(dashShop&&dashShop.name)document.title=dashShop.name+' · Dashboard';}
+  else dashShop=null;
+ }catch(e){dashShop=null;}
+ return dashShop;
 }
 db.auth.onAuthStateChange((_event,session)=>{staffSession=session;if(session){document.getElementById('auth-gate').classList.add('hidden');loadDashboard();}else{document.getElementById('auth-gate').classList.remove('hidden');}});
 const money=n=>'$'+Math.round(n||0).toLocaleString('es-CL');
@@ -76,7 +86,10 @@ async function loadDashboard(){
  const loading=document.getElementById('loading'), error=document.getElementById('error-box'), dashboard=document.getElementById('dashboard');
  loading.classList.remove('hidden');dashboard.classList.add('hidden');error.classList.add('hidden');
  const since=new Date(Date.now()-100*86400000).toISOString();
- const {data,error:err}=await db.from('orders').select('created_at,total,items,service_type,status').gte('created_at',since).order('created_at',{ascending:false}).limit(5000);
+ const shop=await resolveDashShop();
+ let q=db.from('orders').select('created_at,total,items,service_type,status').gte('created_at',since).order('created_at',{ascending:false}).limit(5000);
+ if(shop)q=q.eq('shop_id',shop.id);
+ const {data,error:err}=await q;
  loading.classList.add('hidden');
  if(err){error.textContent='No se pudieron cargar los datos. '+err.message;error.classList.remove('hidden');return;}
  allOrders=data||[];

@@ -187,13 +187,38 @@
       unlockStaffPanel(staffSession);
     }
 
-    function unlockStaffPanel(session) {
+    async function unlockStaffPanel(session) {
       staffSession = session;
       document.getElementById('auth-gate').classList.add('hidden');
       if (window.AndroidPrinter && window.AndroidPrinter.saveAuthSession) {
         try { window.AndroidPrinter.saveAuthSession(session.access_token, session.refresh_token || ''); } catch (e) {}
       }
+      await resolveMyShop(session);
       fetchOrders();
+      loadAdminDishes();
+    }
+
+    // 登录后通过 shop_members 找到员工所属店铺；URL ?shop= 参数优先（调试/演示用）。
+    async function resolveMyShop(session) {
+      await shopReady;
+      if (SHOP) { applyShopBranding(); return; }
+      try {
+        const { data: m, error } = await db.from('shop_members')
+          .select('shop_id').eq('user_id', session.user.id)
+          .order('shop_id', { ascending: true }).limit(1).maybeSingle();
+        if (error || !m) return;
+        const { data: shop } = await db.from('shops').select('*').eq('id', m.shop_id).maybeSingle();
+        if (shop) { SHOP = shop; applyShopBranding(); }
+      } catch (e) { console.log('resolveMyShop', e); }
+    }
+
+    // 应用店铺配置：标题、默认打印机 IP（本地手动设置优先）。
+    function applyShopBranding() {
+      if (!SHOP) return;
+      if (SHOP.name) document.title = SHOP.name + ' · POS';
+      if (SHOP.printer_ip && !localStorage.getItem('printer_ip')) {
+        localStorage.setItem('printer_ip', SHOP.printer_ip);
+      }
     }
 
     db.auth.getSession().then(({ data }) => {
@@ -457,7 +482,7 @@
     function getPrinterIp() {
       const input = document.getElementById('printer-ip');
       const typed = input ? input.value.trim() : '';
-      return typed || localStorage.getItem('printer_ip') || '10.0.4.250';
+      return typed || localStorage.getItem('printer_ip') || (SHOP && SHOP.printer_ip) || '10.0.4.250';
     }
 
     function savePrinterIp() {
