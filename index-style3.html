@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRAGÓN DE ORO — Premium Bistro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
@@ -14,128 +13,28 @@
     </style>
 </head>
 <body class="pb-28">
-
-    <!-- 顶部暗黑高级感 Header -->
-    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-4">
-        <div class="max-w-xl mx-auto text-center">
-            <span class="text-amber-500 text-xs tracking-widest uppercase font-bold">Tradición & Sabor</span>
-            <h1 class="font-cinzel text-xl font-bold tracking-wider text-amber-400 mt-0.5">DRAGÓN DE ORO</h1>
-        </div>
+    <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-40 px-4 py-4 text-center">
+        <span class="text-amber-500 text-xs tracking-widest uppercase font-bold">Estilo 3: Dark Bistro (Oscuro & Elegante)</span>
+        <h1 class="font-cinzel text-xl font-bold tracking-wider text-amber-400 mt-1">DRAGÓN DE ORO</h1>
     </header>
 
-    <!-- 分类标签 -->
-    <nav class="sticky top-[69px] z-30 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 py-3 px-4 overflow-x-auto">
-        <div class="max-w-xl mx-auto flex space-x-3" id="darkCategories"></div>
-    </nav>
-
-    <!-- 菜品列表 -->
-    <main class="max-w-xl mx-auto p-4 space-y-4" id="darkMenuContainer"></main>
-
-    <!-- 底部悬浮结算 -->
-    <div id="darkCartBar" class="fixed bottom-4 left-4 right-4 z-40 max-w-xl mx-auto transform translate-y-28 transition-all">
-        <div class="bg-amber-500 text-slate-950 rounded-2xl p-4 shadow-2xl flex items-center justify-between font-bold">
-            <div class="flex items-center space-x-3">
-                <div class="bg-slate-950 text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-utensils"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] text-slate-900 uppercase">Total cuenta</p>
-                    <p id="darkTotal" class="text-base font-black">$0 CLP</p>
-                </div>
+    <main class="max-w-xl mx-auto p-4 space-y-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+            <div>
+                <h4 class="font-bold text-sm text-slate-100">Colación Pollo Mongoliciano</h4>
+                <p class="text-xs text-slate-400 mt-0.5">Especialidad de la casa</p>
+                <span class="font-black text-sm text-amber-400 mt-2 block">$7.300 CLP</span>
             </div>
-            <button onclick="openCheckout()" class="bg-slate-950 text-white px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider">
-                Ordenar Ahora
-            </button>
+            <button class="bg-amber-500 text-slate-950 w-10 h-10 rounded-xl font-bold flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
         </div>
-    </div>
-
-    <!-- 结算模态框 -->
-    <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end">
-        <div class="bg-slate-900 text-white w-full max-w-xl mx-auto rounded-t-3xl p-6 space-y-4 border-t border-slate-800">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-cinzel text-lg text-amber-400">Confirmar Reserva / Pedido</h3>
-                <button onclick="closeCheckout()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+            <div>
+                <h4 class="font-bold text-sm text-slate-100">Arrollado Primavera (5 u.)</h4>
+                <p class="text-xs text-slate-400 mt-0.5">Entrada crujiente</p>
+                <span class="font-black text-sm text-amber-400 mt-2 block">$4.200 CLP</span>
             </div>
-            <div id="modalList" class="space-y-2 max-h-48 overflow-y-auto text-xs text-slate-300"></div>
-            <div class="space-y-3 pt-2">
-                <input type="text" id="dName" placeholder="Nombre" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white">
-                <input type="tel" id="dPhone" placeholder="Teléfono" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white">
-                <button onclick="submitOrder()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-sm">Enviar Pedido a Cocina</button>
-            </div>
+            <button class="bg-amber-500 text-slate-950 w-10 h-10 rounded-xl font-bold flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
         </div>
-    </div>
-
-    <script>
-        const SUPABASE_URL = 'https://ecjxlhhhywxsqtwbujxr.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanhsaGhoeXd4c3F0d2J1anhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2OTE0NDgsImV4cCI6MjEwNzI2NzQ0OH0.7_OdMxyrL-rAZH8Kh3Uz8M_pgA_EfwiAzPqnfXUTiLs';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let menu = [], cart = [];
-
-        async function load() {
-            const { data } = await supabaseClient.from('dishes').select('*').eq('available', true);
-            menu = data || [];
-            renderCats();
-            renderMenu('todos');
-        }
-
-        function renderCats() {
-            const cats = ['todos', ...new Set(menu.map(d => d.category))];
-            document.getElementById('darkCategories').innerHTML = cats.map(c => `
-                <button onclick="renderMenu('${c}')" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-amber-500 hover:text-slate-950 transition-all uppercase tracking-wider shrink-0">${c}</button>
-            `).join('');
-        }
-
-        function renderMenu(cat) {
-            const items = cat === 'todos' ? menu : menu.filter(d => d.category === cat);
-            document.getElementById('darkMenuContainer').innerHTML = items.map(d => `
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex items-center justify-between shadow-lg">
-                    <div class="flex-1 pr-3">
-                        <h4 class="font-bold text-sm text-slate-100">${d.name}</h4>
-                        <p class="text-xs text-slate-400 mt-1 line-clamp-2">${d.description || ''}</p>
-                        <span class="font-black text-sm text-amber-400 mt-2 block">$${d.price.toLocaleString('es-CL')}</span>
-                    </div>
-                    <button onclick='add(${JSON.stringify(d).replace(/'/g, "&apos;")})' class="bg-amber-500 text-slate-950 w-10 h-10 rounded-xl font-bold flex items-center justify-center shadow-md active:scale-95 transition-all">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function add(item) {
-            let ex = cart.find(i => i.id === item.id);
-            if (ex) ex.qty++; else cart.push({ ...item, qty: 1 });
-            updateUI();
-        }
-
-        function updateUI() {
-            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            document.getElementById('darkTotal').textContent = `$${total.toLocaleString('es-CL')} CLP`;
-            const bar = document.getElementById('darkCartBar');
-            if (cart.length > 0) bar.classList.remove('translate-y-28'); else bar.classList.add('translate-y-28');
-        }
-
-        function openCheckout() {
-            document.getElementById('modalList').innerHTML = cart.map(i => `<div class="flex justify-between"><span>${i.name} (x${i.qty})</span><span>$${(i.price*i.qty).toLocaleString('es-CL')}</span></div>`).join('');
-            document.getElementById('checkoutModal').classList.remove('hidden');
-        }
-        function closeCheckout() { document.getElementById('checkoutModal').classList.add('hidden'); }
-
-        async function submitOrder() {
-            const name = document.getElementById('dName').value;
-            const phone = document.getElementById('dPhone').value;
-            if(!name || !phone) { alert('Completa tus datos'); return; }
-            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            const code = 'DRAGON-' + Math.floor(100000 + Math.random() * 900000);
-            await supabaseClient.from('orders').insert([{
-                order_code: code, service_type: 'Para llevar', timing_info: 'Inmediato',
-                customer_name: name, customer_phone: phone, items: cart,
-                subtotal: total, delivery_fee: 0, total: total, payment_detail: 'Efectivo', status: 'pending'
-            }]);
-            alert('Pedido enviado. Código: ' + code);
-            cart = []; updateUI(); closeCheckout();
-        }
-        load();
-    </script>
+    </main>
 </body>
 </html>
