@@ -1158,14 +1158,17 @@ nav > div{
   </div>
 </header>
 
-<!-- 主分类切换 -->
+<!-- 主分类切换（动态渲染，见 renderMenuTabs） -->
 <nav class="shrink-0 z-20">
-  <div class="flex">
+  <div class="flex" id="menu-tabs">
     <button id="btn-tab-china" onclick="switchMainMenu('china')" class="flex-1 flex items-center justify-center gap-1.5 is-active">
       <span class="text-sm">🥢</span> Comida China
     </button>
     <button id="btn-tab-sushi" onclick="switchMainMenu('sushi')" class="flex-1 flex items-center justify-center gap-1.5">
       <span class="text-sm">🍣</span> Sushi
+    </button>
+    <button id="btn-tab-milk-tea" onclick="switchMainMenu('milk-tea')" class="flex-1 flex items-center justify-center gap-1.5 hidden">
+      <span class="text-sm">🧋</span> Milk Tea
     </button>
   </div>
 </nav>
@@ -1469,6 +1472,39 @@ nav > div{
         </div>
       </div>
 
+      <!-- G. 奶茶专属定制（大小杯双价 + 糖度 + 冰量 + 小料） -->
+      <div id="box-milk-tea-options" class="space-y-4 hidden">
+        <!-- 1. 大小杯（决定价格档位） -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-black text-gray-800">🧋 Tamaño *</label>
+            <span class="text-[10px] text-gray-400 font-semibold">(Elige tu tamaño)</span>
+          </div>
+          <div id="milk-tea-size-grid" class="grid grid-cols-2 gap-2 text-xs"></div>
+        </div>
+
+        <!-- 2. 糖度（自选） -->
+        <div>
+          <label class="block text-xs font-black text-gray-800 mb-2">🍬 Nivel de Azúcar *</label>
+          <div class="grid grid-cols-5 gap-1.5 text-[11px]" id="milk-tea-sugar-grid"></div>
+        </div>
+
+        <!-- 3. 冰量（自选） -->
+        <div>
+          <label class="block text-xs font-black text-gray-800 mb-2">🧊 Hielo *</label>
+          <div class="grid grid-cols-3 gap-1.5 text-[11px]" id="milk-tea-ice-grid"></div>
+        </div>
+
+        <!-- 4. 小料（加料，带价，可多选） -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-black text-gray-800">✨ Toppings / Agregados</label>
+            <span class="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Opcional · precio c/u</span>
+          </div>
+          <div id="milk-tea-topping-grid" class="grid grid-cols-2 gap-2 text-xs"></div>
+        </div>
+      </div>
+
       <!-- 数量步进器 -->
       <div class="flex items-center justify-between border-t border-gray-150 pt-3.5 mt-4 mb-4">
         <span class="text-xs font-black text-gray-700">Cantidad:</span>
@@ -1609,12 +1645,21 @@ nav > div{
       } catch (e) { console.log('DragonOro: shops 表不存在，使用默认店铺'); }
     })();
 
-    // 店铺加载完成后，用shops里的品牌信息覆盖页面的店名/副标题/联系方式。
+    // 店铺加载完成后，用shops里的品牌信息覆盖页面的店名/副标题/联系方式/品牌色/地址/Logo。
     shopReady.then(() => {
       if (!SHOP) return;
       if (SHOP.name) { STORE_CONFIG.storeName = SHOP.name; document.title = SHOP.name; }
       if (SHOP.tagline) STORE_CONFIG.slogan = SHOP.tagline;
       if (SHOP.phone) STORE_CONFIG.whatsapp = String(SHOP.phone).replace(/[^0-9]/g, '');
+      if (SHOP.address) STORE_CONFIG.address = SHOP.address;
+      if (SHOP.logo_url) STORE_CONFIG.logoImage = SHOP.logo_url;
+      // 品牌色：动态覆盖主题主色（brand_color 为空时回退到主题预设，保持默认行为）
+      if (SHOP.brand_color) {
+        STORE_CONFIG.brandColor = SHOP.brand_color;
+        document.documentElement.style.setProperty('--color-primary', SHOP.brand_color);
+        document.documentElement.style.setProperty('--color-primary-dark', darkenHex(SHOP.brand_color, 0.35));
+        document.documentElement.style.setProperty('--color-primary-light', hexToRgba(SHOP.brand_color, 0.10));
+      }
       ['landing-title', 'store-title'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerText = STORE_CONFIG.storeName;
@@ -1624,6 +1669,27 @@ nav > div{
         if (el && SHOP.tagline) el.innerText = SHOP.tagline;
       });
     });
+
+    // 十六进制颜色 → rgba（用于主题色浅色变体）
+    function hexToRgba(hex, alpha) {
+      const h = String(hex || '').replace('#', '');
+      if (!/^[0-9a-fA-F]{6}$/.test(h)) return 'rgba(168,30,36,' + alpha + ')';
+      const r = parseInt(h.slice(0, 2), 16);
+      const g = parseInt(h.slice(2, 4), 16);
+      const b = parseInt(h.slice(4, 6), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
+
+    // 十六进制颜色 → 加深后的十六进制（用于主题色暗色变体）
+    function darkenHex(hex, factor) {
+      const h = String(hex || '').replace('#', '');
+      if (!/^[0-9a-fA-F]{6}$/.test(h)) return '#6E1014';
+      const r = Math.round(parseInt(h.slice(0, 2), 16) * (1 - factor));
+      const g = Math.round(parseInt(h.slice(2, 4), 16) * (1 - factor));
+      const b = Math.round(parseInt(h.slice(4, 6), 16) * (1 - factor));
+      const to2 = n => n.toString(16).padStart(2, '0');
+      return '#' + to2(r) + to2(g) + to2(b);
+    }
 
     const DIRECT_ADD_CATEGORIES = ['cat-aperitivos', 'cat-sopas', 'cat-arroz'];
 
@@ -1667,6 +1733,21 @@ nav > div{
       { id: "cat-sushi-piqueos", title: "🍤 GYOSAS, NIGIRI, SASHIMI & PIQUEOS", icon: "🍤", short: "Piqueos" },
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
+
+    const categoriesMilkTea = [
+      { id: "cat-milk-tea", title: "🧋 MILK TEA", icon: "🧋", short: "Milk Tea" },
+      { id: "cat-fruit-tea", title: "🍓 FRUIT TEA", icon: "🍓", short: "Fruit Tea" },
+      { id: "cat-mt-premium", title: "✨ PREMIUM", icon: "✨", short: "Premium" }
+    ];
+
+    // 主分类组：决定顶部显示哪些 Tab。每组的 categories 是左侧侧边栏的分类。
+    // 关键：Tab 是否显示，由「菜单里有没有该组分类的菜品」动态决定（见 renderMenuTabs），
+    // 因此 China Ideal 没有奶茶菜品 → 不显示奶茶 Tab，行为与原来完全一致。
+    const MENU_GROUPS = {
+      'china':     { label: 'Comida China', icon: '🥢', categories: () => categoriesChina },
+      'sushi':     { label: 'Sushi',        icon: '🍣', categories: () => categoriesSushi },
+      'milk-tea':  { label: 'Milk Tea',     icon: '🧋', categories: () => categoriesMilkTea }
+    };
 
     const BUILT_IN_SUSHI_DISHES = [
       { id: 9001, name: "Promoción Tempura 1 (20 piezas)", description: "Ebi Tempura, Chicken Tempura", price: 12000, category: "cat-sushi-promos", is_available: true },
@@ -1940,6 +2021,32 @@ nav > div{
     let selectedSushiWasabi = false;
     let selectedSushiJengibre = false;
     let sushiAccOrder = [];
+
+    // ===== 奶茶（Milk Tea）定制状态 =====
+    // 大小杯双价：{ label, priceDelta }。priceDelta 是相对基准价的差价，0 表示基准价（小杯）。
+    const MILK_TEA_SIZES = [
+      { label: 'Mediano', priceDelta: 0 },
+      { label: 'Grande',  priceDelta: 700 }
+    ];
+    const MILK_TEA_SUGARS = ['0%', '25%', '50%', '75%', '100%'];
+    const MILK_TEA_ICES = [
+      { label: 'Sin hielo',  value: 'Sin hielo' },
+      { label: 'Poco hielo', value: 'Poco hielo' },
+      { label: 'Normal',     value: 'Hielo normal' }
+    ];
+    // 小料（带价，可多选）。价格单位 CLP。
+    const MILK_TEA_TOPPINGS = [
+      { label: 'Tapioca',   price: 500 },
+      { label: 'Popping Boba', price: 600 },
+      { label: 'Nata / Crema', price: 500 },
+      { label: 'Pudín',     price: 600 },
+      { label: 'Coco',      price: 500 }
+    ];
+
+    let selectedMilkTeaSize = null;      // 存 size 对象
+    let selectedMilkTeaSugar = '50%';
+    let selectedMilkTeaIce = 'Hielo normal';
+    let selectedMilkTeaToppings = new Set(); // 存 topping label
 
     let selectedChinaExtras = {
       'Champiñón': false,
@@ -2433,6 +2540,79 @@ nav > div{
       if (btnTiempo) btnTiempo.className = (val === 'Al tiempo') ? BTN_ACTIVE_STYLE : BTN_INACTIVE_STYLE;
     }
 
+    // ===== 奶茶（Milk Tea）渲染与选择 =====
+    const MILK_TEA_CATEGORY_IDS = categoriesMilkTea.map(c => c.id);
+    function isMilkTeaDish(dish) {
+      return dish && MILK_TEA_CATEGORY_IDS.includes(dish.category);
+    }
+
+    function renderMilkTeaSizeGrid(basePrice) {
+      const grid = document.getElementById('milk-tea-size-grid');
+      if (!grid) return;
+      if (!selectedMilkTeaSize) selectedMilkTeaSize = MILK_TEA_SIZES[0];
+      grid.innerHTML = MILK_TEA_SIZES.map(size => {
+        const price = basePrice + size.priceDelta;
+        const active = selectedMilkTeaSize.label === size.label;
+        return '<button type="button" onclick="selectMilkTeaSize(\'' + size.label + '\')" ' +
+          'class="flex flex-col items-center justify-center py-3 rounded-xl border-2 font-bold transition ' + (active ? 'opt-btn is-on' : 'opt-btn') + '">' +
+          '<span>' + size.label + '</span>' +
+          '<span class="text-[11px] font-black theme-text-primary">$' + Number(price).toLocaleString('es-CL') + '</span>' +
+          '</button>';
+      }).join('');
+    }
+
+    function selectMilkTeaSize(label) {
+      selectedMilkTeaSize = MILK_TEA_SIZES.find(s => s.label === label) || MILK_TEA_SIZES[0];
+      if (currentSelectedDish) renderMilkTeaSizeGrid(currentSelectedDish.price);
+    }
+
+    function renderMilkTeaSugarGrid() {
+      const grid = document.getElementById('milk-tea-sugar-grid');
+      if (!grid) return;
+      grid.innerHTML = MILK_TEA_SUGARS.map(s => {
+        const active = selectedMilkTeaSugar === s;
+        return '<button type="button" onclick="selectMilkTeaSugar(\'' + s + '\')" ' +
+          'class="py-2.5 rounded-xl border-2 font-bold transition ' + (active ? 'opt-btn is-on' : 'opt-btn') + '">' + s + '</button>';
+      }).join('');
+    }
+
+    function selectMilkTeaSugar(s) {
+      selectedMilkTeaSugar = s;
+      renderMilkTeaSugarGrid();
+    }
+
+    function renderMilkTeaIceGrid() {
+      const grid = document.getElementById('milk-tea-ice-grid');
+      if (!grid) return;
+      grid.innerHTML = MILK_TEA_ICES.map(ice => {
+        const active = selectedMilkTeaIce === ice.value;
+        return '<button type="button" onclick="selectMilkTeaIce(\'' + ice.value + '\')" ' +
+          'class="py-2.5 rounded-xl border-2 font-bold transition ' + (active ? 'opt-btn is-on' : 'opt-btn') + '">' + ice.label + '</button>';
+      }).join('');
+    }
+
+    function selectMilkTeaIce(val) {
+      selectedMilkTeaIce = val;
+      renderMilkTeaIceGrid();
+    }
+
+    function renderMilkTeaToppingGrid() {
+      const grid = document.getElementById('milk-tea-topping-grid');
+      if (!grid) return;
+      grid.innerHTML = MILK_TEA_TOPPINGS.map(t => {
+        const active = selectedMilkTeaToppings.has(t.label);
+        return '<button type="button" onclick="toggleMilkTeaTopping(\'' + t.label + '\')" ' +
+          'class="flex items-center justify-center py-2.5 px-2 rounded-xl border-2 font-bold transition ' + (active ? 'opt-btn is-on' : 'opt-btn') + '">' +
+          '<span>' + t.label + ' (+$' + Number(t.price).toLocaleString('es-CL') + ')</span></button>';
+      }).join('');
+    }
+
+    function toggleMilkTeaTopping(label) {
+      if (selectedMilkTeaToppings.has(label)) selectedMilkTeaToppings.delete(label);
+      else selectedMilkTeaToppings.add(label);
+      renderMilkTeaToppingGrid();
+    }
+
     let activeFoodBannerUrl = "bg.jpg.jpg";
 
     window.addEventListener('scroll', () => {
@@ -2460,9 +2640,9 @@ nav > div{
 
     function applyStoreConfig() {
       const t = THEMES[STORE_CONFIG.theme] || THEMES.red;
-      document.documentElement.style.setProperty('--color-primary', t.primary);
-      document.documentElement.style.setProperty('--color-primary-dark', t.primaryDark);
-      document.documentElement.style.setProperty('--color-primary-light', t.primaryLight);
+      document.documentElement.style.setProperty('--color-primary', STORE_CONFIG.brandColor || t.primary);
+      document.documentElement.style.setProperty('--color-primary-dark', STORE_CONFIG.brandColor ? darkenHex(STORE_CONFIG.brandColor, 0.35) : t.primaryDark);
+      document.documentElement.style.setProperty('--color-primary-light', STORE_CONFIG.brandColor ? hexToRgba(STORE_CONFIG.brandColor, 0.10) : t.primaryLight);
       document.title = STORE_CONFIG.storeName + " - Menú Online";
       document.getElementById('store-title').innerText = STORE_CONFIG.storeName;
       document.getElementById('store-slogan').innerText = STORE_CONFIG.slogan;
@@ -2483,11 +2663,33 @@ nav > div{
 
     function switchMainMenu(mode) {
       currentMenuMode = mode;
-      const btnChina = document.getElementById('btn-tab-china');
-      const btnSushi = document.getElementById('btn-tab-sushi');
-      btnChina.classList.toggle('is-active', mode === 'china');
-      btnSushi.classList.toggle('is-active', mode === 'sushi');
+      ['china', 'sushi', 'milk-tea'].forEach(m => {
+        const btn = document.getElementById('btn-tab-' + m);
+        if (btn) btn.classList.toggle('is-active', mode === m);
+      });
       renderCurrentMenu();
+    }
+
+    // 动态决定显示哪些主 Tab：
+    // 一个 Tab 只在「该组分类下至少有一道菜」时显示。
+    // China Ideal 没有 milk-tea 分类的菜 → 奶茶 Tab 自动隐藏，行为与原来一致。
+    function renderMenuTabs() {
+      const hasDishes = (mode) => {
+        const catIds = MENU_GROUPS[mode].categories().map(c => c.id);
+        return allDishes.some(d => catIds.includes(d.category));
+      };
+      // china / sushi 始终显示（兜底，与历史行为一致）
+      // milk-tea 仅当有奶茶菜品时显示
+      const mtBtn = document.getElementById('btn-tab-milk-tea');
+      if (mtBtn) mtBtn.classList.toggle('hidden', !hasDishes('milk-tea'));
+      // 若当前模式对应的 Tab 被隐藏，则回退到 china
+      if (currentMenuMode === 'milk-tea' && !hasDishes('milk-tea')) {
+        currentMenuMode = 'china';
+        ['china', 'sushi', 'milk-tea'].forEach(m => {
+          const btn = document.getElementById('btn-tab-' + m);
+          if (btn) btn.classList.toggle('is-active', m === 'china');
+        });
+      }
     }
 
     async function loadLiveMenu() {
@@ -2520,7 +2722,10 @@ nav > div{
     }
 
     function renderCurrentMenu() {
-      const activeCats = currentMenuMode === 'china' ? categoriesChina : categoriesSushi;
+      const activeCats = MENU_GROUPS[currentMenuMode]
+        ? MENU_GROUPS[currentMenuMode].categories()
+        : categoriesChina;
+      renderMenuTabs();
       renderSidebar(activeCats);
       renderDishesList(activeCats);
     }
@@ -3045,6 +3250,7 @@ nav > div{
       const isComboMenu = (currentSelectedDish.category === 'cat-menus' || currentSelectedDish.category === 'cat-sushi-promos');
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
+      const isMilkTea = isMilkTeaDish(currentSelectedDish);
       const isColacion = currentSelectedDish.is_colacion;
 
       const boxBao = document.getElementById('box-bao-options');
@@ -3080,11 +3286,22 @@ nav > div{
         if (defaultSide) defaultSide.checked = true;
       }
 
-      document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink || isBao);
+      document.getElementById('box-china-options').classList.toggle('hidden', isSushi || isDrink || isBao || isMilkTea);
       document.getElementById('box-sushi-options').classList.toggle('hidden', !isSushi);
       document.getElementById('box-drink-options').classList.toggle('hidden', !isDrink);
+      document.getElementById('box-milk-tea-options').classList.toggle('hidden', !isMilkTea);
 
-      if (isSushi) {
+      if (isMilkTea) {
+        // 初始化奶茶选择
+        selectedMilkTeaSize = MILK_TEA_SIZES[0];
+        selectedMilkTeaSugar = '50%';
+        selectedMilkTeaIce = 'Hielo normal';
+        selectedMilkTeaToppings = new Set();
+        renderMilkTeaSizeGrid(currentSelectedDish.price);
+        renderMilkTeaSugarGrid();
+        renderMilkTeaIceGrid();
+        renderMilkTeaToppingGrid();
+      } else if (isSushi) {
         const isCalifornia = currentSelectedDish.category === 'cat-sushi-california';
         document.getElementById('sushi-california-wrap-box').classList.toggle('hidden', !isCalifornia);
         if (isCalifornia) selectCaliforniaWrap('Sésamo');
@@ -3183,8 +3400,24 @@ nav > div{
 
       const isSushi = currentSelectedDish.category.startsWith('cat-sushi-');
       const isDrink = currentSelectedDish.category === 'cat-bebidas';
+      const isMilkTea = isMilkTeaDish(currentSelectedDish);
 
-      if (isSushi) {
+      if (isMilkTea) {
+        // 奶茶：大小杯差价 + 小料
+        if (selectedMilkTeaSize) {
+          optionsList.push('Tamaño: ' + selectedMilkTeaSize.label);
+          extraPrice += selectedMilkTeaSize.priceDelta;
+        }
+        if (selectedMilkTeaSugar) optionsList.push('Azúcar: ' + selectedMilkTeaSugar);
+        if (selectedMilkTeaIce) optionsList.push('Hielo: ' + selectedMilkTeaIce);
+        selectedMilkTeaToppings.forEach(tLabel => {
+          const t = MILK_TEA_TOPPINGS.find(x => x.label === tLabel);
+          if (t) {
+            extraPrice += t.price;
+            optionsList.push('Extra ' + t.label + ' (+$' + Number(t.price).toLocaleString('es-CL') + ')');
+          }
+        });
+      } else if (isSushi) {
         if (currentSelectedDish.category === 'cat-sushi-california') {
           optionsList.push('Envuelto en: ' + selectedCaliforniaWrap);
         }
