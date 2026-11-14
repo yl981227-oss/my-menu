@@ -1808,6 +1808,7 @@ nav > div{
       { id: "cat-sushi-handrolls", title: "🌯 HAND ROLLS & TEMAKI", icon: "🌯", short: "Hand Rolls" },
       { id: "cat-sushi-hosomaki", title: "🍙 HOSOMAKI (8 pzs)", icon: "🍙", short: "Hosomaki" },
       { id: "cat-sushi-piqueos", title: "🍤 GYOSAS, NIGIRI, SASHIMI & PIQUEOS", icon: "🍤", short: "Piqueos" },
+      { id: "cat-sushi-gohan-burger", title: "🍚 GOHAN & SUSHI BURGER", icon: "🍚", short: "Gohan & Burger" },
       { id: "cat-bebidas", title: "🥤 BEBIDAS Y JUGOS", icon: "🥤", short: "Bebidas" }
     ];
 
@@ -1937,7 +1938,19 @@ nav > div{
       { id: 9098, name: "Camarón Tempura (10 unidades)", description: "Piqueo de camarones fritos en tempura", price: 9300, category: "cat-sushi-piqueos", is_available: true },
       { id: 9099, name: "Salmón en Panko (10 unidades)", description: "Piqueo de salmón apanado en panko", price: 9900, category: "cat-sushi-piqueos", is_available: true },
       { id: 9100, name: "Pollo en Panko (10 unidades)", description: "Piqueo de pollo apanado en panko", price: 9300, category: "cat-sushi-piqueos", is_available: true },
-      { id: 9101, name: "Calamar Apanado (12 unidades)", description: "Piqueo de aros de calamar apanados", price: 8800, category: "cat-sushi-piqueos", is_available: true }
+      { id: 9101, name: "Calamar Apanado (12 unidades)", description: "Piqueo de aros de calamar apanados", price: 8800, category: "cat-sushi-piqueos", is_available: true },
+
+      // ===== GOHAN & SUSHI BURGER（2026-11-14 按店内菜单照片补录）=====
+      // GOHAN: con base de arroz o con base de lechuga si prefiere
+      { id: 9201, name: "Gohan Pollo", description: "Base de arroz o lechuga si prefieres · Pollo, queso crema, sésamo, cebollín, palta", price: 7500, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9202, name: "Gohan Camarón & Salmón", description: "Base de arroz o lechuga si prefieres · Camarón, salmón, queso crema, palta", price: 8200, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9203, name: "Arma tu Gohan (4 ingredientes a elección)", description: "Base de arroz o lechuga si prefieres · Arma tu Gohan con 4 ingredientes a elección · Precio desde", price: 7800, category: "cat-sushi-gohan-burger", is_available: true },
+      // SUSHI BURGER: hecha con arroz en forma de hamburguesa
+      { id: 9204, name: "Sushi Burger Pollo", description: "Arroz en forma de hamburguesa · Pollo, palta, queso crema, cebollín", price: 7500, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9205, name: "Sushi Burger Carne", description: "Arroz en forma de hamburguesa · Carne, palta, queso crema, cebollín", price: 8200, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9206, name: "Sushi Burger Camarón", description: "Arroz en forma de hamburguesa · Camarón, palta, queso crema, cebollín", price: 8500, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9207, name: "Sushi Burger Salmón", description: "Arroz en forma de hamburguesa · Salmón, palta, queso crema, cebollín", price: 9200, category: "cat-sushi-gohan-burger", is_available: true },
+      { id: 9208, name: "Sushi Burger Vegetariano", description: "Arroz en forma de hamburguesa · Champiñón, palta, queso crema, cebollín", price: 7500, category: "cat-sushi-gohan-burger", is_available: true }
     ];
 
     const SUSHI_COMBO_ITEMS_MAP = {
@@ -2841,7 +2854,11 @@ nav > div{
         setupScrollSpy();
         return;
       }
-      const rawDbDishes = liveDishes.filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
+      // 无 ?shop 参数 = 默认店铺 China Ideal（shop_id=1）。必须按 shop_id 过滤，
+      // 否则其他店（如 YA XING）的菜会串进默认菜单，出现同名不同价的重复菜品。
+      const rawDbDishes = liveDishes
+        .filter(d => d.shop_id == null || Number(d.shop_id) === DEFAULT_SHOP_ID)
+        .filter(d => !REMOVED_DISH_NAMES.has((d.name || '').toLowerCase().trim()));
       // is_hidden 从菜单完全隐藏，但保留数据库记录和历史订单；is_available=false 仍显示为售罄。
       const existingNames = new Set(rawDbDishes.map(d => (d.name || '').toLowerCase().trim()));
       const dbDishes = rawDbDishes.filter(d => d.is_hidden !== true);
@@ -2869,8 +2886,10 @@ nav > div{
 
     function renderSidebar(cats) {
       const sidebar = document.getElementById('sidebar-categories');
+      // 只显示真正有菜品的分类，避免新增栏目在别的店变成点不动的空按钮。
+      const visibleCats = cats.filter(cat => allDishes.some(d => d.category === cat.id));
       let html = '';
-      cats.forEach((cat, idx) => {
+      visibleCats.forEach((cat, idx) => {
         html += '<button id="side-btn-' + cat.id + '" onclick="scrollToSection(\'' + cat.id + '\')" class="' + (idx === 0 ? 'side-active' : '') + '">';
         html += '  <span>' + cat.icon + '</span>';
         html += '  <span>' + cat.short + '</span>';
