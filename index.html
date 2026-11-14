@@ -1067,7 +1067,7 @@ nav > div{
         <div id="landing-promos-list" class="space-y-2.5"></div>
       </div>
 
-      <div class="land-card">
+      <div id="landing-specials-card" class="land-card">
         <div class="land-card-head">
           <span class="ico">📸</span>
           <h2>Nuestras Especialidades</h2>
@@ -1088,7 +1088,7 @@ nav > div{
         <div class="land-card-head">
           <span class="ico">📍</span>
           <h2>Ubicación del Local</h2>
-          <span class="ml-auto text-[9px] font-black px-2 py-0.5 rounded-full" style="color:#0F7A4A;background:#EDF8F1;border:1px solid #CDEBDA;">Huechuraba</span>
+          <span id="landing-address-tag" class="ml-auto text-[9px] font-black px-2 py-0.5 rounded-full" style="color:#0F7A4A;background:#EDF8F1;border:1px solid #CDEBDA;">Huechuraba</span>
         </div>
 
         <p id="landing-address-text">Camino de la Viña 1461, Huechuraba, Santiago, Chile</p>
@@ -1106,14 +1106,14 @@ nav > div{
         </a>
       </div>
 
-      <p class="text-center text-[9px] pt-3 pb-1" style="color:var(--muted);letter-spacing:.2em;">CHINA IDEAL · SANTIAGO DE CHILE</p>
+      <p id="landing-footer" class="text-center text-[9px] pt-3 pb-1" style="color:var(--muted);letter-spacing:.2em;">CHINA IDEAL · SANTIAGO DE CHILE</p>
     </div>
   </div>
 
   <div class="fixed bottom-3 left-3 right-3 z-50 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
     <div class="land-bottom">
       <div class="pl-1">
-        <div class="k">Camino de la Viña 1461</div>
+        <div id="landing-bottom-address" class="k">Camino de la Viña 1461</div>
         <div class="v">Pide directo, sin comisiones</div>
       </div>
       <button onclick="enterMenuPage()" id="btn-landing-bottom-order" class="cart-cta">
@@ -1646,12 +1646,23 @@ nav > div{
     })();
 
     // 店铺加载完成后，用shops里的品牌信息覆盖页面的店名/副标题/联系方式/品牌色/地址/Logo。
+    // 同时清空/禁用 China Ideal 专属的硬编码信息（配送红区、专属地址引用、专属地图链接、
+    // 促销活动、宣传图、评价数），避免切到别的店铺时串店。
     shopReady.then(() => {
       if (!SHOP) return;
-      if (SHOP.name) { STORE_CONFIG.storeName = SHOP.name; document.title = SHOP.name; }
+      const isChinaIdeal = SHOP.slug === 'china-ideal';
+      if (SHOP.name) STORE_CONFIG.storeName = SHOP.name;
       if (SHOP.tagline) STORE_CONFIG.slogan = SHOP.tagline;
       if (SHOP.phone) STORE_CONFIG.whatsapp = String(SHOP.phone).replace(/[^0-9]/g, '');
-      if (SHOP.address) STORE_CONFIG.address = SHOP.address;
+      if (SHOP.address) {
+        STORE_CONFIG.address = SHOP.address;
+        // 非 China Ideal 店铺：用地址动态生成地图链接，清掉 China Ideal 专属的地址引用
+        if (!isChinaIdeal) {
+          const encoded = encodeURIComponent(SHOP.address);
+          STORE_CONFIG.googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+          STORE_CONFIG.addressReference = '';
+        }
+      }
       if (SHOP.logo_url) STORE_CONFIG.logoImage = SHOP.logo_url;
       // 品牌色：动态覆盖主题主色（brand_color 为空时回退到主题预设，保持默认行为）
       if (SHOP.brand_color) {
@@ -1660,6 +1671,18 @@ nav > div{
         document.documentElement.style.setProperty('--color-primary-dark', darkenHex(SHOP.brand_color, 0.35));
         document.documentElement.style.setProperty('--color-primary-light', hexToRgba(SHOP.brand_color, 0.10));
       }
+      // 非 China Ideal 店铺：关闭其专属的配送红区、促销、宣传图，订单号前缀按 slug 生成
+      if (!isChinaIdeal) {
+        STORE_CONFIG.deliveryZone = { ...STORE_CONFIG.deliveryZone, enabled: false };
+        STORE_CONFIG.showPromotions = false;
+        STORE_CONFIG.promoBanner = '';
+        STORE_CONFIG.promotions = [];
+        STORE_CONFIG.promoDishes = [];
+        STORE_CONFIG.orderCodePrefix = String(SHOP.slug || 'SHOP').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || 'SHOP';
+        STORE_CONFIG.ratingText = '';
+        STORE_CONFIG.prepTimeText = '';
+      }
+      document.title = STORE_CONFIG.storeName;
       ['landing-title', 'store-title'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerText = STORE_CONFIG.storeName;
@@ -1668,6 +1691,26 @@ nav > div{
         const el = document.getElementById(id);
         if (el && SHOP.tagline) el.innerText = SHOP.tagline;
       });
+      // 落地页专属：地址标签、页脚、底部地址栏、评价/时长/配送三个徽章
+      if (!isChinaIdeal) {
+        const tagEl = document.getElementById('landing-address-tag');
+        if (tagEl) tagEl.style.display = 'none';
+        const footerEl = document.getElementById('landing-footer');
+        if (footerEl) footerEl.innerText = (SHOP.name || '') + ' · CHILE';
+        const bottomAddrEl = document.getElementById('landing-bottom-address');
+        if (bottomAddrEl && SHOP.address) {
+          bottomAddrEl.innerText = SHOP.address.split(',')[0].trim();
+        }
+        // 评价/时长/配送徽章：无数据时整行隐藏
+        const badgeRow = document.getElementById('landing-rating') && document.getElementById('landing-rating').parentElement;
+        if (badgeRow) badgeRow.style.display = 'none';
+        // 营业时间：China Ideal 专属时间，非本店时隐藏该卡片（拿到本店时间后再补）
+        const hoursCard = document.getElementById('landing-hours-list') && document.getElementById('landing-hours-list').closest('.land-card');
+        if (hoursCard) hoursCard.style.display = 'none';
+        // 宣传图卡片：非本店时隐藏
+        const specialsCard = document.getElementById('landing-specials-card');
+        if (specialsCard) specialsCard.style.display = 'none';
+      }
     });
 
     // 十六进制颜色 → rgba（用于主题色浅色变体）
@@ -3051,7 +3094,9 @@ nav > div{
         const allMatchable = [...poolAperitivos, ...poolPlatos, ...poolArroz];
 
         const desc = currentDish.description || '';
-        const rawParts = desc.split(/[,+\n]/).map(s => s.trim()).filter(Boolean);
+        // 兼容两种分隔符：China Ideal 用逗号/加号/换行，YA XING 等新店铺用斜杠 " / "。
+        // "X o Y" 表示二选一（如 "Chapsui Carne o Pollo"），取第一个即可代表该槽位。
+        const rawParts = desc.split(/[,+\n/]/).map(s => s.trim()).filter(Boolean);
 
         rawParts.forEach(raw => {
           const qtyMatch = raw.match(/^(\d+)\s*(?:unidades|u|uds|x)?\s+(.+)$/i);
@@ -3061,6 +3106,9 @@ nav > div{
             count = parseInt(qtyMatch[1], 10) || 1;
             cleanName = qtyMatch[2].trim();
           }
+          // "Chapsui Carne o Pollo" → 取 " o " 之前的第一个选项（换菜槽位只需一个代表）
+          const orIdx = cleanName.search(/\s+o\s+/i);
+          if (orIdx > 0) cleanName = cleanName.slice(0, orIdx).trim();
           const baseCleanName = cleanName.replace(/\([^)]*\)/g, '').trim();
           const matched = matchSingleDishFromPool(baseCleanName, allMatchable);
           const slotType = classifyChineseComboItem(baseCleanName, matched);
@@ -4112,11 +4160,14 @@ nav > div{
       if (m) m.classList.add('hidden');
     }
 
-    applyStoreConfig();
-    applyClosedMode();
-    initLandingPage();
-    autoDetectAndSetBanner();
-    loadLiveMenu();
+    // 先等店铺数据就绪，再渲染页面，确保 ?shop=xxx 时店名/地址/logo/营业时间正确。
+    shopReady.then(() => {
+      applyStoreConfig();
+      applyClosedMode();
+      initLandingPage();
+      autoDetectAndSetBanner();
+      loadLiveMenu();
+    });
   </script>
 
   <div id="my-orders-modal" class="hidden" style="position:fixed;inset:0;z-index:200;background:#0f172a;overflow-y:auto">
